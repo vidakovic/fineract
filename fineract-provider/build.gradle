@@ -113,10 +113,6 @@ war {
     war.finalizedBy(bootWar)
 }
 
-/* http://stackoverflow.com/questions/19653311/jpa-repository-works-in-idea-and-production-but-not-in-gradle */
-sourceSets.main.output.resourcesDir = sourceSets.main.java.outputDir
-sourceSets.test.output.resourcesDir = sourceSets.test.java.outputDir
-
 /* Exclude maria db related files for non dev builds */
 if (!(project.hasProperty('env') && project.getProperty('env') == 'dev')) {
     sourceSets {
