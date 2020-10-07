@@ -1,0 +1,85 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+apply plugin: 'java'
+apply plugin: 'java-library'
+apply plugin: 'org.openapi.generator'
+
+apply from: 'dependencies.gradle'
+
+// compileJava.dependsOn project(':fineract-provider')
+
+openApiMeta {
+    generatorName = 'Fineract'
+    packageName = 'org.apache.fineract.client'
+    outputFolder = "$buildDir/meta".toString()
+}
+
+openApiValidate {
+    inputSpec = "$rootDir/fineract-provider/build/classes/java/main/static/swagger-ui/fineract.yaml".toString()
+    recommend = true
+}
+
+task buildJavaSdk(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask){
+    generatorName = 'java'
+    verbose = false
+    skipValidateSpec = false
+    inputSpec = "$rootDir/fineract-provider/build/classes/java/main/static/swagger-ui/fineract.yaml".toString()
+    outputDir = "$buildDir/generated/java".toString()
+    groupId = 'org.apache.fineract'
+    apiPackage = 'org.apache.fineract.client.services'
+    invokerPackage = 'org.apache.fineract.client'
+    modelPackage = 'org.apache.fineract.client.models'
+    configOptions = [
+        dateLibrary: 'java8',
+        useRxJava2: 'true',
+        library: 'retrofit2',
+        hideGenerationTimestamp: 'true',
+    ]
+    generateModelTests = false
+    generateApiTests = false
+    templateDir = "$rootDir/fineract-client/config/swagger/templates/".toString()
+}
+
+task buildGoSdk(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask){
+    generatorName = "go"
+    verbose = false
+    skipValidateSpec = true
+    inputSpec = "$rootDir/fineract-provider/build/classes/java/main/static/swagger-ui/fineract.yaml".toString()
+    outputDir = "$buildDir/generated/go".toString()
+    apiPackage = "fineract"
+    configOptions = [
+        dateLibrary: "threetenp"
+    ]
+    generateModelTests = false
+    generateApiTests = false
+}
+
+/*
+ task buildZip(type: Zip) {
+ into("rspndr-api-go-sdk") {
+ from "$buildDir/generated/go"
+ }
+ }
+ compileJava.dependsOn tasks.buildJavaSdk, tasks.buildGoSdk, buildZip
+ */
+
+// buildJavaSdk.finalizedBy licenseFormat
+compileJava.dependsOn buildJavaSdk, buildGoSdk, licenseFormat, spotlessJavaApply
+
+sourceSets.main.java.srcDir new File(buildDir, "generated/java/src/main/java")
