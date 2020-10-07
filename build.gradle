@@ -72,7 +72,7 @@ gradle clean bootRun'''
 
 ext['groovy.version'] = '3.0.6'
 
-// apply from: 'gradle/sql.gradle'
+apply from: 'gradle/sql.gradle'
 
 allprojects  {
     apply plugin: 'io.spring.dependency-management'
