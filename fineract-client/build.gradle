@@ -24,6 +24,8 @@ ext['swaggerFile'] = "$projectDir/config/swagger/fineract.yaml".toString()
 
 apply from: 'dependencies.gradle'
 
+// apply from: "$rootDir/gradle/publish.gradle"
+
 openApiMeta {
     generatorName = 'Fineract'
     packageName = 'org.apache.fineract.client'

@@ -16,4 +16,4 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-apply plugin: 'java-library'
+// apply from: "$rootDir/gradle/publish.gradle"
