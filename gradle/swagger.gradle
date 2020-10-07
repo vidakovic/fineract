@@ -18,13 +18,13 @@
  */
 apply plugin: 'io.swagger.core.v3.swagger-gradle-plugin'
 
-task prepareInputYaml(dependsOn: 'generateGitProperties') {
+task prepareInputYaml() {
     doLast {
         copy {
             from file("$projectDir/config/swagger/fineract-input.yaml.template")
             into file("$buildDir/config/swagger")
             rename { filename -> return 'fineract-input.yaml' }
-            filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [VERSION: project.ext.gitProps['git.commit.id.describe']])
+            filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: [VERSION: "$version".toString()])
         }
     }
 }
