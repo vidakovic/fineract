@@ -1,0 +1,103 @@
+apply plugin: 'org.asciidoctor.jvm.convert'
+apply plugin: 'org.asciidoctor.jvm.pdf'
+// apply plugin: 'org.asciidoctor.jvm.epub'
+// apply plugin: 'org.asciidoctor.kindlegen.base'
+apply plugin: 'io.github.lhotari.swagger2markup'
+
+if(file('src/resources/openapi.yml').exists()) {
+    convertSwagger2markup {
+        swaggerInput file('src/resources/openapi.yml').getAbsolutePath()
+        outputDir file("$buildDir/generated/asciidoc")
+        config = [
+            'swagger2markup.markupLanguage': 'ASCIIDOC',
+            'swagger2markup.pathsGroupedBy' : 'TAGS'
+        ]
+    }
+
+    build.dependsOn convertSwagger2markup
+}
+
+asciidoctorj {
+    version = '2.4.0'
+
+    attributes = [
+        revnumber: {
+            project.version.toString()
+        },
+        generated: "${buildDir}/generated/asciidoc",
+        imagesdir: 'images',
+        diagrams: 'diagrams',
+        years: '2017-2020',
+        baseurl: 'fineract.apache.org'
+    ]
+
+    modules {
+        pdf.version '1.5.3'
+        diagram.version '2.0.2'
+        epub.version '1.5.0-alpha.18'
+        revealjs.version '4.0.1'
+    }
+}
+
+asciidoctor {
+    languages 'en'
+
+    baseDir 'src/docs'
+    sourceDir 'src/docs'
+    sources {
+        include('index.adoc')
+    }
+    outputDir 'build/docs/html'
+}
+
+// asciidoctorEpub {
+//     languages 'en'
+//
+//     baseDir 'src/docs'
+//     sourceDir 'src/docs'
+//     sources {
+//         include('index.adoc')
+//     }
+//     outputDir 'build/docs/epub'
+//     ebookFormats 'epub3'
+// }
+
+asciidoctorPdf {
+    languages 'en'
+
+    baseDir 'src/docs'
+    sourceDir 'src/docs'
+    sources {
+        include('index.adoc')
+    }
+    outputDir 'build/docs/pdf'
+
+    // TODO: @vidakovic prepare a nicer theme
+    // theme 'fineract-default'
+    // pdfThemes {
+    //     local 'fineract-default', {
+    //         themeDir = "$projectDir/src/resources/themes"
+    //     }
+    // }
+    // fontsDir "$projectDir/src/resources/fonts"
+}
+
+task doc(type: Zip) {
+    dependsOn asciidoctor, asciidoctorPdf
+
+    into("$project.name-$project.version") {
+        from("$buildDir/docs/html") {
+            include "**/*"
+        }
+    }
+    from ("$buildDir/docs/pdf") {
+        include "index.pdf"
+        rename {
+            "$project.name-$project.version\\.pdf"
+        }
+    }
+    archiveName "$project.name-$project.version\\.zip"
+}
+
+// this doesn't really work as intended
+defaultTasks 'doc'

@@ -1,0 +1,8 @@
+:doctitle: Fineract Documentation
+
+include::config.adoc[]
+
+= Fineract Documentation
+
+IMPORTANT: @vidakovic migrate old documentation!
+
