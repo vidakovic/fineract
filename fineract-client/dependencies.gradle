@@ -17,26 +17,29 @@
  * under the License.
  */
 dependencies {
-    implementation 'io.swagger:swagger-core'
-    implementation 'io.swagger:swagger-annotations'
-    implementation 'com.squareup.retrofit2:retrofit'
-    implementation 'com.squareup.retrofit2:adapter-java8'
-    implementation 'com.squareup.retrofit2:adapter-rxjava2'
-    implementation 'com.squareup.retrofit2:converter-jackson'
-    implementation 'com.squareup.retrofit2:converter-scalars'
-    implementation 'com.squareup.retrofit2:converter-gson'
-    implementation 'com.squareup.okhttp3:okhttp'
-    implementation 'com.squareup.okhttp3:okcurl'
-    implementation 'com.squareup.okhttp3:logging-interceptor'
-    implementation ('org.apache.oltu.oauth2:org.apache.oltu.oauth2.client') {
+    // project(':fineract-provider')
+    implementation(
+            'io.swagger:swagger-core',
+            'io.swagger:swagger-annotations',
+            'com.squareup.retrofit2:retrofit',
+            'com.squareup.retrofit2:adapter-java8',
+            'com.squareup.retrofit2:adapter-rxjava2',
+            'com.squareup.retrofit2:converter-jackson',
+            'com.squareup.retrofit2:converter-scalars',
+            'com.squareup.retrofit2:converter-gson',
+            'com.squareup.okhttp3:okhttp',
+            'com.squareup.okhttp3:okcurl',
+            'com.squareup.okhttp3:logging-interceptor',
+            'com.google.code.findbugs:jsr305',
+            'com.google.code.gson:gson',
+            'io.gsonfire:gson-fire',
+            'org.threeten:threetenbp',
+            'org.springframework:spring-core',
+            'org.springframework:spring-context',
+            'javax.annotation:javax.annotation-api',
+            'commons-codec:commons-codec',
+            )
+    implementation('org.apache.oltu.oauth2:org.apache.oltu.oauth2.client') {
         exclude group: 'org.apache.oltu.oauth2' , module: 'org.apache.oltu.oauth2.common'
     }
-    implementation 'com.google.code.findbugs:jsr305'
-    implementation 'com.google.code.gson:gson'
-    implementation 'io.gsonfire:gson-fire'
-    implementation 'org.threeten:threetenbp'
-    implementation 'org.springframework:spring-core'
-    implementation 'org.springframework:spring-context'
-    implementation 'javax.annotation:javax.annotation-api'
-    implementation 'commons-codec:commons-codec'
 }

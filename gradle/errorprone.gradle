@@ -27,6 +27,7 @@ dependencies {
 tasks.withType(JavaCompile) {
     options.errorprone {
         disableWarningsInGeneratedCode = true
+        excludedPaths = ".*/build/.*"
         //Todo Remove necessary checks from this list
         disable(
                 "UnusedVariable",

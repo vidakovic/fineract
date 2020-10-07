@@ -24,7 +24,6 @@ dependencies {
     // We also (normally should have) no need to ever use 'compileOnly'.
 
     // implementation dependencies are directly used (compiled against) in src/main (and src/test)
-    //
     implementation(
             //'ch.vorburger.mariaDB4j:mariaDB4j:2.4.0',
 

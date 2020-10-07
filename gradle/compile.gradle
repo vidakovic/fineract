@@ -31,6 +31,9 @@ sourceSets {
 }
 
 configurations {
+    implementation.setCanBeResolved(true)
+    api.setCanBeResolved(true)
+
     integrationTestCompile.extendsFrom testImplementation
     integrationTestRuntime.extendsFrom testRuntime
 }

@@ -24,6 +24,7 @@ rat {
     verbose = false
     reportDir = new File(buildDir, 'reports/rat')
     excludes = [
+        '**/src/main/templates/**/*.mustache',
         '**/*.launch',
         '**/licenses/**',
         '**/*.md',

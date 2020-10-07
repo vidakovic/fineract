@@ -16,13 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-apply plugin: 'java'
-apply plugin: 'java-library'
 apply plugin: 'org.openapi.generator'
 
-apply from: 'dependencies.gradle'
+// TODO: @vidakovic unfortunately I can't make Gradle build the modules in the correct order (first fineract-provider, then fineract-client); this works for now
+// ext['swaggerFile'] = "$rootDir/fineract-provider/build/classes/java/main/static/swagger-ui/fineract.yaml".toString()
+ext['swaggerFile'] = "$projectDir/config/swagger/fineract.yaml".toString()
 
-// compileJava.dependsOn project(':fineract-provider')
+apply from: 'dependencies.gradle'
 
 openApiMeta {
     generatorName = 'Fineract'
@@ -31,15 +31,18 @@ openApiMeta {
 }
 
 openApiValidate {
-    inputSpec = "$rootDir/fineract-provider/build/classes/java/main/static/swagger-ui/fineract.yaml".toString()
+    // onlyIf file("$swaggerFile").exists()
+    inputSpec = "$swaggerFile"
     recommend = true
 }
 
 task buildJavaSdk(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask){
+    // onlyIf file("$swaggerFile").exists()
     generatorName = 'java'
     verbose = false
-    skipValidateSpec = false
-    inputSpec = "$rootDir/fineract-provider/build/classes/java/main/static/swagger-ui/fineract.yaml".toString()
+    validateSpec = false
+    skipValidateSpec = true
+    inputSpec = "$swaggerFile"
     outputDir = "$buildDir/generated/java".toString()
     groupId = 'org.apache.fineract'
     apiPackage = 'org.apache.fineract.client.services'
@@ -53,33 +56,47 @@ task buildJavaSdk(type: org.openapitools.generator.gradle.plugin.tasks.GenerateT
     ]
     generateModelTests = false
     generateApiTests = false
-    templateDir = "$rootDir/fineract-client/config/swagger/templates/".toString()
+    templateDir = "$projectDir/src/main/templates/java/retrofit2".toString()
 }
 
 task buildGoSdk(type: org.openapitools.generator.gradle.plugin.tasks.GenerateTask){
+    // onlyIf file("$swaggerFile").exists()
     generatorName = "go"
     verbose = false
+    validateSpec = false
     skipValidateSpec = true
-    inputSpec = "$rootDir/fineract-provider/build/classes/java/main/static/swagger-ui/fineract.yaml".toString()
+    inputSpec = "$swaggerFile"
     outputDir = "$buildDir/generated/go".toString()
     apiPackage = "fineract"
     configOptions = [
-        dateLibrary: "threetenp"
+        dateLibrary: 'threetenp'
     ]
     generateModelTests = false
     generateApiTests = false
 }
 
-/*
- task buildZip(type: Zip) {
- into("rspndr-api-go-sdk") {
- from "$buildDir/generated/go"
- }
- }
- compileJava.dependsOn tasks.buildJavaSdk, tasks.buildGoSdk, buildZip
- */
+task buildZip(type: Zip) {
+    into('fineract-client-go') {
+        from "$buildDir/generated/go"
+    }
+}
 
-// buildJavaSdk.finalizedBy licenseFormat
-compileJava.dependsOn buildJavaSdk, buildGoSdk, licenseFormat, spotlessJavaApply
+compileJava.dependsOn buildJavaSdk, buildGoSdk, spotlessJavaApply, buildZip
+buildJavaSdk.finalizedBy licenseFormat
 
-sourceSets.main.java.srcDir new File(buildDir, "generated/java/src/main/java")
+sourceSets {
+    generated {
+        java {
+            srcDir "$buildDir/generated/java/src/main/java"
+        }
+    }
+}
+
+compileJava {
+    source += sourceSets.generated.java
+}
+
+configurations {
+    generatedCompile.extendsFrom implementation
+    generatedRuntime.extendsFrom runtime
+}

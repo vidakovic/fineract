@@ -18,9 +18,6 @@
  */
 apply plugin: 'com.github.andygoossens.gradle-modernizer-plugin'
 
-dependencies {
-}
-
 // Configuration for the modernizer plugin
 // https://github.com/andygoossens/gradle-modernizer-plugin
 modernizer {

@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-apply plugin: 'java-library'
 apply plugin: 'war'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'openjpa'
@@ -181,6 +180,13 @@ tasks.withType(Tar) {
     compression Compression.GZIP
     extension 'tar.gz'
 }
+
+task copySwagger(type: Copy) {
+    from file("$buildDir/classes/java/main/static/swagger-ui/fineract.yaml")
+    into file("$rootDir/fineract-client/config/swagger/")
+}
+
+resolve.finalizedBy copySwagger
 
 distributions {
     binary {
