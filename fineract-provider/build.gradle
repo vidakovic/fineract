@@ -194,7 +194,7 @@ distributions {
         contents {
             from bootJar
             from bootWar
-            // TODO: fix this
+            // TODO: @vidakovic include fineract-client in distribution
             // from("$rootDir/build/swagger-code-fineract/build/libs/") {
             //     include '**/*.jar'
             //     rename 'client-(.+)\\.jar', 'fineract-client.jar'
