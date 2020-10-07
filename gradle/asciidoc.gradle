@@ -14,7 +14,7 @@ if(file('src/resources/openapi.yml').exists()) {
         ]
     }
 
-    build.dependsOn convertSwagger2markup
+    asciidoctor.dependsOn convertSwagger2markup
 }
 
 asciidoctorj {
