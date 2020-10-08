@@ -77,16 +77,14 @@ publishing {
             }
         }
     }
-    /*
-    repositories {
-        maven {
-            name = 'GitHubPackages'
-            url = uri('https://maven.pkg.github.com/rspndr/rspndr')
-            credentials {
-                username = project.findProperty('gh.user') ?: System.getenv('GH_USERNAME')
-                password = project.findProperty('gh.key') ?: System.getenv('GH_PASSWORD')
-            }
-        }
-    }
-    */
+    // repositories {
+    //     maven {
+    //         name = 'GitHubPackages'
+    //         url = uri('https://maven.pkg.github.com/rspndr/rspndr')
+    //         credentials {
+    //             username = project.findProperty('gh.user') ?: System.getenv('GH_USERNAME')
+    //             password = project.findProperty('gh.key') ?: System.getenv('GH_PASSWORD')
+    //         }
+    //     }
+    // }
 }

@@ -16,10 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-apply plugin: "com.gorylenko.gradle-git-properties"
+apply plugin: 'com.gorylenko.gradle-git-properties'
 
-def branch = ""
-def proc = "git rev-parse --abbrev-ref HEAD".execute()
+// this sets the variable "branch" with the current branch; sometimes useful e. g. if you want to have different version schemes depending on the branch (develop=x.y.z-SNAPSHOT, master=x.y.z)
+def branch = ''
+def proc = 'git rev-parse --abbrev-ref HEAD'.execute()
 proc.in.eachLine { line -> branch = line }
 proc.err.eachLine { line -> println line }
 proc.waitFor()
