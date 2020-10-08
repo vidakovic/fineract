@@ -19,3 +19,5 @@ bin/
 out/
 fineract-provider/src/main/resources/application.properties
 .lock
+**/src/**/*.pdf
+.asciidoctor/

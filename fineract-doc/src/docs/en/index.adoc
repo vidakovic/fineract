@@ -6,3 +6,20 @@ include::config.adoc[]
 
 IMPORTANT: @vidakovic migrate old documentation!
 
+.Amazon
+[plantuml,amazon,svg]
+----
+include::diagrams/amazon.puml[]
+----
+
+.C4 Diagram
+[plantuml,c4,svg]
+----
+include::diagrams/c4.puml[]
+----
+
+.Mindmap
+[plantuml,mindmap,svg]
+----
+include::diagrams/mindmap.puml[]
+----
