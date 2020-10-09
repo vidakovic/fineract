@@ -79,19 +79,13 @@ allprojects  {
     apply plugin: 'rebel'
     apply plugin: 'idea'
     apply plugin: 'project-report'
-    apply plugin: 'fr.brouillard.oss.gradle.jgitver'
 
     group = 'org.apache.fineract'
     version = '0.0.0'
 
     apply from: "$rootDir/gradle/repositories.gradle"
 
-    jgitver {
-        strategy 'PATTERN'
-        // TODO: @vidakovic see if we need to do anything here (when publishing Docker images to AWS ECR we can't overwrite and therefor need to add Git hashes to make the version in develop unique)
-        // versionPattern "master".equals(System.getProperty("branch")) ? '${v}' : '${M}.${m}.${p}-${meta.GIT_SHA1_8}'
-        versionPattern '${M}.${m}.${p}'
-    }
+    apply from: "$rootDir/gradle/gitversion.gradle"
 
     dependencyManagement {
         imports {

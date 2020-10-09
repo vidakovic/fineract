@@ -27,6 +27,7 @@ rat {
         '**/src/main/templates/**/*.mustache',
         '**/*.adoc',
         '**/.asciidoctorconfig',
+        '**/*.puml',
         '**/*.launch',
         '**/licenses/**',
         '**/*.md',

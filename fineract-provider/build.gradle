@@ -186,7 +186,7 @@ resolve.finalizedBy copySwagger
 
 distributions {
     binary {
-        baseName "apache-fineract-binary"
+        baseName 'apache-fineract-binary'
         contents {
             from bootJar
             from bootWar
@@ -196,7 +196,7 @@ distributions {
             //     rename 'client-(.+)\\.jar', 'fineract-client.jar'
             // }
             from("$rootDir/licenses/binary/") {
-                into "licenses/binary/"
+                into 'licenses/binary/'
             }
             from "$rootDir/LICENSE_RELEASE"
             from "$rootDir/NOTICE_RELEASE"
@@ -208,13 +208,17 @@ distributions {
         }
     }
     src {
-        baseName "apache-fineract-src"
+        baseName 'apache-fineract-src'
         contents {
-            from("../") {
-                exclude '**/build' , '**/gradle/wrapper' , '**/.git', '**/.gradle', '**/.github', '**/.settings', '**/.project', '**/.classpath', '**/.idea', '**/out', '**/._.DS_Store', '**/.DS_Store', '**/WebContent', '**/.externalToolBuilders', '**/.theia', '**/.gitpod.yml', '**/.travis.yml', '**/LICENSE_RELEASE', '**/NOTICE_RELEASE', '**/licenses/binary'
+            from('../') {
+                exclude '**/build' , '**/.git', '**/.gradle', '**/.github', '**/.settings', '**/.project', '**/.classpath', '**/.idea', '**/out', '**/bin', '**/._.DS_Store', '**/.DS_Store', '**/WebContent', '**/.externalToolBuilders', '**/.theia', '**/.gitpod.yml', '**/.travis.yml', '**/LICENSE_RELEASE', '**/NOTICE_RELEASE', '**/licenses/binary'
                 rename ('LICENSE_SOURCE', 'LICENSE')
                 rename ('NOTICE_SOURCE', 'NOTICE')
             }
+            from('build/classes/java/main/git.properties') {
+                into 'fineract-provider/src/main/resources'
+            }
+            filter { line -> line.replaceAll('version = \'0\\.0\\.0\'', "version = '$version'".toString()) }
         }
     }
 }
