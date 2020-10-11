@@ -172,6 +172,9 @@ bootWar {
 
 bootJar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes 'Main-Class': 'org.springframework.boot.loader.PropertiesLauncher'
+    }
 }
 
 tasks.withType(Tar) {
