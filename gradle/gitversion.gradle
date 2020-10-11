@@ -23,6 +23,7 @@ try {
     def sout = new StringBuffer()
     def serr = new StringBuffer()
     proc.waitForProcessOutput(sout, serr)
+    branch = sout.toString()
     logger.info(sout.toString())
 } catch(all) {
     // ignore

@@ -31,6 +31,8 @@ apply from: 'dependencies.gradle'
  }
  */
 
+apply from: "$rootDir/gradle/docker.gradle"
+
 apply from: "$rootDir/gradle/cargo.gradle"
 
 apply from: "$rootDir/gradle/openjpa.gradle"
