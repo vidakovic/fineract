@@ -126,6 +126,7 @@ dependencies {
     //
     testImplementation( 'io.cucumber:cucumber-spring',
             'io.github.classgraph:classgraph',
+            'org.eclipse.jgit:org.eclipse.jgit',
             project(':module:dummy:core'),
             project(':module:dummy:service'),
             project(':module:dummy:starter'),
