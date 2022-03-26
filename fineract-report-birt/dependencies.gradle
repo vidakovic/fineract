@@ -16,18 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.security.utils;
 
-import java.sql.SQLException;
+dependencies {
+    implementation('org.slf4j:slf4j-api',
+            'jakarta.ws.rs:jakarta.ws.rs-api',
+            'jakarta.annotation:jakarta.annotation-api',
+            'org.springframework:spring-context',
 
-// TODO: to keep this module self-contained avoid dependency on PlatformException
-public class SQLInjectionException extends RuntimeException {
+            'org.tukaani:xz:1.9',
 
-    public SQLInjectionException() {
-        super("error.msg.found.sql.injection", null);
-    }
-
-    public SQLInjectionException(SQLException e) {
-        super("error.msg.found.sql.injection", e);
-    }
+            project(':fineract-core'))
 }

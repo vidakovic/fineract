@@ -1,0 +1,11 @@
+== Reporting
+
+TBD
+
+=== Default Reporting Ecliplse BIRT
+
+TBD
+
+=== Legacy Pentaho reporting
+
+TBD

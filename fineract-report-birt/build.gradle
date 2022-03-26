@@ -16,21 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.report.annotation;
+description = 'Fineract Module: Eclipse BIRT Service'
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+apply plugin: 'java'
+apply plugin: 'eclipse'
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
-@Documented
-public @interface ReportService {
+apply from: 'dependencies.gradle'
 
-    /**
-     * @return the type of the report
-     */
-    String[] type();
+repositories {
+    flatDir {
+        dirs layout.buildDirectory.dir('libs')
+    }
+}
+
+task downloadFile(type: Download) {
+    src 'https://ftp2.osuosl.org/pub/eclipse/birt/updates/release/4.14.0/downloads/birt-runtime-4.14.0-202312020807.zip'
+    dest layout.buildDirectory
+    onlyIfModified true
+}
+
+task unpack(type: Copy) {
+    from layout.buildDirectory
+    into layout.buildDirectory.dir('tmp')
+    filesMatching '*.zip', { zipDetails ->
+        copy {
+            from zipTree(zipDetails.file)
+            into destinationDir
+        }
+        zipDetails.exclude()
+    }
 }
