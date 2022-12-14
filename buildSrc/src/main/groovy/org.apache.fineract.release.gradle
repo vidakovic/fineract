@@ -122,8 +122,7 @@ fineract {
             email: [
                 from: "${findProperty('fineract.config.email')}",
                 name: "${findProperty('fineract.config.name')}",
-                to: "${findProperty('fineract.config.email')}",
-                // to: 'dev@fineract.apache.org',
+                to: 'dev@fineract.apache.org',
                 mime: 'text/plain',
                 subjectTemplate: [
                     templateFile: "${projectDir}/buildSrc/src/main/resources/email/release.step01.headsup.subject.ftl"
@@ -143,8 +142,7 @@ fineract {
             email: [
                 from: "${findProperty('fineract.config.email')}",
                 name: "${findProperty('fineract.config.name')}",
-                to: "${findProperty('fineract.config.email')}",
-                // to: 'dev@fineract.apache.org',
+                to: 'dev@fineract.apache.org',
                 mime: 'text/plain',
                 subjectTemplate: [
                     templateFile: "${projectDir}/buildSrc/src/main/resources/email/release.step03.branch.subject.ftl"
@@ -199,8 +197,7 @@ fineract {
             email: [
                 from: "${findProperty('fineract.config.email')}",
                 name: "${findProperty('fineract.config.name')}",
-                to: "${findProperty('fineract.config.email')}",
-                // to: 'dev@fineract.apache.org',
+                to: 'dev@fineract.apache.org',
                 mime: 'text/plain',
                 subjectTemplate: [
                     templateFile: "${projectDir}/buildSrc/src/main/resources/email/release.step10.vote.subject.ftl"
@@ -216,8 +213,7 @@ fineract {
             email: [
                 from: "${findProperty('fineract.config.email')}",
                 name: "${findProperty('fineract.config.name')}",
-                to: "${findProperty('fineract.config.email')}",
-                // to: 'dev@fineract.apache.org',
+                to: 'dev@fineract.apache.org',
                 mime: 'text/plain',
                 subjectTemplate: [
                     templateFile: "${projectDir}/buildSrc/src/main/resources/email/release.step11.vote.subject.ftl"
@@ -253,8 +249,8 @@ fineract {
             email: [
                 from: "${findProperty('fineract.config.email')}",
                 name: "${findProperty('fineract.config.name')}",
-                to: "${findProperty('fineract.config.email')}",
                 // to: 'dev@fineract.apache.org',
+                to: 'announce@apache.org',
                 mime: 'text/plain',
                 subjectTemplate: [
                     templateFile: "${projectDir}/buildSrc/src/main/resources/email/release.step15.announce.subject.ftl"
