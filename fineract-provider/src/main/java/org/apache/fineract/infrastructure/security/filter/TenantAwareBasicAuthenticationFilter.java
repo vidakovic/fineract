@@ -40,6 +40,8 @@ import org.apache.fineract.infrastructure.security.data.PlatformRequestLog;
 import org.apache.fineract.infrastructure.security.exception.InvalidTenantIdentifierException;
 import org.apache.fineract.infrastructure.security.service.BasicAuthTenantDetailsService;
 import org.apache.fineract.notification.service.UserNotificationService;
+import org.apache.fineract.infrastructure.security.service.TenantDetailsService;
+import org.apache.fineract.notification.service.NotificationReadPlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;

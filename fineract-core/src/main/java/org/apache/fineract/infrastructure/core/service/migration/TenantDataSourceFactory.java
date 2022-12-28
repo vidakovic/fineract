@@ -19,23 +19,22 @@
 package org.apache.fineract.infrastructure.core.service.migration;
 
 import static org.apache.fineract.infrastructure.core.domain.FineractPlatformTenantConnection.toJdbcUrl;
-import static org.apache.fineract.infrastructure.core.domain.FineractPlatformTenantConnection.toProtocol;
 
 import com.zaxxer.hikari.HikariDataSource;
+import java.sql.Connection;
 import javax.sql.DataSource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenantConnection;
-import org.apache.fineract.infrastructure.core.service.database.DatabasePasswordEncryptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.tika.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
+@Deprecated // TODO: remove this when we switched exclusively to properties based configuration
 public class TenantDataSourceFactory {
-
-    private static final Logger LOG = LoggerFactory.getLogger(TenantDataSourceFactory.class);
 
     private final HikariDataSource tenantDataSource;
 
@@ -63,11 +62,22 @@ public class TenantDataSourceFactory {
         }
         dataSource.setUsername(tenantConnection.getSchemaUsername());
         dataSource.setPassword(databasePasswordEncryptor.decrypt(tenantConnection.getSchemaPassword()));
-        String protocol = toProtocol(tenantDataSource);
+        String protocol = StringUtils.isEmpty(tenantConnection.getSchemaProtocol()) ? toProtocol(tenantDataSource)
+                : tenantConnection.getSchemaProtocol();
         String tenantJdbcUrl = toJdbcUrl(protocol, tenantConnection.getSchemaServer(), tenantConnection.getSchemaServerPort(),
                 tenantConnection.getSchemaName(), tenantConnection.getSchemaConnectionParameters());
-        LOG.debug("JDBC URL for tenant {} is {}", tenant.getTenantIdentifier(), tenantJdbcUrl);
+        // TODO: remove this, could be security relevant if someone sets the password via URL query parameter
+        log.debug("JDBC URL for tenant {} is {}", tenant.getTenantIdentifier(), tenantJdbcUrl);
         dataSource.setJdbcUrl(tenantJdbcUrl);
         return dataSource;
+    }
+
+    private String toProtocol(DataSource dataSource) {
+        try (Connection connection = dataSource.getConnection()) {
+            String url = connection.getMetaData().getURL();
+            return url.substring(0, url.indexOf("://"));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

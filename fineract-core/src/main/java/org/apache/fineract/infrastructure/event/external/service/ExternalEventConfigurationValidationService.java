@@ -42,6 +42,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Deprecated // TODO: remove this when we switched exclusively to properties based configuration
 public class ExternalEventConfigurationValidationService implements InitializingBean {
 
     private static final String EXTERNAL_EVENT_BUSINESS_INTERFACE = BusinessEvent.class.getName();

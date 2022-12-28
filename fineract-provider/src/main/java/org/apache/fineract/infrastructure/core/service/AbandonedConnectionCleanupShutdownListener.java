@@ -29,6 +29,7 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Service;
 
 @Service
+@Deprecated // NOTE: I doubt that we still need this given that we use Hikari connection pooling
 public class AbandonedConnectionCleanupShutdownListener implements ApplicationListener<ContextClosedEvent> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AbandonedConnectionCleanupShutdownListener.class);

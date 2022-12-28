@@ -16,18 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.infrastructure.security.constants;
+package org.apache.fineract.infrastructure.core.service.database;
 
-public final class TenantConstants {
+import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
+import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
-    private TenantConstants() {
+public class TenantRoutingDataSource extends AbstractRoutingDataSource {
 
+    private static final String DEFAULT_TENANT = "default";
+
+    @Override
+    protected Object determineCurrentLookupKey() {
+        final FineractPlatformTenant tenant = ThreadLocalContextUtil.getTenant();
+
+        if (tenant != null) {
+            return tenant.getTenantIdentifier();
+        }
+
+        return DEFAULT_TENANT;
     }
-
-    public static final String PROPERTY_RO_SCHEMA_SERVER_NAME = "FINERACT_RO_SCHEMA_SERVER_NAME";
-    public static final String PROPERTY_RO_SCHEMA_SERVER_PORT = "FINERACT_RO_SCHEMA_SERVER_PORT";
-    public static final String PROPERTY_RO_SCHEMA_SCHEMA_NAME = "FINERACT_RO_SCHEMA_SCHEMA_NAME";
-    public static final String PROPERTY_RO_SCHEMA_USERNAME = "FINERACT_RO_SCHEMA_USERNAME";
-    public static final String PROPERTY_RO_SCHEMA_PASSWORD = "FINERACT_RO_SCHEMA_PASSWORD";
-    public static final String PROPERTY_RO_SCHEMA_CONNECTION_PARAMETERS = "FINERACT_RO_SCHEMA_CONNECTION_PARAMETERS";
 }

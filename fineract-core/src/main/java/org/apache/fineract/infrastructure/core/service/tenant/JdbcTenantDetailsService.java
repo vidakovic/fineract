@@ -21,29 +21,24 @@ package org.apache.fineract.infrastructure.core.service.tenant;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.util.List;
-import javax.sql.DataSource;
+import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.security.exception.InvalidTenantIdentifierException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
 
 /**
  * A JDBC implementation of {@link TenantDetailsService} for loading a tenants details by a
  * <code>tenantIdentifier</code>.
  */
-@Service
+@RequiredArgsConstructor
+@Deprecated // TODO: remove this when we switched exclusively to properties based configuration
 public class JdbcTenantDetailsService implements TenantDetailsService {
 
+    @Qualifier("hikariTenantJdbcTemplate")
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public JdbcTenantDetailsService(@Qualifier("hikariTenantDataSource") final DataSource dataSource) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-    }
 
     @Override
     @Cacheable(value = "tenantsById")
@@ -52,7 +47,7 @@ public class JdbcTenantDetailsService implements TenantDetailsService {
             throw new IllegalArgumentException("tenantIdentifier cannot be blank");
         }
         try {
-            final TenantMapper rm = new TenantMapper(false);
+            final JdbcTenantDetailsMapper rm = new JdbcTenantDetailsMapper(false);
             final String sql = "select " + rm.schema() + " where t.identifier = ?";
 
             return this.jdbcTemplate.queryForObject(sql, rm, new Object[] { tenantIdentifier }); // NOSONAR
@@ -62,8 +57,22 @@ public class JdbcTenantDetailsService implements TenantDetailsService {
     }
 
     @Override
+    @Cacheable(value = "tenantsById")
+    public FineractPlatformTenant loadTenantById(final String tenantIdentifier, final boolean isReport) {
+
+        try {
+            final JdbcTenantDetailsMapper rm = new JdbcTenantDetailsMapper(isReport);
+            final String sql = "select  " + rm.schema() + " where t.identifier = ?";
+
+            return this.jdbcTemplate.queryForObject(sql, rm, new Object[] { tenantIdentifier }); // NOSONAR
+        } catch (final EmptyResultDataAccessException e) {
+            throw new InvalidTenantIdentifierException("The tenant identifier: " + tenantIdentifier + " is not valid.", e);
+        }
+    }
+
+    @Override
     public List<FineractPlatformTenant> findAllTenants() {
-        final TenantMapper rm = new TenantMapper(false);
+        final JdbcTenantDetailsMapper rm = new JdbcTenantDetailsMapper(false);
         final String sql = "select  " + rm.schema();
 
         final List<FineractPlatformTenant> fineractPlatformTenants = this.jdbcTemplate.query(sql, rm); // NOSONAR

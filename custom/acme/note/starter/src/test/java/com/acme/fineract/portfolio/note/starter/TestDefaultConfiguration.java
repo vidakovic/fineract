@@ -20,10 +20,9 @@ package com.acme.fineract.portfolio.note.starter;
 
 import static org.mockito.Mockito.mock;
 
+import javax.sql.DataSource;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
-import org.apache.fineract.infrastructure.core.service.database.RoutingDataSource;
-import org.apache.fineract.infrastructure.core.service.database.RoutingDataSourceServiceFactory;
 import org.apache.fineract.portfolio.client.domain.ClientRepositoryWrapper;
 import org.apache.fineract.portfolio.group.domain.GroupRepository;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
@@ -44,13 +43,8 @@ public class TestDefaultConfiguration {
     }
 
     @Bean
-    public RoutingDataSourceServiceFactory routingDataSourceServiceFactory() {
-        return mock(RoutingDataSourceServiceFactory.class);
-    }
-
-    @Bean
-    public RoutingDataSource routingDataSource() {
-        return mock(RoutingDataSource.class);
+    public DataSource dataSource() {
+        return mock(DataSource.class);
     }
 
     @Bean

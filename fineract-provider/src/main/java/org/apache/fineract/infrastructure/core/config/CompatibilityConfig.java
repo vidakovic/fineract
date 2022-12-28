@@ -126,7 +126,6 @@ public class CompatibilityConfig {
     }
 
     // These are the properties for the all Tenants DB; the same configuration is also (hard-coded) in the
-    // TomcatJdbcDataSourcePerTenantService class -->
     private Properties dataSourceProperties() {
         Properties props = new Properties();
 

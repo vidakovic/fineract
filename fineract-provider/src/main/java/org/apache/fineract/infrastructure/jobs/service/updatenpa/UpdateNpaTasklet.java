@@ -32,20 +32,22 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @RequiredArgsConstructor
+@Component
 public class UpdateNpaTasklet implements Tasklet {
 
-    private final RoutingDataSourceServiceFactory dataSourceServiceFactory;
     private final DatabaseTypeResolver databaseTypeResolver;
     private final DatabaseSpecificSQLGenerator sqlGenerator;
     private final PlatformSecurityContext context;
 
+    private final JdbcTemplate jdbcTemplate;
+
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         AppUser user = context.getAuthenticatedUserIfPresent();
-        final JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSourceServiceFactory.determineDataSourceService().retrieveDataSource());
 
         final StringBuilder resetNPASqlBuilder = new StringBuilder();
         resetNPASqlBuilder.append("update m_loan loan ");

@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.sql.DataSource;
 import org.apache.fineract.infrastructure.core.auditing.JpaAuditingHandlerRegistrar;
 import org.apache.fineract.infrastructure.core.domain.AuditorAwareImpl;
 import org.apache.fineract.infrastructure.core.persistence.DatabaseSelectingPersistenceUnitPostProcessor;
@@ -65,7 +66,7 @@ public class JPAConfig extends JpaBaseConfiguration {
     private final DatabaseTypeResolver databaseTypeResolver;
     private final Collection<EntityManagerFactoryCustomizer> emFactoryCustomizers;
 
-    public JPAConfig(RoutingDataSource dataSource, JpaProperties properties, ObjectProvider<JtaTransactionManager> jtaTransactionManager,
+    public JPAConfig(DataSource dataSource, JpaProperties properties, ObjectProvider<JtaTransactionManager> jtaTransactionManager,
             DatabaseTypeResolver databaseTypeResolver, Collection<EntityManagerFactoryCustomizer> customizers) {
         super(dataSource, properties, jtaTransactionManager);
         this.databaseTypeResolver = databaseTypeResolver;

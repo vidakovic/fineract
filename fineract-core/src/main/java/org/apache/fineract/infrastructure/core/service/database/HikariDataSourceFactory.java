@@ -18,14 +18,21 @@
  */
 package org.apache.fineract.infrastructure.core.service.database;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import org.springframework.stereotype.Component;
+import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
+import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
-@Component
-public class HikariDataSourceFactory {
+public class TenantRoutingDataSource extends AbstractRoutingDataSource {
 
-    public HikariDataSource create(HikariConfig config) {
-        return new HikariDataSource(config);
+    private static final String DEFAULT_TENANT = "default";
+
+    @Override
+    protected Object determineCurrentLookupKey() {
+        final FineractPlatformTenant tenant = ThreadLocalContextUtil.getTenant();
+
+        if (tenant != null) {
+            return tenant.getTenantIdentifier();
+        }
+
+        return DEFAULT_TENANT;
     }
 }

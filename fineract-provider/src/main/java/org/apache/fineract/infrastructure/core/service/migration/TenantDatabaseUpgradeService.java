@@ -37,14 +37,17 @@ import org.apache.fineract.infrastructure.core.service.tenant.TenantDetailsServi
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 /**
  * A service that picks up on tenants that are configured to auto-update their specific schema on application startup.
  */
-@Service
 @Slf4j
 @RequiredArgsConstructor
+@Service
+@ConditionalOnProperty(value = "fineract.tenant.source", havingValue = "jdbc")
+@Deprecated // TODO: remove this when we switched exclusively to properties based configuration
 public class TenantDatabaseUpgradeService implements InitializingBean {
 
     private static final String TENANT_STORE_DB_CONTEXT = "tenant_store_db";

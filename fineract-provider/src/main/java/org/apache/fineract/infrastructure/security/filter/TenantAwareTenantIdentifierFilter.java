@@ -42,6 +42,8 @@ import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.security.data.PlatformRequestLog;
 import org.apache.fineract.infrastructure.security.exception.InvalidTenantIdentifierException;
 import org.apache.fineract.infrastructure.security.service.BasicAuthTenantDetailsService;
+import org.apache.fineract.infrastructure.security.service.TenantDetailsService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -62,7 +64,7 @@ public class TenantAwareTenantIdentifierFilter extends GenericFilterBean {
 
     private static AtomicBoolean firstRequestProcessed = new AtomicBoolean();
 
-    private final BasicAuthTenantDetailsService basicAuthTenantDetailsService;
+    private final TenantDetailsService tenantDetailsService;
     private final ToApiJsonSerializer<PlatformRequestLog> toApiJsonSerializer;
     private final ConfigurationDomainService configurationDomainService;
     private final CacheWritePlatformService cacheWritePlatformService;
@@ -112,7 +114,7 @@ public class TenantAwareTenantIdentifierFilter extends GenericFilterBean {
                 if (pathInfo != null && pathInfo.contains("report")) {
                     isReportRequest = true;
                 }
-                final FineractPlatformTenant tenant = this.basicAuthTenantDetailsService.loadTenantById(tenantIdentifier, isReportRequest);
+                final FineractPlatformTenant tenant = this.tenantDetailsService.loadTenantById(tenantIdentifier, isReportRequest);
                 ThreadLocalContextUtil.setTenant(tenant);
                 HashMap<BusinessDateType, LocalDate> businessDates = this.businessDateReadPlatformService.getBusinessDates();
                 ThreadLocalContextUtil.setBusinessDates(businessDates);

@@ -41,7 +41,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class NotificationReadPlatformServiceImpl implements NotificationReadPlatformService {
 
-    private HashMap<Long, HashMap<Long, CacheNotificationResponseHeader>> tenantNotificationResponseHeaderCache = new HashMap<>();
+    private HashMap<String, HashMap<Long, CacheNotificationResponseHeader>> tenantNotificationResponseHeaderCache = new HashMap<>();
 
     private final NotificationDataRow notificationDataRow = new NotificationDataRow();
     private final NotificationMapperRow notificationMapperRow = new NotificationMapperRow();
@@ -54,7 +54,7 @@ public class NotificationReadPlatformServiceImpl implements NotificationReadPlat
 
     @Override
     public boolean hasUnreadNotifications(Long appUserId) {
-        Long tenantId = ThreadLocalContextUtil.getTenant().getId();
+        String tenantId = ThreadLocalContextUtil.getTenant().getTenantIdentifier();
         Long now = System.currentTimeMillis() / 1000L;
         if (this.tenantNotificationResponseHeaderCache.containsKey(tenantId)) {
             HashMap<Long, CacheNotificationResponseHeader> notificationResponseHeaderCache = this.tenantNotificationResponseHeaderCache
@@ -75,7 +75,7 @@ public class NotificationReadPlatformServiceImpl implements NotificationReadPlat
         }
     }
 
-    private boolean initializeTenantNotificationResponseHeaderCache(Long tenantId, Long now, Long appUserId) {
+    private boolean initializeTenantNotificationResponseHeaderCache(String tenantId, Long now, Long appUserId) {
         HashMap<Long, CacheNotificationResponseHeader> notificationResponseHeaderCache = new HashMap<>();
         this.tenantNotificationResponseHeaderCache.put(tenantId, notificationResponseHeaderCache);
         return this.createUpdateCacheValue(appUserId, now, notificationResponseHeaderCache);
@@ -84,7 +84,7 @@ public class NotificationReadPlatformServiceImpl implements NotificationReadPlat
     private boolean createUpdateCacheValue(Long appUserId, Long now,
             HashMap<Long, CacheNotificationResponseHeader> notificationResponseHeaderCache) {
         boolean hasNotifications;
-        Long tenantId = ThreadLocalContextUtil.getTenant().getId();
+        String tenantId = ThreadLocalContextUtil.getTenant().getTenantIdentifier();
         CacheNotificationResponseHeader cacheNotificationResponseHeader;
         hasNotifications = checkForUnreadNotifications(appUserId);
         cacheNotificationResponseHeader = new CacheNotificationResponseHeader(hasNotifications, now);

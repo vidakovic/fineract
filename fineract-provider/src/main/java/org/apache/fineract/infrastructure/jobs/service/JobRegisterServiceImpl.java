@@ -307,7 +307,7 @@ public class JobRegisterServiceImpl implements JobRegisterService, ApplicationLi
     private String getSchedulerName(final ScheduledJobDetail scheduledJobDetail) {
         final StringBuilder sb = new StringBuilder(20);
         final FineractPlatformTenant tenant = ThreadLocalContextUtil.getTenant();
-        sb.append(SchedulerServiceConstants.SCHEDULER).append(tenant.getId());
+        sb.append(SchedulerServiceConstants.SCHEDULER).append(tenant.getTenantIdentifier());
         if (scheduledJobDetail.getSchedulerGroup() > 0) {
             sb.append(SchedulerServiceConstants.SCHEDULER_GROUP).append(scheduledJobDetail.getSchedulerGroup());
         }
@@ -341,7 +341,7 @@ public class JobRegisterServiceImpl implements JobRegisterService, ApplicationLi
         }
 
         final MethodInvokingJobDetailFactoryBean jobDetailFactoryBean = new MethodInvokingJobDetailFactoryBean();
-        jobDetailFactoryBean.setName(scheduledJobDetail.getJobName() + "JobDetail" + tenant.getId());
+        jobDetailFactoryBean.setName(scheduledJobDetail.getJobName() + "JobDetail" + tenant.getTenantIdentifier());
         jobDetailFactoryBean.setTargetObject(jobStarter);
         jobDetailFactoryBean.setTargetMethod(JOB_STARTER_METHOD_NAME);
         jobDetailFactoryBean.setGroup(scheduledJobDetail.getGroupName());
@@ -355,7 +355,7 @@ public class JobRegisterServiceImpl implements JobRegisterService, ApplicationLi
     private Trigger createTrigger(final ScheduledJobDetail scheduledJobDetails, final JobDetail jobDetail) throws ParseException {
         final FineractPlatformTenant tenant = ThreadLocalContextUtil.getTenant();
         final CronTriggerFactoryBean cronTriggerFactoryBean = new CronTriggerFactoryBean();
-        cronTriggerFactoryBean.setName(scheduledJobDetails.getJobName() + "Trigger" + tenant.getId());
+        cronTriggerFactoryBean.setName(scheduledJobDetails.getJobName() + "Trigger" + tenant.getTenantIdentifier());
         cronTriggerFactoryBean.setJobDetail(jobDetail);
         final JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put(SchedulerServiceConstants.TENANT_IDENTIFIER, tenant.getTenantIdentifier());

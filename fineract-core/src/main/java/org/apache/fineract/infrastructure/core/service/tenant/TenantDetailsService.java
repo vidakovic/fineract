@@ -25,5 +25,7 @@ public interface TenantDetailsService {
 
     FineractPlatformTenant loadTenantById(String tenantId);
 
+    FineractPlatformTenant loadTenantById(final String tenantIdentifier, final boolean isReport);
+
     List<FineractPlatformTenant> findAllTenants();
 }

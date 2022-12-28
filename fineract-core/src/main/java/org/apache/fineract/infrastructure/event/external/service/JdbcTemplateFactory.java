@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
+@Deprecated // TODO: remove this when we switched exclusively to properties based configuration
 public class JdbcTemplateFactory {
 
     private final TenantDataSourceFactory tenantDataSourceFactory;

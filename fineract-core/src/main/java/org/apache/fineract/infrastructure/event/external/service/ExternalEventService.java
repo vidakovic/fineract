@@ -65,8 +65,8 @@ public class ExternalEventService {
         try {
             flushChangesBeforeSerialization();
             ExternalEvent externalEvent;
-            if (event instanceof BulkBusinessEvent) {
-                externalEvent = handleBulkBusinessEvent((BulkBusinessEvent) event);
+            if (event instanceof BulkBusinessEvent bbe) {
+                externalEvent = handleBulkBusinessEvent(bbe);
             } else {
                 externalEvent = handleRegularBusinessEvent(event);
             }

@@ -278,7 +278,8 @@ jib {
             '-Duser.home=/tmp',
             '-Dfile.encoding=UTF-8',
             '-Duser.timezone=UTC',
-            '-Djava.security.egd=file:/dev/./urandom'
+            '-Djava.security.egd=file:/dev/./urandom',
+            '-Dspring.profiles.active=tenants'
         ]
         ports = ['8080/tcp', '8443/tcp']
         labels = [maintainer: 'Aleksandar Vidakovic <aleks@apache.org>']
