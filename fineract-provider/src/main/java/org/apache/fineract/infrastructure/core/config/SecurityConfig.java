@@ -26,6 +26,7 @@ import org.apache.fineract.infrastructure.security.filter.InsecureTwoFactorAuthe
 import org.apache.fineract.infrastructure.security.filter.TenantAwareBasicAuthenticationFilter;
 import org.apache.fineract.infrastructure.security.filter.TwoFactorAuthenticationFilter;
 import org.apache.fineract.infrastructure.security.service.TenantAwareJpaPlatformUserDetailsService;
+import org.apache.fineract.infrastructure.security.vote.SelfServiceUserAccessVote;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
@@ -33,6 +34,11 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.access.AccessDecisionManager;
+import org.springframework.security.access.AccessDecisionVoter;
+import org.springframework.security.access.vote.AuthenticatedVoter;
+import org.springframework.security.access.vote.RoleVoter;
+import org.springframework.security.access.vote.UnanimousBased;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -43,9 +49,13 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.ExceptionTranslationFilter;
+import org.springframework.security.web.access.expression.WebExpressionVoter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextPersistenceFilter;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @ConditionalOnProperty("fineract.security.basicauth.enabled")
@@ -77,6 +87,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http //
                 .csrf().disable() // NOSONAR only creating a service that is used by non-browser clients
                 .antMatcher("/api/**").authorizeRequests() //
+                .accessDecisionManager(accessDecisionManager())
                 .antMatchers(HttpMethod.OPTIONS, "/api/**").permitAll() //
                 .antMatchers(HttpMethod.POST, "/api/*/echo").permitAll() //
                 .antMatchers(HttpMethod.POST, "/api/*/authentication").permitAll() //
@@ -102,6 +113,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         if (serverProperties.getSsl().isEnabled()) {
             http.requiresChannel(channel -> channel.antMatchers("/api/**").requiresSecure());
         }
+    }
+
+    @Bean
+    public AccessDecisionManager accessDecisionManager() {
+        List<AccessDecisionVoter<? extends Object>> decisionVoters = Arrays.asList(new RoleVoter(), new AuthenticatedVoter(),
+            new WebExpressionVoter(), new SelfServiceUserAccessVote());
+
+        return new UnanimousBased(decisionVoters);
     }
 
     @Bean
