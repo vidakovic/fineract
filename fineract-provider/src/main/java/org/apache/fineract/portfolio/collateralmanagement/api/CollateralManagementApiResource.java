@@ -35,9 +35,7 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.UriInfo;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
@@ -45,7 +43,6 @@ import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.service.CurrencyReadPlatformService;
 import org.apache.fineract.portfolio.collateralmanagement.data.CollateralManagementData;
@@ -61,7 +58,6 @@ public class CollateralManagementApiResource {
     private final DefaultToApiJsonSerializer<CollateralManagementData> apiJsonSerializerService;
     private final DefaultToApiJsonSerializer<CurrencyData> apiJsonSerializerServiceForCurrency;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-    private final PlatformSecurityContext context;
     private final CollateralManagementReadPlatformService collateralManagementReadPlatformService;
     private final CurrencyReadPlatformService currencyReadPlatformService;
 
@@ -85,12 +81,9 @@ public class CollateralManagementApiResource {
     @Operation(summary = "Get Collateral", description = "Fetch Collateral")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CollateralManagementApiResourceSwagger.GetCollateralManagementsResponse.class))) })
-    public String getCollateral(@PathParam("collateralId") @Parameter(description = "collateralId") final Long collateralId,
-            @Context final UriInfo uriInfo) {
+    public String getCollateral(@PathParam("collateralId") @Parameter(description = "collateralId") final Long collateralId) {
 
-        this.context.authenticatedUser()
-                .validateHasReadPermission(CollateralManagementJsonInputParams.COLLATERAL_PRODUCT_READ_PERMISSION.getValue());
-
+        // TODO: @vidakovic check permission COLLATERAL_PRODUCT
         final CollateralManagementData collateralManagementData = this.collateralManagementReadPlatformService
                 .getCollateralProduct(collateralId);
 
@@ -103,9 +96,8 @@ public class CollateralManagementApiResource {
     @Operation(summary = "Get All Collaterals", description = "Fetch all Collateral Products")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = CollateralManagementApiResourceSwagger.GetCollateralManagementsResponse.class)))) })
-    public String getAllCollaterals(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser()
-                .validateHasReadPermission(CollateralManagementJsonInputParams.COLLATERAL_PRODUCT_READ_PERMISSION.getValue());
+    public String getAllCollaterals() {
+        // TODO: @vidakovic check permission COLLATERAL_PRODUCT
         Collection<CollateralManagementData> collateralManagementDataList = this.collateralManagementReadPlatformService
                 .getAllCollateralProducts();
         return this.apiJsonSerializerService.serialize(collateralManagementDataList);
@@ -118,7 +110,7 @@ public class CollateralManagementApiResource {
     @Operation(summary = "Get Collateral Template", description = "Get Collateral Template")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = CollateralManagementApiResourceSwagger.GetCollateralProductTemplate.class)))) })
-    public String getCollateralTemplate(@Context final UriInfo uriInfo) {
+    public String getCollateralTemplate() {
         Collection<CurrencyData> currencyDataCollection = this.currencyReadPlatformService.retrieveAllPlatformCurrencies();
         return this.apiJsonSerializerServiceForCurrency.serialize(currencyDataCollection);
     }

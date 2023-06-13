@@ -36,7 +36,6 @@ import org.apache.fineract.infrastructure.codes.service.CodeValueReadPlatformSer
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.collateralmanagement.data.LoanCollateralResponseData;
 import org.apache.fineract.portfolio.collateralmanagement.service.LoanCollateralManagementReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -50,7 +49,6 @@ public class LoanCollateralManagementApiResource {
     private final DefaultToApiJsonSerializer<LoanCollateralResponseData> apiJsonSerializerService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-    private final PlatformSecurityContext context;
     private final LoanCollateralManagementReadPlatformService loanCollateralManagementReadPlatformService;
     private final CodeValueReadPlatformService codeValueReadPlatformService;
 

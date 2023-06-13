@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.portfolio.interestratechart.api;
 
-import static org.apache.fineract.portfolio.interestratechart.InterestRateChartSlabApiConstants.INTERESTRATE_CHART_SLAB_RESOURCE_NAME;
 import static org.apache.fineract.portfolio.interestratechart.InterestRateChartSlabApiConstants.amountRangeFromParamName;
 import static org.apache.fineract.portfolio.interestratechart.InterestRateChartSlabApiConstants.amountRangeToParamName;
 import static org.apache.fineract.portfolio.interestratechart.InterestRateChartSlabApiConstants.annualInterestRateParamName;
@@ -61,7 +60,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.interestratechart.InterestRateChartSlabApiConstants;
 import org.apache.fineract.portfolio.interestratechart.data.InterestRateChartSlabData;
 import org.apache.fineract.portfolio.interestratechart.service.InterestRateChartSlabReadPlatformService;
@@ -74,7 +72,6 @@ import org.springframework.stereotype.Component;
 public class InterestRateChartSlabsApiResource {
 
     private final InterestRateChartSlabReadPlatformService interestRateChartSlabReadPlatformService;
-    private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<InterestRateChartSlabData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -102,8 +99,7 @@ public class InterestRateChartSlabsApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = InterestRateChartSlabsApiResourceSwagger.GetInterestRateChartsChartIdChartSlabsResponse.class)))) })
     public String retrieveAll(@PathParam("chartId") @Parameter(description = "chartId") final Long chartId,
             @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(INTERESTRATE_CHART_SLAB_RESOURCE_NAME);
+        // TODO: @vidakovic check permission CHARTSLAB
         Collection<InterestRateChartSlabData> chartSlabs = this.interestRateChartSlabReadPlatformService.retrieveAll(chartId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
@@ -121,8 +117,7 @@ public class InterestRateChartSlabsApiResource {
     public String retrieveOne(@PathParam("chartId") @Parameter(description = "chartId") final Long chartId,
             @PathParam("chartSlabId") @Parameter(description = "chartSlabId") final Long chartSlabId, @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(INTERESTRATE_CHART_SLAB_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission CHARTSLAB
         InterestRateChartSlabData chartSlab = this.interestRateChartSlabReadPlatformService.retrieveOne(chartId, chartSlabId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         if (settings.isTemplate()) {

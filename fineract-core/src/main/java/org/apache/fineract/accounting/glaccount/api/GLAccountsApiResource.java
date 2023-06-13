@@ -67,7 +67,6 @@ import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.data.UploadRequest;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.stereotype.Component;
@@ -85,9 +84,6 @@ public class GLAccountsApiResource {
             "allowedAssetsTagOptions", "allowedLiabilitiesTagOptions", "allowedEquityTagOptions", "allowedIncomeTagOptions",
             "allowedExpensesTagOptions", "creditAccounts", "debitAccounts"));
 
-    private final String resourceNameForPermission = "GLACCOUNT";
-
-    private final PlatformSecurityContext context;
     private final GLAccountReadPlatformService glAccountReadPlatformService;
     private final DefaultToApiJsonSerializer<GLAccountData> apiJsonSerializerService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -110,9 +106,7 @@ public class GLAccountsApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = GLAccountsApiResourceSwagger.GetGLAccountsTemplateResponse.class))) })
     public String retrieveNewAccountDetails(@Context final UriInfo uriInfo,
             @QueryParam("type") @Parameter(description = "type") final Integer type) {
-
-        this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermission);
-
+        // TODO: @vidakovic check permission GLACCOUNT
         GLAccountData glAccountData = this.glAccountReadPlatformService.retrieveNewGLAccountDetails(type);
         glAccountData = handleTemplate(glAccountData);
 
@@ -136,8 +130,7 @@ public class GLAccountsApiResource {
             @QueryParam("manualEntriesAllowed") @Parameter(description = "manualEntriesAllowed") final Boolean manualEntriesAllowed,
             @QueryParam("disabled") @Parameter(description = "disabled") final Boolean disabled,
             @QueryParam("fetchRunningBalance") @Parameter(description = "fetchRunningBalance") final boolean runningBalance) {
-
-        this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermission);
+        // TODO: @vidakovic check permission GLACCOUNT
         JournalEntryAssociationParametersData associationParametersData = new JournalEntryAssociationParametersData(false, runningBalance);
         final List<GLAccountData> glAccountDatas = this.glAccountReadPlatformService.retrieveAllGLAccounts(type, searchParam, usage,
                 manualEntriesAllowed, disabled, associationParametersData);
@@ -158,9 +151,7 @@ public class GLAccountsApiResource {
     public String retreiveAccount(@PathParam("glAccountId") @Parameter(description = "glAccountId") final Long glAccountId,
             @Context final UriInfo uriInfo,
             @QueryParam("fetchRunningBalance") @Parameter(description = "fetchRunningBalance") final boolean runningBalance) {
-
-        this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermission);
-
+        // TODO: @vidakovic check permission GLACCOUNT
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         JournalEntryAssociationParametersData associationParametersData = new JournalEntryAssociationParametersData(false, runningBalance);
         GLAccountData glAccountData = this.glAccountReadPlatformService.retrieveGLAccountById(glAccountId, associationParametersData);
@@ -273,6 +264,7 @@ public class GLAccountsApiResource {
     @Path("downloadtemplate")
     @Produces("application/vnd.ms-excel")
     public Response getGlAccountsTemplate(@QueryParam("dateFormat") final String dateFormat) {
+        // TODO: @vidakovic check permission GLACCOUNT
         return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.CHART_OF_ACCOUNTS.toString(), null, null, dateFormat);
     }
 
@@ -284,6 +276,7 @@ public class GLAccountsApiResource {
     public String postGlAccountsTemplate(@FormDataParam("file") InputStream uploadedInputStream,
             @FormDataParam("file") FormDataContentDisposition fileDetail, @FormDataParam("locale") final String locale,
             @FormDataParam("dateFormat") final String dateFormat) {
+        // TODO: @vidakovic check permission CHART_OF_ACCOUNTS
         Long importDocumentId = bulkImportWorkbookService.importWorkbook(GlobalEntityType.CHART_OF_ACCOUNTS.toString(), uploadedInputStream,
                 fileDetail, locale, dateFormat);
         return this.apiJsonSerializerService.serialize(importDocumentId);

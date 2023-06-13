@@ -37,7 +37,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/email/configuration")
@@ -47,8 +46,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class EmailConfigurationApiResource {
 
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "EMAIL_CONFIGURATION";
-    private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<EmailConfigurationData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
@@ -56,8 +53,7 @@ public class EmailConfigurationApiResource {
 
     @GET
     public String retrieveAll(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission EMAIL_CONFIGURATION
         final Collection<EmailConfigurationData> configuration = this.emailConfigurationReadPlatformService.retrieveAll();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

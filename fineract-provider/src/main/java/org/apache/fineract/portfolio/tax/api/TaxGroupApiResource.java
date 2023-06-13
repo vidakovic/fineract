@@ -46,7 +46,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.tax.data.TaxGroupData;
 import org.apache.fineract.portfolio.tax.service.TaxReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -57,9 +56,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TaxGroupApiResource {
 
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "TAXGROUP";
-
-    private final PlatformSecurityContext context;
     private final TaxReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<TaxGroupData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -73,8 +69,7 @@ public class TaxGroupApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = TaxGroupApiResourceSwagger.GetTaxesGroupResponse.class)))) })
     public String retrieveAllTaxGroups(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission TAXGROUP
         final Collection<TaxGroupData> taxGroupDatas = this.readPlatformService.retrieveAllTaxGroups();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -91,8 +86,7 @@ public class TaxGroupApiResource {
     public String retrieveTaxGroup(@PathParam("taxGroupId") @Parameter(description = "taxGroupId") final Long taxGroupId,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission TAXGROUP
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         TaxGroupData taxGroupData = null;
         if (settings.isTemplate()) {
@@ -109,8 +103,7 @@ public class TaxGroupApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveTemplate(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission TAXGROUP
         final TaxGroupData taxGroupData = this.readPlatformService.retrieveTaxGroupTemplate();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

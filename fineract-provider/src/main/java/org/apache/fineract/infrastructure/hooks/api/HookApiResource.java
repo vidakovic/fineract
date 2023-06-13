@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.infrastructure.hooks.api;
 
-import static org.apache.fineract.infrastructure.hooks.api.HookApiConstants.HOOK_RESOURCE_NAME;
 import static org.apache.fineract.infrastructure.hooks.api.HookApiConstants.RESPONSE_DATA_PARAMETERS;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,7 +51,6 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.hooks.data.HookData;
 import org.apache.fineract.infrastructure.hooks.service.HookReadPlatformService;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/hooks")
@@ -63,7 +61,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class HookApiResource {
 
-    private final PlatformSecurityContext context;
     private final HookReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<HookData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -74,9 +71,7 @@ public class HookApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = HookApiResourceSwagger.GetHookResponse.class)))) })
     public String retrieveHooks(@Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(HOOK_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission HOOK
         final Collection<HookData> hooks = this.readPlatformService.retrieveAllHooks();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -90,9 +85,7 @@ public class HookApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = HookApiResourceSwagger.GetHookResponse.class))) })
     public String retrieveHook(@PathParam("hookId") @Parameter(description = "hookId") final Long hookId, @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(HOOK_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission HOOK
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         HookData hook = this.readPlatformService.retrieveHook(hookId);
@@ -111,9 +104,7 @@ public class HookApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = HookApiResourceSwagger.GetHookTemplateResponse.class))) })
     public String template(@Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(HOOK_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission HOOK
         final HookData hook = this.readPlatformService.retrieveNewHookDetails(null);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -168,5 +159,4 @@ public class HookApiResource {
 
         return this.toApiJsonSerializer.serialize(result);
     }
-
 }

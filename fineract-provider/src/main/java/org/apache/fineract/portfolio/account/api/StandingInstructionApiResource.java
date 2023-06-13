@@ -53,7 +53,6 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.account.data.AccountTransferData;
 import org.apache.fineract.portfolio.account.data.StandingInstructionDTO;
 import org.apache.fineract.portfolio.account.data.StandingInstructionData;
@@ -68,7 +67,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class StandingInstructionApiResource {
 
-    private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<StandingInstructionData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -97,7 +95,7 @@ public class StandingInstructionApiResource {
             @QueryParam("transferType") @Parameter(description = "transferType") final Integer transferType,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(StandingInstructionApiConstants.STANDING_INSTRUCTION_RESOURCE_NAME);
+        // TODO: @vidakovic check permission STANDINGINSTRUCTION
 
         final StandingInstructionData standingInstructionData = this.standingInstructionReadPlatformService.retrieveTemplate(fromOfficeId,
                 fromClientId, fromAccountId, fromAccountType, toOfficeId, toClientId, toAccountId, toAccountType, transferType);
@@ -181,7 +179,7 @@ public class StandingInstructionApiResource {
             @QueryParam("fromAccountId") @Parameter(description = "fromAccountId") final Long fromAccount,
             @QueryParam("fromAccountType") @Parameter(description = "fromAccountType") final Integer fromAccountType) {
 
-        this.context.authenticatedUser().validateHasReadPermission(StandingInstructionApiConstants.STANDING_INSTRUCTION_RESOURCE_NAME);
+        // TODO: @vidakovic check permission STANDINGINSTRUCTION
 
         final SearchParameters searchParameters = SearchParameters.forAccountTransfer(sqlSearch, externalId, offset, limit, orderBy,
                 sortOrder);
@@ -213,7 +211,7 @@ public class StandingInstructionApiResource {
             @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy,
             @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder) {
 
-        this.context.authenticatedUser().validateHasReadPermission(StandingInstructionApiConstants.STANDING_INSTRUCTION_RESOURCE_NAME);
+        // TODO: @vidakovic check permission STANDINGINSTRUCTION
 
         StandingInstructionData standingInstructionData = this.standingInstructionReadPlatformService.retrieveOne(standingInstructionId);
         final SearchParameters searchParameters = SearchParameters.forAccountTransfer(sqlSearch, externalId, offset, limit, orderBy,

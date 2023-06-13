@@ -29,10 +29,12 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.security.api.AuthenticationApiResource;
 import org.apache.fineract.infrastructure.security.api.AuthenticationApiResourceSwagger;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -43,6 +45,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SelfAuthenticationApiResource {
 
+    // TODO: @vidakovic this is really bad practice, resources should be standalone
     private final AuthenticationApiResource authenticationApiResource;
 
     @POST
@@ -53,7 +56,7 @@ public class SelfAuthenticationApiResource {
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = AuthenticationApiResourceSwagger.PostAuthenticationRequest.class)))
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SelfAuthenticationApiResourceSwagger.PostSelfAuthenticationResponse.class))) })
-    public String authenticate(final String apiRequestBodyAsJson) {
-        return this.authenticationApiResource.authenticate(apiRequestBodyAsJson, true);
+    public String authenticate(@Context AppUser user, final String apiRequestBodyAsJson) {
+        return this.authenticationApiResource.authenticate(user, apiRequestBodyAsJson, true);
     }
 }

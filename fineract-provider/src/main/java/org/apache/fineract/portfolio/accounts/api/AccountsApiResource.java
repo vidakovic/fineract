@@ -52,7 +52,6 @@ import org.apache.fineract.infrastructure.core.data.UploadRequest;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.Page;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.accounts.constants.AccountsApiConstants;
 import org.apache.fineract.portfolio.accounts.data.AccountData;
 import org.apache.fineract.portfolio.accounts.service.AccountReadPlatformService;
@@ -72,7 +71,6 @@ public class AccountsApiResource {
     private final ApplicationContext applicationContext;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final DefaultToApiJsonSerializer<AccountData> toApiJsonSerializer;
-    private final PlatformSecurityContext platformSecurityContext;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final BulkImportWorkbookService bulkImportWorkbookService;
     private final BulkImportWorkbookPopulatorService bulkImportWorkbookPopulatorService;
@@ -90,7 +88,6 @@ public class AccountsApiResource {
             @QueryParam("clientId") @Parameter(description = "clientId") final Long clientId,
             @QueryParam("productId") @Parameter(description = "productId") final Long productId, @Context final UriInfo uriInfo) {
         try {
-            this.platformSecurityContext.authenticatedUser();
             String serviceName = accountType + AccountsApiConstants.READPLATFORM_NAME;
             AccountReadPlatformService service = (AccountReadPlatformService) this.applicationContext.getBean(serviceName);
             final AccountData accountData = service.retrieveTemplate(clientId, productId);
@@ -155,9 +152,7 @@ public class AccountsApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountsApiResourceSwagger.PostAccountsTypeResponse.class))) })
     public String createAccount(@PathParam("type") @Parameter(description = "type") final String accountType,
             @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        CommandWrapper commandWrapper = null;
-        this.platformSecurityContext.authenticatedUser();
-        commandWrapper = new CommandWrapperBuilder().createAccount(accountType).withJson(apiRequestBodyAsJson).build();
+        CommandWrapper commandWrapper = new CommandWrapperBuilder().createAccount(accountType).withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult commandProcessingResult = this.commandsSourceWritePlatformService.logCommandSource(commandWrapper);
         return this.toApiJsonSerializer.serialize(commandProcessingResult);
     }
@@ -192,9 +187,7 @@ public class AccountsApiResource {
             @PathParam("accountId") @Parameter(description = "accountId") final Long accountId,
             @QueryParam("command") @Parameter(description = "command") final String commandParam,
             @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        CommandWrapper commandWrapper = null;
-        this.platformSecurityContext.authenticatedUser();
-        commandWrapper = new CommandWrapperBuilder().createAccountCommand(accountType, accountId, commandParam)
+        CommandWrapper commandWrapper = new CommandWrapperBuilder().createAccountCommand(accountType, accountId, commandParam)
                 .withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult commandProcessingResult = this.commandsSourceWritePlatformService.logCommandSource(commandWrapper);
         return this.toApiJsonSerializer.serialize(commandProcessingResult);
@@ -211,7 +204,6 @@ public class AccountsApiResource {
     public String updateAccount(@PathParam("type") @Parameter(description = "type") final String accountType,
             @PathParam("accountId") @Parameter(description = "accountId") final Long accountId,
             @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        this.platformSecurityContext.authenticatedUser();
         final CommandWrapper commandRequest = new CommandWrapperBuilder().updateAccount(accountType, accountId)
                 .withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
@@ -224,6 +216,7 @@ public class AccountsApiResource {
     public Response getSharedAccountsTemplate(@QueryParam("officeId") final Long officeId,
             @QueryParam("dateFormat") final String dateFormat,
             @PathParam("type") @Parameter(description = "type") final String accountType) {
+        // TODO: @vidakovic check permission all CLIENT, SHAREDACCOUNT
         return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.SHARE_ACCOUNTS.toString(), officeId, null, dateFormat);
     }
 

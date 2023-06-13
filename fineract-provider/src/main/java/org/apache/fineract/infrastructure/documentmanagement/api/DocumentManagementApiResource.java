@@ -55,7 +55,6 @@ import org.apache.fineract.infrastructure.documentmanagement.data.DocumentData;
 import org.apache.fineract.infrastructure.documentmanagement.data.FileData;
 import org.apache.fineract.infrastructure.documentmanagement.service.DocumentReadPlatformService;
 import org.apache.fineract.infrastructure.documentmanagement.service.DocumentWritePlatformService;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -73,9 +72,6 @@ public class DocumentManagementApiResource {
     private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(
             Arrays.asList("id", "parentEntityType", "parentEntityId", "name", "fileName", "size", "type", "description"));
 
-    private static final String SYSTEM_ENTITY_TYPE = "DOCUMENT";
-
-    private final PlatformSecurityContext context;
     private final DocumentReadPlatformService documentReadPlatformService;
     private final DocumentWritePlatformService documentWritePlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -92,9 +88,7 @@ public class DocumentManagementApiResource {
     public String retrieveAllDocuments(@Context final UriInfo uriInfo,
             @PathParam("entityType") @Parameter(description = "entityType") final String entityType,
             @PathParam("entityId") @Parameter(description = "entityId") final Long entityId) {
-
-        this.context.authenticatedUser().validateHasReadPermission(SYSTEM_ENTITY_TYPE);
-
+        // TODO: @vidakovic check permission DOCUMENT
         final Collection<DocumentData> documentDatas = this.documentReadPlatformService.retrieveAllDocuments(entityType, entityId);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -187,9 +181,7 @@ public class DocumentManagementApiResource {
     public String getDocument(@PathParam("entityType") @Parameter(description = "entityType") final String entityType,
             @PathParam("entityId") @Parameter(description = "entityId") final Long entityId,
             @PathParam("documentId") @Parameter(description = "documentId") final Long documentId, @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(SYSTEM_ENTITY_TYPE);
-
+        // TODO: @vidakovic check permission DOCUMENT
         final DocumentData documentData = this.documentReadPlatformService.retrieveDocument(entityType, entityId, documentId);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -206,8 +198,7 @@ public class DocumentManagementApiResource {
     public Response downloadFile(@PathParam("entityType") @Parameter(description = "entityType") final String entityType,
             @PathParam("entityId") @Parameter(description = "entityId") final Long entityId,
             @PathParam("documentId") @Parameter(description = "documentId") final Long documentId) {
-
-        this.context.authenticatedUser().validateHasReadPermission(SYSTEM_ENTITY_TYPE);
+        // TODO: @vidakovic check permission DOCUMENT
         final FileData fileData = this.documentReadPlatformService.retrieveFileData(entityType, entityId, documentId);
         return ContentResources.fileDataToResponse(fileData, "attachment");
     }

@@ -45,7 +45,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.LoanScheduleData;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.service.LoanScheduleCalculationPlatformService;
 import org.springframework.stereotype.Component;
@@ -56,8 +55,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class LoanScheduleApiResource {
 
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "LOAN";
-    private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<LoanScheduleData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final LoanScheduleCalculationPlatformService calculationPlatformService;
@@ -80,7 +77,7 @@ public class LoanScheduleApiResource {
 
         CommandWrapper commandRequest = null;
         if (is(commandParam, "calculateLoanSchedule")) {
-            this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+            // TODO: @vidakovic check permission LOAN
             final LoanScheduleData loanSchedule = this.calculationPlatformService.generateLoanScheduleForVariableInstallmentRequest(loanId,
                     apiRequestBodyAsJson);
 

@@ -42,7 +42,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.rate.data.RateData;
 import org.apache.fineract.portfolio.rate.service.RateReadService;
 import org.springframework.stereotype.Component;
@@ -59,8 +58,6 @@ public class RateApiResource {
 
     private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(
             Arrays.asList("id", "name", "percentage", "productApply", "active"));
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "RATE";
-    private final PlatformSecurityContext context;
     private final RateReadService readPlatformService;
     private final DefaultToApiJsonSerializer<RateData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -72,8 +69,7 @@ public class RateApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveRate(@PathParam("rateId") Long rateId, @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission RATE
         final RateData rate = this.readPlatformService.retrieveOne(rateId);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -98,8 +94,7 @@ public class RateApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String getAllRates(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission RATE
         Collection<RateData> rates = this.readPlatformService.retrieveAllRates();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

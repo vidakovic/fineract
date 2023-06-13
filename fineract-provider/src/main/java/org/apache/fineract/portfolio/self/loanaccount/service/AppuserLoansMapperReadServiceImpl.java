@@ -18,19 +18,21 @@
  */
 package org.apache.fineract.portfolio.self.loanaccount.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class AppuserLoansMapperReadServiceImpl implements AppuserLoansMapperReadService {
 
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public AppuserLoansMapperReadServiceImpl(final JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    private final PlatformSecurityContext context;
 
     @Override
     public Boolean isLoanMappedToUser(Long loanId, Long appUserId) {
@@ -40,4 +42,12 @@ public class AppuserLoansMapperReadServiceImpl implements AppuserLoansMapperRead
                 Boolean.class, loanId, appUserId);
     }
 
+    @Override
+    public void validateAppuserLoansMapping(Long loanId) {
+        AppUser user = this.context.authenticatedUser();
+        final boolean isLoanMappedToUser = isLoanMappedToUser(loanId, user.getId());
+        if (!isLoanMappedToUser) {
+            throw new LoanNotFoundException(loanId);
+        }
+    }
 }

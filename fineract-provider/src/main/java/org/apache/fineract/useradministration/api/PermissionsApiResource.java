@@ -47,7 +47,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.useradministration.data.PermissionData;
 import org.apache.fineract.useradministration.service.PermissionReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -62,9 +61,6 @@ public class PermissionsApiResource {
 
     private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(
             Arrays.asList("grouping", "code", "entityName", "actionName", "selected", "isMakerChecker"));
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "PERMISSION";
-
-    private final PlatformSecurityContext context;
     private final PermissionReadPlatformService permissionReadPlatformService;
     private final DefaultToApiJsonSerializer<PermissionData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -83,9 +79,7 @@ public class PermissionsApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PermissionsApiResourceSwagger.GetPermissionsResponse.class)))) })
     public String retrieveAllPermissions(@Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission PERMISSION
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         Collection<PermissionData> permissions;

@@ -21,7 +21,6 @@ package org.apache.fineract.portfolio.savings.api;
 import static org.apache.fineract.portfolio.savings.SavingsApiConstants.COMMAND_INACTIVATE_CHARGE;
 import static org.apache.fineract.portfolio.savings.SavingsApiConstants.COMMAND_PAY_CHARGE;
 import static org.apache.fineract.portfolio.savings.SavingsApiConstants.COMMAND_WAIVE_CHARGE;
-import static org.apache.fineract.portfolio.savings.SavingsApiConstants.SAVINGS_ACCOUNT_CHARGE_RESOURCE_NAME;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -56,7 +55,6 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.exception.UnrecognizedQueryParamException;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.savings.data.SavingsAccountChargeData;
@@ -71,7 +69,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SavingsAccountChargesApiResource {
 
-    private final PlatformSecurityContext context;
     private final ChargeReadPlatformService chargeReadPlatformService;
     private final SavingsAccountChargeReadPlatformService savingsAccountChargeReadPlatformService;
     private final DefaultToApiJsonSerializer<SavingsAccountChargeData> toApiJsonSerializer;
@@ -96,8 +93,7 @@ public class SavingsAccountChargesApiResource {
             @DefaultValue("all") @QueryParam("chargeStatus") @Parameter(description = "chargeStatus") final String chargeStatus,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(SAVINGS_ACCOUNT_CHARGE_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission SAVINGSACCOUNTCHARGE
         if (!(is(chargeStatus, "all") || is(chargeStatus, "active") || is(chargeStatus, "inactive"))) {
             throw new UnrecognizedQueryParamException("status", chargeStatus, new Object[] { "all", "active", "inactive" });
         }
@@ -122,8 +118,7 @@ public class SavingsAccountChargesApiResource {
     public String retrieveTemplate(@PathParam("savingsAccountId") @Parameter(description = "savingsAccountId") final Long savingsAccountId,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(SAVINGS_ACCOUNT_CHARGE_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission SAVINGSACCOUNTCHARGE
         final Collection<ChargeData> chargeOptions = this.chargeReadPlatformService
                 .retrieveSavingsAccountApplicableCharges(savingsAccountId);
         final SavingsAccountChargeData savingsAccountChargeTemplate = SavingsAccountChargeData.template(chargeOptions);
@@ -146,8 +141,7 @@ public class SavingsAccountChargesApiResource {
             @PathParam("savingsAccountChargeId") @Parameter(description = "savingsAccountChargeId") final Long savingsAccountChargeId,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(SAVINGS_ACCOUNT_CHARGE_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission SAVINGSACCOUNTCHARGE
         final SavingsAccountChargeData savingsAccountCharge = this.savingsAccountChargeReadPlatformService
                 .retrieveSavingsAccountChargeDetails(savingsAccountChargeId, savingsAccountId);
 

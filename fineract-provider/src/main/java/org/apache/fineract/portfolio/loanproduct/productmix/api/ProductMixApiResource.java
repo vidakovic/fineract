@@ -42,7 +42,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.loanproduct.data.LoanProductData;
 import org.apache.fineract.portfolio.loanproduct.productmix.data.ProductMixData;
 import org.apache.fineract.portfolio.loanproduct.productmix.service.ProductMixReadPlatformService;
@@ -55,12 +54,9 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ProductMixApiResource {
 
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "PRODUCTMIX";
-
     private static final Set<String> PRODUCT_MIX_DATA_PARAMETERS = new HashSet<>(
             Arrays.asList("productId", "productName", "restrictedProducts", "allowedProducts", "productOptions"));
 
-    private final PlatformSecurityContext context;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final DefaultToApiJsonSerializer<ProductMixData> toApiJsonSerializer;
@@ -73,8 +69,7 @@ public class ProductMixApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveTemplate(@PathParam("productId") final Long productId, @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission PRODUCTMIX
         ProductMixData productMixData = this.productMixReadPlatformService.retrieveLoanProductMixDetails(productId);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

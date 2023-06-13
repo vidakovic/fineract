@@ -44,7 +44,6 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.sms.data.SmsData;
 import org.apache.fineract.infrastructure.sms.service.SmsReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -57,9 +56,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SmsApiResource {
 
-    private final String resourceNameForPermissions = "SMS";
-
-    private final PlatformSecurityContext context;
     private final SmsReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<SmsData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -67,7 +63,7 @@ public class SmsApiResource {
 
     @GET
     public String retrieveAll(@Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+        // TODO: @vidakovic check permission SMS
         final Collection<SmsData> smsMessages = readPlatformService.retrieveAll();
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return toApiJsonSerializer.serialize(settings, smsMessages);
@@ -96,7 +92,7 @@ public class SmsApiResource {
             @QueryParam("dateFormat") final String dateFormat, @QueryParam("sqlSearch") final String sqlSearch,
             @QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit,
             @QueryParam("orderBy") final String orderBy, @QueryParam("sortOrder") final String sortOrder) {
-        context.authenticatedUser().validateHasReadPermission(resourceNameForPermissions);
+        // TODO: @vidakovic check permission SMS
         final SearchParameters searchParameters = SearchParameters.forSMSCampaign(sqlSearch, offset, limit, orderBy, sortOrder);
 
         LocalDate fromDate = null;

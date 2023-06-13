@@ -40,7 +40,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.data.OfficeTransactionData;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -54,9 +53,6 @@ public class OfficeTransactionsApiResource {
             Arrays.asList("id", "transactionDate", "fromOfficeId", "fromOfficeName", "toOfficeId", "toOfficeIdName", "currencyCode",
                     "digitsAfterDecimal", "inMultiplesOf", "transactionAmount", "description", "allowedOffices", "currencyOptions"));
 
-    private static final String RESOURCE_NAME_FOR_READ_PERMISSIONS = "OFFICE";
-
-    private final PlatformSecurityContext context;
     private final OfficeReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<OfficeTransactionData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -67,8 +63,7 @@ public class OfficeTransactionsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveOfficeTransactions(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_READ_PERMISSIONS);
-
+        // TODO: @vidakovic check permission OFFICE
         final Collection<OfficeTransactionData> officeTransactions = this.readPlatformService.retrieveAllOfficeTransactions();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -81,8 +76,7 @@ public class OfficeTransactionsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String newOfficeTransactionDetails(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_READ_PERMISSIONS);
-
+        // TODO: @vidakovic check permission OFFICE
         final OfficeTransactionData officeTransactionData = this.readPlatformService.retrieveNewOfficeTransactionDetails();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

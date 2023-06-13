@@ -33,7 +33,6 @@ import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.survey.data.LikelihoodData;
 import org.apache.fineract.infrastructure.survey.service.ReadLikelihoodService;
 import org.springframework.stereotype.Component;
@@ -48,7 +47,6 @@ import org.springframework.stereotype.Component;
 public class LikelihoodApiResource {
 
     private final DefaultToApiJsonSerializer<LikelihoodData> toApiJsonSerializer;
-    private final PlatformSecurityContext context;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final ReadLikelihoodService readService;
 
@@ -57,12 +55,9 @@ public class LikelihoodApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveAll(@PathParam("ppiName") final String ppiName) {
-
-        this.context.authenticatedUser().validateHasReadPermission(PovertyLineApiConstants.POVERTY_LINE_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission POVERTYLINE
         List<LikelihoodData> likelihoodData = this.readService.retrieveAll(ppiName);
         return this.toApiJsonSerializer.serialize(likelihoodData);
-
     }
 
     @GET
@@ -70,12 +65,9 @@ public class LikelihoodApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieve(@PathParam("likelihoodId") final Long likelihoodId, @PathParam("ppiName") final String ppiName) {
-
-        this.context.authenticatedUser().validateHasReadPermission(PovertyLineApiConstants.POVERTY_LINE_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission POVERTYLINE
         LikelihoodData likelihoodData = this.readService.retrieve(likelihoodId);
         return this.toApiJsonSerializer.serialize(likelihoodData);
-
     }
 
     @PUT
@@ -84,9 +76,7 @@ public class LikelihoodApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String update(@PathParam("likelihoodId") final Long likelihoodId, final String apiRequestBodyAsJson,
             @PathParam("ppiName") final String ppiName) {
-
-        this.context.authenticatedUser().validateHasReadPermission(PovertyLineApiConstants.POVERTY_LINE_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission POVERTYLINE
         final CommandWrapper commandRequest = new CommandWrapperBuilder() //
                 .updateLikelihood(likelihoodId) //
                 .withJson(apiRequestBodyAsJson) //
@@ -95,6 +85,5 @@ public class LikelihoodApiResource {
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
 
         return this.toApiJsonSerializer.serialize(result);
-
     }
 }

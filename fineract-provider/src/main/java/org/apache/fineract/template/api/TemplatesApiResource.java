@@ -55,7 +55,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.template.data.TemplateData;
 import org.apache.fineract.template.domain.Template;
 import org.apache.fineract.template.domain.TemplateEntity;
@@ -84,7 +83,6 @@ public class TemplatesApiResource {
     private static final Set<String> RESPONSE_TEMPLATE_DATA_PARAMETERS = new HashSet<>(List.of(ID, ENTITIES, TYPES, PARAM_TEMPLATE));
     private static final String RESOURCE_NAME_FOR_PERMISSION = PARAM_TEMPLATE;
 
-    private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<Template> toApiJsonSerializer;
     private final DefaultToApiJsonSerializer<TemplateData> templateDataApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -102,9 +100,6 @@ public class TemplatesApiResource {
     public String retrieveAll(@DefaultValue("-1") @QueryParam("typeId") @Parameter(description = "typeId") final int typeId,
             @DefaultValue("-1") @QueryParam("entityId") @Parameter(description = "entityId") final int entityId,
             @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
-
         // FIXME - we dont use the ORM when doing fetches - we write SQL and
         // fetch through JDBC returning data to be serialized to JSON
         List<Template> templates;
@@ -127,9 +122,6 @@ public class TemplatesApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = TemplatesApiResourcesSwagger.GetTemplatesTemplateResponse.class))) })
     public String template(@Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
-
         final TemplateData templateData = TemplateData.template();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -157,9 +149,6 @@ public class TemplatesApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = TemplatesApiResourcesSwagger.GetTemplatesTemplateIdResponse.class))) })
     public String retrieveOne(@PathParam("templateId") @Parameter(description = "templateId") final Long templateId,
             @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
-
         final Template template = this.templateService.findOneById(templateId);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -169,9 +158,6 @@ public class TemplatesApiResource {
     @GET
     @Path("{templateId}/template")
     public String getTemplateByTemplate(@PathParam("templateId") final Long templateId, @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
-
         final TemplateData template = TemplateData.template(this.templateService.findOneById(templateId));
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

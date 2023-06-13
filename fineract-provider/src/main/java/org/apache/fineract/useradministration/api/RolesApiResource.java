@@ -53,7 +53,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.useradministration.data.PermissionData;
 import org.apache.fineract.useradministration.data.RoleData;
 import org.apache.fineract.useradministration.data.RolePermissionsData;
@@ -85,9 +84,6 @@ public class RolesApiResource {
      */
     private static final Set<String> PERMISSIONS_RESPONSE_PARAMETERS = new HashSet<>(
             Arrays.asList(ID, NAME, DESCRIPTION, PERMISSION_USAGE_DATA));
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "ROLE";
-
-    private final PlatformSecurityContext context;
     private final RoleReadPlatformService roleReadPlatformService;
     private final PermissionReadPlatformService permissionReadPlatformService;
     private final DefaultToApiJsonSerializer<RoleData> toApiJsonSerializer;
@@ -102,9 +98,7 @@ public class RolesApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RolesApiResourceSwagger.GetRolesResponse.class)))) })
     public String retrieveAllRoles(@Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission ROLE
         final Collection<RoleData> roles = this.roleReadPlatformService.retrieveAll();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -138,9 +132,7 @@ public class RolesApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = RolesApiResourceSwagger.GetRolesRoleIdResponse.class))) })
     public String retrieveRole(@PathParam("roleId") @Parameter(description = "roleId") final Long roleId, @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission ROLE
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         final RoleData role = this.roleReadPlatformService.retrieveOne(roleId);
@@ -214,9 +206,7 @@ public class RolesApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = RolesApiResourceSwagger.GetRolesRoleIdPermissionsResponse.class))) })
     public String retrieveRolePermissions(@PathParam("roleId") @Parameter(description = "roleId") final Long roleId,
             @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission ROLE
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         final RoleData role = this.roleReadPlatformService.retrieveOne(roleId);

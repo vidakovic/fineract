@@ -30,6 +30,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Context;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -39,7 +40,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.exception.InvalidJsonException;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.useradministration.api.UsersApiResource;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
@@ -51,7 +51,6 @@ import org.springframework.stereotype.Component;
 public class SelfUserApiResource {
 
     private final UsersApiResource usersApiResource;
-    private final PlatformSecurityContext context;
     private final FromJsonHelper fromApiJsonHelper;
     private static final Set<String> SUPPORTED_PARAMETERS = new HashSet<>(Arrays.asList("password", "repeatPassword"));
 
@@ -60,7 +59,7 @@ public class SelfUserApiResource {
     @RequestBody(required = true, content = @Content(schema = @Schema(implementation = SelfUserApiResourceSwagger.PutSelfUserRequest.class)))
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SelfUserApiResourceSwagger.PutSelfUserResponse.class))) })
-    public String update(@Parameter(hidden = true) final String apiRequestBodyAsJson) {
+    public String update(@Context AppUser user, @Parameter(hidden = true) final String apiRequestBodyAsJson) {
         if (StringUtils.isBlank(apiRequestBodyAsJson)) {
             throw new InvalidJsonException();
         }
@@ -68,8 +67,7 @@ public class SelfUserApiResource {
         final Type typeOfMap = new TypeToken<Map<String, Object>>() {}.getType();
         this.fromApiJsonHelper.checkForUnsupportedParameters(typeOfMap, apiRequestBodyAsJson, SUPPORTED_PARAMETERS);
 
-        final AppUser appUser = this.context.authenticatedUser();
-        return this.usersApiResource.update(appUser.getId(), apiRequestBodyAsJson);
+        return this.usersApiResource.update(user.getId(), apiRequestBodyAsJson);
     }
 
 }

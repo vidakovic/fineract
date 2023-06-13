@@ -18,19 +18,21 @@
  */
 package org.apache.fineract.portfolio.self.savings.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.portfolio.savings.exception.SavingsAccountNotFoundException;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class AppuserSavingsMapperReadServiceImpl implements AppuserSavingsMapperReadService {
 
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public AppuserSavingsMapperReadServiceImpl(final JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    private final PlatformSecurityContext context;
 
     @Override
     public Boolean isSavingsMappedToUser(Long savingsId, Long appUserId) {
@@ -38,5 +40,14 @@ public class AppuserSavingsMapperReadServiceImpl implements AppuserSavingsMapper
                 "select case when (count(*) > 0) then true else false end " + " from m_selfservice_user_client_mapping as m "
                         + " left join m_savings_account as s on s.client_id = m.client_id " + " where s.id = ? and m.appuser_id = ? ",
                 Boolean.class, savingsId, appUserId);
+    }
+
+    @Override
+    public void validateAppuserSavingsMapping(Long savingsId) {
+        AppUser user = this.context.authenticatedUser();
+        final boolean isMappedSavings = isSavingsMappedToUser(savingsId, user.getId());
+        if (!isMappedSavings) {
+            throw new SavingsAccountNotFoundException(savingsId);
+        }
     }
 }

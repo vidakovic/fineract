@@ -50,7 +50,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.fund.data.FundData;
 import org.apache.fineract.portfolio.fund.service.FundReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -66,9 +65,6 @@ public class FundsApiResource {
      */
     private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id", "name", "externalId"));
 
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "FUND";
-
-    private final PlatformSecurityContext context;
     private final FundReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<FundData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -81,7 +77,7 @@ public class FundsApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = FundsApiResourceSwagger.GetFundsResponse.class)))) })
     public String retrieveFunds(@Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission FUND
         final Collection<FundData> funds = readPlatformService.retrieveAllFunds();
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return toApiJsonSerializer.serialize(settings, funds, RESPONSE_DATA_PARAMETERS);
@@ -109,7 +105,7 @@ public class FundsApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = FundsApiResourceSwagger.GetFundsResponse.class))) })
     public String retrieveFund(@PathParam("fundId") @Parameter(description = "fundId") final Long fundId, @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission FUND
         final FundData fund = readPlatformService.retrieveFund(fundId);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return toApiJsonSerializer.serialize(settings, fund, RESPONSE_DATA_PARAMETERS);

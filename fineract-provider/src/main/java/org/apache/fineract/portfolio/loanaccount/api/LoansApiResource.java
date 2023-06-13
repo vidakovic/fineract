@@ -87,7 +87,6 @@ import org.apache.fineract.infrastructure.dataqueries.data.DatatableData;
 import org.apache.fineract.infrastructure.dataqueries.data.EntityTables;
 import org.apache.fineract.infrastructure.dataqueries.data.StatusEnum;
 import org.apache.fineract.infrastructure.dataqueries.service.EntityDatatableChecksReadService;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.staff.data.StaffData;
 import org.apache.fineract.portfolio.account.PortfolioAccountType;
@@ -241,7 +240,6 @@ public class LoansApiResource {
             "parentLoanAccountNo", "parentPrincipalAmount", "childLoanAccountNo", "childPrincipalAmount", "clientName"));
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "LOAN";
 
-    private final PlatformSecurityContext context;
     private final LoanReadPlatformService loanReadPlatformService;
     private final LoanProductReadPlatformService loanProductReadPlatformService;
     private final LoanDropdownReadPlatformService dropdownReadPlatformService;
@@ -311,7 +309,7 @@ public class LoansApiResource {
             @DefaultValue("false") @QueryParam("activeOnly") @Parameter(description = "activeOnly") final boolean onlyActive,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission LOAN
 
         // template
         final Collection<LoanProductData> productOptions = this.loanProductReadPlatformService.retrieveAllLoanProductsForLookup(onlyActive);
@@ -469,7 +467,7 @@ public class LoansApiResource {
             @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder,
             @QueryParam("accountNo") @Parameter(description = "accountNo") final String accountNo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission LOAN
 
         final SearchParameters searchParameters = SearchParameters.forLoans(sqlSearch, externalId, offset, limit, orderBy, sortOrder,
                 accountNo);
@@ -570,6 +568,7 @@ public class LoansApiResource {
     @Produces("application/vnd.ms-excel")
     public Response getLoansTemplate(@QueryParam("officeId") final Long officeId, @QueryParam("staffId") final Long staffId,
             @QueryParam("dateFormat") final String dateFormat) {
+        // TODO: @vidakovic check permission all OFFICE, STAFF, GROUP, CLIENT, LOANPRODUCT, FUNDS, PAYMENTTYPE, CURRENCY
         return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.LOANS.toString(), officeId, staffId, dateFormat);
     }
 
@@ -578,7 +577,7 @@ public class LoansApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String getGlimRepaymentTemplate(@PathParam("glimId") final Long glimId, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission LOAN
         Collection<GlimRepaymentTemplate> glimRepaymentTemplate = this.glimAccountInfoReadPlatformService.findglimRepaymentTemplate(glimId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.glimTemplateToApiJsonSerializer.serialize(settings, glimRepaymentTemplate, GLIM_ACCOUNTS_DATA_PARAMETERS);
@@ -632,6 +631,7 @@ public class LoansApiResource {
     @Produces("application/vnd.ms-excel")
     public Response getLoanRepaymentTemplate(@QueryParam("officeId") final Long officeId,
             @QueryParam("dateFormat") final String dateFormat) {
+        // TODO: @vidakovic check permission all OFFICE, CLIENT, FUNDS, PAYMENTTYPE, CURRENCY
         return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.LOAN_TRANSACTIONS.toString(), officeId, null, dateFormat);
     }
 
@@ -670,6 +670,7 @@ public class LoansApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = DelinquencyApiResourceSwagger.GetDelinquencyTagHistoryResponse.class)))) })
     public String getDelinquencyTagHistory(@PathParam("loanId") @Parameter(description = "loanId", required = true) final Long loanId,
             @Context final UriInfo uriInfo) {
+        // TODO: @vidakovic check permission DELINQUINCY_TAGS
         return getDelinquencyTagHistory(loanId, null, uriInfo);
     }
 
@@ -773,12 +774,13 @@ public class LoansApiResource {
     public String getDelinquencyTagHistory(
             @PathParam("loanExternalId") @Parameter(description = "loanExternalId", required = true) final String loanExternalId,
             @Context final UriInfo uriInfo) {
+        // TODO: @vidakovic check permission DELINQUINCY_TAGS
         return getDelinquencyTagHistory(null, loanExternalId, uriInfo);
     }
 
     private String retrieveApprovalTemplate(final Long loanId, final String loanExternalIdStr, final String templateType,
             final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission LOAN
         LoanApprovalData loanApprovalTemplate = null;
         ExternalId loanExternalId = ExternalIdFactory.produce(loanExternalIdStr);
         Long resolvedLoanId = getResolvedLoanId(loanId, loanExternalId);
@@ -795,7 +797,7 @@ public class LoansApiResource {
 
     private String retrieveLoan(final Long loanId, final String loanExternalIdStr, boolean staffInSelectedOfficeOnly, final String exclude,
             final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission LOAN
         ExternalId loanExternalId = ExternalIdFactory.produce(loanExternalIdStr);
         Long resolvedLoanId = getResolvedLoanId(loanId, loanExternalId);
         LoanAccountData loanBasicDetails = this.loanReadPlatformService.retrieveOne(resolvedLoanId);
@@ -1133,7 +1135,6 @@ public class LoansApiResource {
     }
 
     private String getDelinquencyTagHistory(final Long loanId, final String loanExternalIdStr, final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission("DELINQUENCY_TAGS");
         ExternalId loanExternalId = ExternalIdFactory.produce(loanExternalIdStr);
         Long resolvedLoanId = getResolvedLoanId(loanId, loanExternalId);
         final Collection<LoanDelinquencyTagHistoryData> loanDelinquencyTagHistoryData = this.delinquencyReadPlatformService

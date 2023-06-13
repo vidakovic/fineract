@@ -43,20 +43,16 @@ import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.exception.UnrecognizedQueryParamException;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.api.LoanApiConstants;
 import org.apache.fineract.portfolio.loanaccount.api.LoanChargesApiResource;
 import org.apache.fineract.portfolio.loanaccount.api.LoanTransactionsApiResource;
 import org.apache.fineract.portfolio.loanaccount.api.LoansApiResource;
-import org.apache.fineract.portfolio.loanaccount.exception.LoanNotFoundException;
 import org.apache.fineract.portfolio.loanaccount.exception.LoanTemplateTypeRequiredException;
 import org.apache.fineract.portfolio.loanaccount.exception.NotSupportedLoanTemplateTypeException;
 import org.apache.fineract.portfolio.loanaccount.guarantor.api.GuarantorsApiResource;
 import org.apache.fineract.portfolio.self.client.service.AppuserClientMapperReadService;
 import org.apache.fineract.portfolio.self.loanaccount.data.SelfLoansDataValidator;
 import org.apache.fineract.portfolio.self.loanaccount.service.AppuserLoansMapperReadService;
-import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/self/loans")
@@ -65,7 +61,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SelfLoansApiResource {
 
-    private final PlatformSecurityContext context;
     private final LoansApiResource loansApiResource;
     private final LoanTransactionsApiResource loanTransactionsApiResource;
     private final LoanChargesApiResource loanChargesApiResource;
@@ -87,7 +82,7 @@ public class SelfLoansApiResource {
 
         this.dataValidator.validateRetrieveLoan(uriInfo);
 
-        validateAppuserLoanMapping(loanId);
+        appuserLoansMapperReadService.validateAppuserLoansMapping(loanId);
 
         final boolean staffInSelectedOfficeOnly = false;
         final String associations = LoanApiConstants.LOAN_ASSOCIATIONS_ALL;
@@ -111,7 +106,7 @@ public class SelfLoansApiResource {
 
         this.dataValidator.validateRetrieveTransaction(uriInfo);
 
-        validateAppuserLoanMapping(loanId);
+        appuserLoansMapperReadService.validateAppuserLoansMapping(loanId);
 
         return this.loanTransactionsApiResource.retrieveTransaction(loanId, transactionId, fields, uriInfo);
     }
@@ -127,7 +122,7 @@ public class SelfLoansApiResource {
     public String retrieveAllLoanCharges(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId,
             @Context final UriInfo uriInfo) {
 
-        validateAppuserLoanMapping(loanId);
+        appuserLoansMapperReadService.validateAppuserLoansMapping(loanId);
 
         return this.loanChargesApiResource.retrieveAllLoanCharges(loanId, uriInfo);
     }
@@ -143,7 +138,7 @@ public class SelfLoansApiResource {
     public String retrieveLoanCharge(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId,
             @PathParam("chargeId") @Parameter(description = "chargeId") final Long loanChargeId, @Context final UriInfo uriInfo) {
 
-        validateAppuserLoanMapping(loanId);
+        appuserLoansMapperReadService.validateAppuserLoansMapping(loanId);
 
         return this.loanChargesApiResource.retrieveLoanCharge(loanId, loanChargeId, uriInfo);
     }
@@ -165,7 +160,7 @@ public class SelfLoansApiResource {
             @Context final UriInfo uriInfo) {
 
         if (clientId != null) {
-            validateAppuserClientsMapping(clientId);
+            appUserClientMapperReadService.validateAppuserClientsMapping(clientId);
         }
 
         if (templateType == null) {
@@ -204,7 +199,7 @@ public class SelfLoansApiResource {
 
         HashMap<String, Object> attr = this.dataValidator.validateLoanApplication(apiRequestBodyAsJson);
         final Long clientId = (Long) attr.get("clientId");
-        validateAppuserClientsMapping(clientId);
+        appUserClientMapperReadService.validateAppuserClientsMapping(clientId);
 
         return this.loansApiResource.calculateLoanScheduleOrSubmitLoanApplication(commandParam, uriInfo, apiRequestBodyAsJson);
     }
@@ -221,10 +216,10 @@ public class SelfLoansApiResource {
             @Parameter(hidden = true) final String apiRequestBodyAsJson) {
 
         HashMap<String, Object> attr = this.dataValidator.validateModifyLoanApplication(apiRequestBodyAsJson);
-        validateAppuserLoanMapping(loanId);
+        appuserLoansMapperReadService.validateAppuserLoansMapping(loanId);
         final Long clientId = (Long) attr.get("clientId");
         if (clientId != null) {
-            validateAppuserClientsMapping(clientId);
+            appUserClientMapperReadService.validateAppuserClientsMapping(clientId);
         }
         final String command = null;
         return this.loansApiResource.modifyLoanApplication(loanId, command, apiRequestBodyAsJson);
@@ -245,24 +240,8 @@ public class SelfLoansApiResource {
         if (!is(commandParam, "withdrawnByApplicant")) {
             throw new UnrecognizedQueryParamException("command", commandParam);
         }
-        validateAppuserLoanMapping(loanId);
+        appuserLoansMapperReadService.validateAppuserLoansMapping(loanId);
         return this.loansApiResource.stateTransitions(loanId, commandParam, apiRequestBodyAsJson);
-    }
-
-    private void validateAppuserLoanMapping(final Long loanId) {
-        AppUser user = this.context.authenticatedUser();
-        final boolean isLoanMappedToUser = this.appuserLoansMapperReadService.isLoanMappedToUser(loanId, user.getId());
-        if (!isLoanMappedToUser) {
-            throw new LoanNotFoundException(loanId);
-        }
-    }
-
-    private void validateAppuserClientsMapping(final Long clientId) {
-        AppUser user = this.context.authenticatedUser();
-        final boolean mappedClientId = this.appUserClientMapperReadService.isClientMappedToUser(clientId, user.getId());
-        if (!mappedClientId) {
-            throw new ClientNotFoundException(clientId);
-        }
     }
 
     private boolean is(final String commandParam, final String commandValue) {
@@ -275,7 +254,7 @@ public class SelfLoansApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveGuarantorDetails(@PathParam("loanId") final Long loanId, @Context final UriInfo uriInfo) {
 
-        validateAppuserLoanMapping(loanId);
+        appuserLoansMapperReadService.validateAppuserLoansMapping(loanId);
         return this.guarantorsApiResource.retrieveGuarantorDetails(uriInfo, loanId);
     }
 

@@ -27,7 +27,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.spm.api.SpmApiResource;
 import org.apache.fineract.spm.data.SurveyData;
 import org.springframework.stereotype.Component;
@@ -39,7 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SelfSpmApiResource {
 
-    private final PlatformSecurityContext securityContext;
     private final SpmApiResource spmApiResource;
 
     @GET
@@ -47,9 +45,7 @@ public class SelfSpmApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     @Transactional
     public List<SurveyData> fetchAllSurveys() {
-        securityContext.authenticatedUser();
         final Boolean isActive = true;
         return this.spmApiResource.fetchAllSurveys(isActive);
     }
-
 }

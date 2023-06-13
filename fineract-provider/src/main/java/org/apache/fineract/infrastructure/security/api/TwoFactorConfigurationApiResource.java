@@ -31,7 +31,6 @@ import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.security.service.TwoFactorConfigurationService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -44,16 +43,13 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TwoFactorConfigurationApiResource {
 
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "TWOFACTOR_CONFIG";
-
-    private final PlatformSecurityContext context;
     private final TwoFactorConfigurationService configurationService;
     private final DefaultToApiJsonSerializer<Map<String, Object>> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
     @GET
     public String retrieveAll() {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission TWOFACTOR_CONFIG
         Map<String, Object> configurationMap = configurationService.retrieveAll();
         return toApiJsonSerializer.serialize(configurationMap);
     }

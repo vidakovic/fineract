@@ -36,22 +36,14 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.UriInfo;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
-import org.apache.fineract.infrastructure.codes.service.CodeValueReadPlatformService;
-import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.collateralmanagement.data.ClientCollateralManagementData;
 import org.apache.fineract.portfolio.collateralmanagement.data.LoanCollateralTemplateData;
 import org.apache.fineract.portfolio.collateralmanagement.domain.ClientCollateralManagement;
@@ -67,13 +59,8 @@ public class ClientCollateralManagementApiResource {
     private final DefaultToApiJsonSerializer<ClientCollateralManagement> apiJsonSerializerService;
     private final DefaultToApiJsonSerializer<ClientCollateralManagementData> apiJsonSerializerDataService;
     private final DefaultToApiJsonSerializer<LoanCollateralTemplateData> apiJsonSerializerForLoanCollateralTemplateService;
-    private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-    private final PlatformSecurityContext context;
-    private final CodeValueReadPlatformService codeValueReadPlatformService;
     private final ClientCollateralManagementReadPlatformService clientCollateralManagementReadPlatformService;
-    private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(
-            Arrays.asList("name", "quantity", "total", "totalCollateral", "clientId", "loanTransactionData"));
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
@@ -82,14 +69,10 @@ public class ClientCollateralManagementApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClientCollateralManagementApiResourceSwagger.GetClientCollateralManagementsResponse.class)))) })
     public String getClientCollateral(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId,
-            @Context final UriInfo uriInfo, @QueryParam("prodId") @Parameter(description = "prodId") final Long prodId) {
-
-        this.context.authenticatedUser()
-                .validateHasReadPermission(CollateralManagementJsonInputParams.CLIENT_COLLATERAL_PRODUCT_READ_PERMISSION.getValue());
-
-        List<ClientCollateralManagementData> collateralProductList = null;
-
-        collateralProductList = this.clientCollateralManagementReadPlatformService.getClientCollaterals(clientId, prodId);
+            @QueryParam("prodId") @Parameter(description = "prodId") final Long prodId) {
+        // TODO: @vidakovic check permission CLIENT_COLLATERAL_PRODUCT
+        List<ClientCollateralManagementData> collateralProductList = this.clientCollateralManagementReadPlatformService
+                .getClientCollaterals(clientId, prodId);
 
         return this.apiJsonSerializerDataService.serialize(collateralProductList);
     }
@@ -103,10 +86,7 @@ public class ClientCollateralManagementApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ClientCollateralManagementApiResourceSwagger.GetClientCollateralManagementsResponse.class))) })
     public String getClientCollateralData(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId,
             @PathParam("clientCollateralId") @Parameter(description = "clientCollateralId") final Long collateralId) {
-
-        this.context.authenticatedUser()
-                .validateHasReadPermission(CollateralManagementJsonInputParams.CLIENT_COLLATERAL_PRODUCT_READ_PERMISSION.getValue());
-
+        // TODO: @vidakovic check permission CLIENT_COLLATERAL_PRODUCT
         ClientCollateralManagementData clientCollateralManagementData = this.clientCollateralManagementReadPlatformService
                 .getClientCollateralManagementData(collateralId);
 
@@ -120,8 +100,7 @@ public class ClientCollateralManagementApiResource {
     @Operation(summary = "Get Client Collateral Template", description = "Get Client Collateral Template")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ClientCollateralManagementApiResourceSwagger.GetLoanCollateralManagementTemplate.class)))) })
-    public String getClientCollateralTemplate(@Context final UriInfo uriInfo,
-            @PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
+    public String getClientCollateralTemplate(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
         List<LoanCollateralTemplateData> loanCollateralTemplateDataList = this.clientCollateralManagementReadPlatformService
                 .getLoanCollateralTemplate(clientId);
         return this.apiJsonSerializerForLoanCollateralTemplateService.serialize(loanCollateralTemplateDataList);
@@ -178,5 +157,4 @@ public class ClientCollateralManagementApiResource {
         return this.apiJsonSerializerService.serialize(commandProcessingResult);
 
     }
-
 }

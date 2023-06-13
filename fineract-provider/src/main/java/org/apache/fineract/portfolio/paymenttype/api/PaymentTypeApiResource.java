@@ -48,7 +48,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.domain.PaymentTypeRepositoryWrapper;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadPlatformService;
@@ -60,7 +59,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PaymentTypeApiResource {
 
-    private final PlatformSecurityContext securityContext;
     private final DefaultToApiJsonSerializer<PaymentTypeData> jsonSerializer;
     private final PaymentTypeReadPlatformService readPlatformService;
     private final PortfolioCommandSourceWritePlatformService commandWritePlatformService;
@@ -75,7 +73,7 @@ public class PaymentTypeApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PaymentTypeApiResourceSwagger.GetPaymentTypesResponse.class)))) })
     public String getAllPaymentTypes(@Context final UriInfo uriInfo,
             @QueryParam("onlyWithCode") @Parameter(description = "onlyWithCode") final boolean onlyWithCode) {
-        this.securityContext.authenticatedUser().validateHasReadPermission(PaymentTypeApiResourceConstants.resourceNameForPermissions);
+        // TODO: @vidakovic check permission PAYMENT_TYPE
         Collection<PaymentTypeData> paymentTypes = null;
         if (onlyWithCode) {
             paymentTypes = this.readPlatformService.retrieveAllPaymentTypesWithCode();
@@ -95,7 +93,7 @@ public class PaymentTypeApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = PaymentTypeApiResourceSwagger.GetPaymentTypesPaymentTypeIdResponse.class))) })
     public String retrieveOnePaymentType(@PathParam("paymentTypeId") @Parameter(description = "paymentTypeId") final Long paymentTypeId,
             @Context final UriInfo uriInfo) {
-        this.securityContext.authenticatedUser().validateHasReadPermission(PaymentTypeApiResourceConstants.resourceNameForPermissions);
+        // TODO: @vidakovic check permission PAYMENT_TYPE
         this.paymentTypeRepositoryWrapper.findOneWithNotFoundDetection(paymentTypeId);
         final PaymentTypeData paymentTypes = this.readPlatformService.retrieveOne(paymentTypeId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

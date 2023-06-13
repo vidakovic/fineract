@@ -52,7 +52,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/codes")
@@ -67,9 +66,6 @@ public class CodesApiResource {
      * The set of parameters that are supported in response for {@link CodeData}
      */
     private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id", "name", "systemDefined"));
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "CODE";
-
-    private final PlatformSecurityContext context;
     private final CodeReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<CodeData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -83,8 +79,7 @@ public class CodesApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = CodesApiResourceSwagger.GetCodesResponse.class)))) })
     public String retrieveCodes(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission CODE
         final Collection<CodeData> codes = this.readPlatformService.retrieveAllCodes();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

@@ -51,7 +51,6 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.PagedRequest;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadPlatformService;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
@@ -70,7 +69,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SavingsAccountTransactionsApiResource {
 
-    private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<SavingsAccountTransactionData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -90,7 +88,7 @@ public class SavingsAccountTransactionsApiResource {
             // @QueryParam("command") final String commandParam,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME);
+        // TODO: @vidakovic check permission SAVINGSACCOUNT
 
         // FIXME - KW - for now just send back generic default information for
         // both deposit/withdrawal templates
@@ -111,7 +109,7 @@ public class SavingsAccountTransactionsApiResource {
     public String retrieveOne(@PathParam("savingsId") final Long savingsId, @PathParam("transactionId") final Long transactionId,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME);
+        // TODO: @vidakovic check permission SAVINGSACCOUNT
         SavingsAccountTransactionData transactionData = this.savingsAccountReadPlatformService.retrieveSavingsTransaction(savingsId,
                 transactionId, DepositAccountType.SAVINGS_DEPOSIT);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

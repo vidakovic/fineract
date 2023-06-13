@@ -46,7 +46,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/externalservice")
@@ -57,7 +56,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ExternalServicesConfigurationApiResource {
 
-    private final PlatformSecurityContext context;
     private final ExternalServicesPropertiesReadPlatformService externalServicePropertiesReadPlatformService;
     private final ToApiJsonSerializer<ExternalServicesPropertiesData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -73,7 +71,7 @@ public class ExternalServicesConfigurationApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ExternalServicesPropertiesData.class))) })
     public String retrieveOne(@PathParam("servicename") @Parameter(description = "servicename") final String serviceName,
             @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(ExternalServiceConfigurationApiConstant.EXTERNAL_SERVICE_RESOURCE_NAME);
+        // TODO: @vidakovic check permission EXTERNALSERVICECONFIGURATION
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         final Collection<ExternalServicesPropertiesData> externalServiceNVPs = this.externalServicePropertiesReadPlatformService
                 .retrieveOne(serviceName);

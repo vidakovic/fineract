@@ -58,7 +58,6 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.service.CurrencyReadPlatformService;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
@@ -95,7 +94,6 @@ public class FixedDepositProductsApiResource {
     private final DepositProductReadPlatformService depositProductReadPlatformService;
     private final SavingsDropdownReadPlatformService savingsDropdownReadPlatformService;
     private final CurrencyReadPlatformService currencyReadPlatformService;
-    private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<FixedDepositProductData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -159,8 +157,7 @@ public class FixedDepositProductsApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = FixedDepositProductsApiResourceSwagger.GetFixedDepositProductsResponse.class)))) })
     public String retrieveAll(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_PRODUCT_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission FIXEDDEPOSIT
         @SuppressWarnings({ "unchecked", "rawtypes" })
         final Collection<FixedDepositProductData> products = (Collection) this.depositProductReadPlatformService
                 .retrieveAll(DepositAccountType.FIXED_DEPOSIT);
@@ -181,8 +178,7 @@ public class FixedDepositProductsApiResource {
     public String retrieveOne(@PathParam("productId") @Parameter(description = "productId") final Long productId,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_PRODUCT_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission FIXEDDEPOSIT
         FixedDepositProductData fixedDepositProductData = (FixedDepositProductData) this.depositProductReadPlatformService
                 .retrieveOne(DepositAccountType.FIXED_DEPOSIT, productId);
 
@@ -221,8 +217,7 @@ public class FixedDepositProductsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveTemplate(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_PRODUCT_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission FIXEDDEPOSIT
         final FixedDepositProductData fixedDepositProduct = handleTemplateRelatedData(null);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

@@ -60,7 +60,6 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.service.CurrencyReadPlatformService;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
@@ -116,7 +115,6 @@ public class LoanProductsApiResource {
     public static final String PRODUCTMIX = "PRODUCTMIX";
     public static final String PRODUCT_MIXES = "productMixes";
 
-    private final PlatformSecurityContext context;
     private final LoanProductReadPlatformService loanProductReadPlatformService;
     private final ChargeReadPlatformService chargeReadPlatformService;
     private final CurrencyReadPlatformService currencyReadPlatformService;
@@ -173,12 +171,14 @@ public class LoanProductsApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = LoanProductsApiResourceSwagger.GetLoanProductsResponse.class)))) })
     public String retrieveAllLoanProducts(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission LOANPRODUCT
+        // TODO: @vidakovic check permission PRODUCTMIX
+        // NOTE: require both permissions always; make a changelog entry!
         final Set<String> associationParameters = ApiParameterHelper.extractAssociationsForResponseIfProvided(uriInfo.getQueryParameters());
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         if (!associationParameters.isEmpty() && associationParameters.contains(PRODUCT_MIXES)) {
-            this.context.authenticatedUser().validateHasReadPermission(PRODUCTMIX);
+            // TODO: @vidakovic check permission PRODUCTMIX
             final Collection<ProductMixData> productMixes = this.productMixReadPlatformService.retrieveAllProductMixes();
             return this.productMixDataApiJsonSerializer.serialize(settings, productMixes, PRODUCT_MIX_DATA_PARAMETERS);
         }
@@ -199,12 +199,13 @@ public class LoanProductsApiResource {
     public String retrieveTemplate(@Context final UriInfo uriInfo,
             @QueryParam("isProductMixTemplate") @Parameter(description = "isProductMixTemplate") final boolean isProductMixTemplate) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission LOANPRODUCT
+        // TODO: @vidakovic check permission PRODUCTMIX
+        // NOTE: require both permissions always; make a changelog entry!
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         if (isProductMixTemplate) {
-            this.context.authenticatedUser().validateHasReadPermission(PRODUCTMIX);
-
+            // TODO: @vidakovic check permission PRODUCTMIX
             final Collection<LoanProductData> productOptions = this.loanProductReadPlatformService.retrieveAvailableLoanProductsForMix();
             final ProductMixData productMixData = ProductMixData.template(productOptions);
             return this.productMixDataApiJsonSerializer.serialize(settings, productMixData, PRODUCT_MIX_DATA_PARAMETERS);
@@ -228,8 +229,7 @@ public class LoanProductsApiResource {
     public String retrieveLoanProductDetails(@PathParam("productId") @Parameter(description = "productId") final Long productId,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission LOANPRODUCT
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         LoanProductData loanProduct = this.loanProductReadPlatformService.retrieveLoanProduct(productId);

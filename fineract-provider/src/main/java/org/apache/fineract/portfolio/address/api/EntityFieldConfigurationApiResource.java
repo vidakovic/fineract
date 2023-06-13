@@ -42,7 +42,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.address.data.FieldConfigurationData;
 import org.apache.fineract.portfolio.address.service.FieldConfigurationReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -58,8 +57,6 @@ public class EntityFieldConfigurationApiResource {
     private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(
             Arrays.asList("clientAddressId", "client_id", "address_id", "address_type_id", "isActive", "fieldConfigurationId", "entity",
                     "table", "field", "is_enabled", "is_mandatory", "validation_regex"));
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "Address";
-    private final PlatformSecurityContext context;
     private final FieldConfigurationReadPlatformService readPlatformServicefld;
     private final DefaultToApiJsonSerializer<FieldConfigurationData> toApiJsonSerializerfld;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -72,8 +69,7 @@ public class EntityFieldConfigurationApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = EntityFieldConfigurationApiResourcesSwagger.GetFieldConfigurationEntityResponse.class)))) })
     public String getAddresses(@PathParam("entity") @Parameter(description = "entity") final String entityname,
             @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission ADDRESS (shouldn't this be FIELD?)
         final Collection<FieldConfigurationData> fldconfig = this.readPlatformServicefld.retrieveFieldConfiguration(entityname);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

@@ -27,18 +27,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
 import org.apache.fineract.infrastructure.security.constants.TwoFactorConstants;
 import org.apache.fineract.infrastructure.security.data.AuthenticatedOauthUserData;
 import org.apache.fineract.infrastructure.security.data.FineractJwtAuthenticationToken;
-import org.apache.fineract.infrastructure.security.service.SpringSecurityPlatformSecurityContext;
-import org.apache.fineract.useradministration.data.RoleData;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.apache.fineract.useradministration.domain.Role;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,7 +57,6 @@ import org.springframework.stereotype.Component;
 public class UserDetailsApiResource {
 
     private final ToApiJsonSerializer<AuthenticatedOauthUserData> apiJsonSerializerService;
-    private final SpringSecurityPlatformSecurityContext springSecurityPlatformSecurityContext;
 
     @Value("${fineract.security.2fa.enabled}")
     private boolean twoFactorEnabled;
@@ -69,8 +66,8 @@ public class UserDetailsApiResource {
     @Operation(summary = "Fetch authenticated user details\n", description = "checks the Authentication and returns the set roles and permissions allowed.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = UserDetailsApiResourceSwagger.GetUserDetailsResponse.class))) })
-    public String fetchAuthenticatedUserData() {
-
+    public String fetchAuthenticatedUserData(@Context AppUser user) {
+        // TODO: @vidakovic check permission BYPASS_TWO_FACTOR_PERMISSION (only if 2FA is enabled)
         final SecurityContext context = SecurityContextHolder.getContext();
         if (context == null) {
             return null;
@@ -81,46 +78,34 @@ public class UserDetailsApiResource {
             return null;
         }
 
-        final AppUser principal = (AppUser) authentication.getPrincipal();
-        if (principal == null) {
-            return null;
-        }
-
         final Collection<String> permissions = new ArrayList<>();
-        AuthenticatedOauthUserData authenticatedUserData = new AuthenticatedOauthUserData().setUsername(principal.getUsername())
-                .setPermissions(permissions);
+        AuthenticatedOauthUserData authenticatedUserData;
 
         final Collection<GrantedAuthority> authorities = new ArrayList<>(authentication.getAuthorities());
         for (final GrantedAuthority grantedAuthority : authorities) {
             permissions.add(grantedAuthority.getAuthority());
         }
 
-        final Collection<RoleData> roles = new ArrayList<>();
-        final Set<Role> userRoles = principal.getRoles();
-        for (final Role role : userRoles) {
-            roles.add(role.toData());
-        }
+        final Long officeId = user.getOffice().getId();
+        final String officeName = user.getOffice().getName();
 
-        final Long officeId = principal.getOffice().getId();
-        final String officeName = principal.getOffice().getName();
+        final Long staffId = user.getStaffId();
+        final String staffDisplayName = user.getStaffDisplayName();
 
-        final Long staffId = principal.getStaffId();
-        final String staffDisplayName = principal.getStaffDisplayName();
-
-        final EnumOptionData organisationalRole = principal.organisationalRoleData();
+        final EnumOptionData organisationalRole = user.organisationalRoleData();
 
         boolean isTwoFactorRequired = this.twoFactorEnabled
-                && !principal.hasSpecificPermissionTo(TwoFactorConstants.BYPASS_TWO_FACTOR_PERMISSION);
-        if (this.springSecurityPlatformSecurityContext.doesPasswordHasToBeRenewed(principal)) {
-            authenticatedUserData = new AuthenticatedOauthUserData().setUsername(principal.getUsername()).setUserId(principal.getId())
+                && !user.hasSpecificPermissionTo(TwoFactorConstants.BYPASS_TWO_FACTOR_PERMISSION);
+        if (!user.isCredentialsNonExpired()) {
+            authenticatedUserData = new AuthenticatedOauthUserData().setUsername(user.getUsername()).setUserId(user.getId())
                     .setAccessToken(authentication.getToken().getTokenValue()).setAuthenticated(true).setShouldRenewPassword(true)
                     .setTwoFactorAuthenticationRequired(isTwoFactorRequired);
         } else {
-            authenticatedUserData = new AuthenticatedOauthUserData().setUsername(principal.getUsername()).setOfficeId(officeId)
+            authenticatedUserData = new AuthenticatedOauthUserData().setUsername(user.getUsername()).setOfficeId(officeId)
                     .setOfficeName(officeName).setStaffId(staffId).setStaffDisplayName(staffDisplayName)
-                    .setOrganisationalRole(organisationalRole).setRoles(roles).setPermissions(permissions).setUserId(principal.getId())
-                    .setAccessToken(authentication.getToken().getTokenValue()).setAuthenticated(true)
-                    .setTwoFactorAuthenticationRequired(isTwoFactorRequired);
+                    .setOrganisationalRole(organisationalRole).setRoles(user.getRoles().stream().map(Role::toData).toList())
+                    .setPermissions(permissions).setUserId(user.getId()).setAccessToken(authentication.getToken().getTokenValue())
+                    .setAuthenticated(true).setTwoFactorAuthenticationRequired(isTwoFactorRequired);
         }
 
         return this.apiJsonSerializerService.serialize(authenticatedUserData);

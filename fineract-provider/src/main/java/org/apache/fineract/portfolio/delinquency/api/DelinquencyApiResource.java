@@ -47,7 +47,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.delinquency.data.DelinquencyBucketData;
 import org.apache.fineract.portfolio.delinquency.data.DelinquencyRangeData;
 import org.apache.fineract.portfolio.delinquency.service.DelinquencyReadPlatformService;
@@ -60,7 +59,6 @@ import org.springframework.stereotype.Component;
 public class DelinquencyApiResource {
 
     private final ApiRequestParameterHelper parameterHelper;
-    private final PlatformSecurityContext securityContext;
     private final DefaultToApiJsonSerializer<DelinquencyBucketData> jsonSerializerBucket;
     private final DefaultToApiJsonSerializer<DelinquencyRangeData> jsonSerializerRange;
     private final DelinquencyReadPlatformService readPlatformService;
@@ -74,7 +72,7 @@ public class DelinquencyApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = DelinquencyApiResourceSwagger.GetDelinquencyRangesResponse.class)))) })
     public String getDelinquencyRanges(@Context final UriInfo uriInfo) {
-        securityContext.authenticatedUser().validateHasReadPermission("DELINQUENCY_BUCKET");
+        // TODO: @vidakovic check permission DELINQUENCY_BUCKET
         final Collection<DelinquencyRangeData> delinquencyRangeData = this.readPlatformService.retrieveAllDelinquencyRanges();
         ApiRequestJsonSerializationSettings settings = parameterHelper.process(uriInfo.getQueryParameters());
         return this.jsonSerializerRange.serialize(settings, delinquencyRangeData);
@@ -90,7 +88,7 @@ public class DelinquencyApiResource {
     public String getDelinquencyRange(
             @PathParam("delinquencyRangeId") @Parameter(description = "delinquencyRangeId") final Long delinquencyRangeId,
             @Context final UriInfo uriInfo) {
-        securityContext.authenticatedUser().validateHasReadPermission("DELINQUENCY_BUCKET");
+        // TODO: @vidakovic check permission DELINQUENCY_BUCKET
         final DelinquencyRangeData delinquencyRangeData = this.readPlatformService.retrieveDelinquencyRange(delinquencyRangeId);
         ApiRequestJsonSerializationSettings settings = parameterHelper.process(uriInfo.getQueryParameters());
         return this.jsonSerializerRange.serialize(settings, delinquencyRangeData);
@@ -105,7 +103,7 @@ public class DelinquencyApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DelinquencyApiResourceSwagger.PostDelinquencyRangeResponse.class))) })
     public String createDelinquencyRange(final String jsonRequestBody, @Context UriInfo uriInfo) {
-        securityContext.authenticatedUser().validateHasCreatePermission("DELINQUENCY_BUCKET");
+        // TODO: @vidakovic check permission DELINQUENCY_BUCKET (create)
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createDelinquencyRange().withJson(jsonRequestBody).build();
 
         CommandProcessingResult result = commandWritePlatformService.logCommandSource(commandRequest);
@@ -123,7 +121,7 @@ public class DelinquencyApiResource {
     public String updateDelinquencyRange(
             @PathParam("delinquencyRangeId") @Parameter(description = "delinquencyRangeId") final Long delinquencyRangeId,
             final String jsonRequestBody, @Context UriInfo uriInfo) {
-        securityContext.authenticatedUser().validateHasUpdatePermission("DELINQUENCY_BUCKET");
+        // TODO: @vidakovic check permission DELINQUENCY_BUCKET (update)
         final CommandWrapper commandRequest = new CommandWrapperBuilder().updateDelinquencyRange(delinquencyRangeId)
                 .withJson(jsonRequestBody).build();
 
@@ -142,7 +140,7 @@ public class DelinquencyApiResource {
     public String deleteDelinquencyRange(
             @PathParam("delinquencyRangeId") @Parameter(description = "delinquencyRangeId") final Long delinquencyRangeId,
             @Context UriInfo uriInfo) {
-        securityContext.authenticatedUser().validateHasDeletePermission("DELINQUENCY_BUCKET");
+        // TODO: @vidakovic check permission DELINQUENCY_BUCKET
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteDelinquencyRange(delinquencyRangeId).build();
 
         CommandProcessingResult result = commandWritePlatformService.logCommandSource(commandRequest);
@@ -157,7 +155,7 @@ public class DelinquencyApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = DelinquencyApiResourceSwagger.GetDelinquencyBucketsResponse.class)))) })
     public String getDelinquencyBuckets(@Context final UriInfo uriInfo) {
-        securityContext.authenticatedUser().validateHasReadPermission("DELINQUENCY_BUCKET");
+        // TODO: @vidakovic check permission DELINQUENCY_BUCKET
         final Collection<DelinquencyBucketData> delinquencyBucketData = this.readPlatformService.retrieveAllDelinquencyBuckets();
         ApiRequestJsonSerializationSettings settings = parameterHelper.process(uriInfo.getQueryParameters());
         return this.jsonSerializerBucket.serialize(settings, delinquencyBucketData);
@@ -173,7 +171,7 @@ public class DelinquencyApiResource {
     public String getDelinquencyBucket(
             @PathParam("delinquencyBucketId") @Parameter(description = "delinquencyBucketId") final Long delinquencyBucketId,
             @Context final UriInfo uriInfo) {
-        securityContext.authenticatedUser().validateHasReadPermission("DELINQUENCY_BUCKET");
+        // TODO: @vidakovic check permission DELINQUENCY_BUCKET
         final DelinquencyBucketData delinquencyBucketData = this.readPlatformService.retrieveDelinquencyBucket(delinquencyBucketId);
         ApiRequestJsonSerializationSettings settings = parameterHelper.process(uriInfo.getQueryParameters());
         return this.jsonSerializerBucket.serialize(settings, delinquencyBucketData);
@@ -188,7 +186,7 @@ public class DelinquencyApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DelinquencyApiResourceSwagger.PostDelinquencyBucketResponse.class))) })
     public String createDelinquencyBucket(final String jsonRequestBody, @Context UriInfo uriInfo) {
-        securityContext.authenticatedUser().validateHasCreatePermission("DELINQUENCY_BUCKET");
+        // TODO: @vidakovic check permission DELINQUENCY_BUCKET (create)
         final CommandWrapper commandRequest = new CommandWrapperBuilder().createDelinquencyBucket().withJson(jsonRequestBody).build();
 
         CommandProcessingResult result = commandWritePlatformService.logCommandSource(commandRequest);
@@ -206,7 +204,7 @@ public class DelinquencyApiResource {
     public String updateDelinquencyBucket(
             @PathParam("delinquencyBucketId") @Parameter(description = "delinquencyBucketId") final Long delinquencyBucketId,
             final String jsonRequestBody, @Context UriInfo uriInfo) {
-        securityContext.authenticatedUser().validateHasUpdatePermission("DELINQUENCY_BUCKET");
+        // TODO: @vidakovic check permission DELINQUENCY_BUCKET (update)
         final CommandWrapper commandRequest = new CommandWrapperBuilder().updateDelinquencyBucket(delinquencyBucketId)
                 .withJson(jsonRequestBody).build();
 
@@ -225,7 +223,7 @@ public class DelinquencyApiResource {
     public String deleteDelinquencyBucket(
             @PathParam("delinquencyBucketId") @Parameter(description = "delinquencyBucketId") final Long delinquencyBucketId,
             @Context UriInfo uriInfo) {
-        securityContext.authenticatedUser().validateHasDeletePermission("DELINQUENCY_BUCKET");
+        // TODO: @vidakovic check permission DELINQUENCY_BUCKET (delete)
         final CommandWrapper commandRequest = new CommandWrapperBuilder().deleteDelinquencyBucket(delinquencyBucketId).build();
 
         CommandProcessingResult result = commandWritePlatformService.logCommandSource(commandRequest);

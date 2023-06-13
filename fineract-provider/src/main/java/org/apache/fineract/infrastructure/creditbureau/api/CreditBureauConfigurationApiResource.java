@@ -50,7 +50,6 @@ import org.apache.fineract.infrastructure.creditbureau.service.CreditBureauLoanP
 import org.apache.fineract.infrastructure.creditbureau.service.CreditBureauReadConfigurationService;
 import org.apache.fineract.infrastructure.creditbureau.service.CreditBureauReadPlatformService;
 import org.apache.fineract.infrastructure.creditbureau.service.OrganisationCreditBureauReadPlatformService;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/CreditBureauConfiguration")
@@ -61,8 +60,6 @@ public class CreditBureauConfigurationApiResource {
 
     private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(
             Arrays.asList("creditBureauId", "alias", "country", "creditBureauProductId", "startDate", "endDate", "isActive"));
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "CreditBureau";
-    private final PlatformSecurityContext context;
     private final CreditBureauReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<CreditBureauData> toApiJsonSerializer;
     private final CreditBureauLoanProductMappingReadPlatformService readPlatformServiceCreditBureauLoanProduct;
@@ -78,8 +75,7 @@ public class CreditBureauConfigurationApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String getCreditBureau(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission CREDITBUREAU
         final Collection<CreditBureauData> creditBureau = this.readPlatformService.retrieveCreditBureau();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -92,8 +88,7 @@ public class CreditBureauConfigurationApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String getCreditBureauLoanProductMapping(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission CREDITBUREAU
         final Collection<CreditBureauLoanProductMappingData> creditBureauLoanProductMapping = this.readPlatformServiceCreditBureauLoanProduct
                 .readCreditBureauLoanProductMapping();
 
@@ -108,8 +103,7 @@ public class CreditBureauConfigurationApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String getOrganisationCreditBureau(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission CREDITBUREAU
         final Collection<OrganisationCreditBureauData> organisationCreditBureau = this.readPlatformServiceOrganisationCreditBureau
                 .retrieveOrgCreditBureau();
 
@@ -122,11 +116,8 @@ public class CreditBureauConfigurationApiResource {
     @Path("/config/{organisationCreditBureauId}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String getConfiguration(@PathParam("organisationCreditBureauId") final Long organisationCreditBureauId,
-            @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+    public String getConfiguration(@PathParam("organisationCreditBureauId") final Long organisationCreditBureauId) {
+        // TODO: @vidakovic check permission CREDITBUREAU
         final Collection<CreditBureauConfigurationData> configurationData = this.creditBureauConfiguration
                 .readConfigurationByOrganisationCreditBureauId(organisationCreditBureauId);
 
@@ -138,8 +129,7 @@ public class CreditBureauConfigurationApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String fetchLoanProducts(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission CREDITBUREAU
         final Collection<CreditBureauLoanProductMappingData> creditBureauLoanProductMapping = this.readPlatformServiceCreditBureauLoanProduct
                 .fetchLoanProducts();
 
@@ -153,8 +143,7 @@ public class CreditBureauConfigurationApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String fetchMappingByLoanProductId(@Context final UriInfo uriInfo, @PathParam("loanProductId") final Long loanProductId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission CREDITBUREAU
         final CreditBureauLoanProductMappingData creditBureauLoanProductMapping = this.readPlatformServiceCreditBureauLoanProduct
                 .readMappingByLoanId(loanProductId);
 

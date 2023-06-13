@@ -23,11 +23,11 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.service.PagedRequest;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.client.domain.ClientRepository;
 import org.apache.fineract.portfolio.client.service.search.domain.ClientSearchData;
 import org.apache.fineract.portfolio.client.service.search.domain.ClientTextSearch;
 import org.apache.fineract.portfolio.client.service.search.mapper.ClientSearchDataMapper;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -38,23 +38,20 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ClientSearchService {
 
-    private final PlatformSecurityContext context;
     private final ClientRepository clientRepository;
     private final ClientSearchDataMapper clientSearchDataMapper;
 
-    public Page<ClientSearchData> searchByText(PagedRequest<ClientTextSearch> searchRequest) {
+    public Page<ClientSearchData> searchByText(AppUser user, PagedRequest<ClientTextSearch> searchRequest) {
         validateTextSearchRequest(searchRequest);
-        return executeTextSearch(searchRequest);
+        return executeTextSearch(user, searchRequest);
     }
 
     private void validateTextSearchRequest(PagedRequest<ClientTextSearch> searchRequest) {
         Objects.requireNonNull(searchRequest, "searchRequest must not be null");
-
-        context.isAuthenticated();
     }
 
-    private Page<ClientSearchData> executeTextSearch(PagedRequest<ClientTextSearch> searchRequest) {
-        final String hierarchy = context.authenticatedUser().getOffice().getHierarchy();
+    private Page<ClientSearchData> executeTextSearch(final AppUser user, PagedRequest<ClientTextSearch> searchRequest) {
+        final String hierarchy = user.getOffice().getHierarchy();
 
         Optional<ClientTextSearch> request = searchRequest.getRequest();
         String requestSearchText = request.map(ClientTextSearch::getText).orElse(null);

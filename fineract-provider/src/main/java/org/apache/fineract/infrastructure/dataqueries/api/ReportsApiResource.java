@@ -53,7 +53,6 @@ import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer
 import org.apache.fineract.infrastructure.dataqueries.data.ReportData;
 import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingService;
 import org.apache.fineract.infrastructure.report.provider.ReportingProcessServiceProvider;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/reports")
@@ -65,8 +64,6 @@ public class ReportsApiResource {
     private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id", "reportName", "reportType",
             "reportSubType", "reportCategory", "description", "reportSql", "coreReport", "useReport", "reportParameters"));
 
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "REPORT";
-    private final PlatformSecurityContext context;
     private final ToApiJsonSerializer<ReportData> toApiJsonSerializer;
     private final ReadReportingService readReportingService;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
@@ -80,9 +77,7 @@ public class ReportsApiResource {
             + "reports")
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ReportsApiResourceSwagger.GetReportsResponse.class))))
     public String retrieveReportList(@Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission REPORT
         final Collection<ReportData> result = this.readReportingService.retrieveReportList();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -98,9 +93,7 @@ public class ReportsApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ReportsApiResourceSwagger.GetReportsResponse.class))) })
     public String retrieveReport(@PathParam("id") @Parameter(description = "id") final Long id, @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission REPORT
         final ReportData result = this.readReportingService.retrieveReport(id);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -121,9 +114,7 @@ public class ReportsApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ReportsApiResourceSwagger.GetReportsTemplateResponse.class))) })
     public String retrieveOfficeTemplate(@Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission REPORT
         final ReportData result = new ReportData();
         result.appendedTemplate(this.readReportingService.getAllowedParameters(),
                 this.reportingProcessServiceProvider.findAllReportingTypes());
@@ -181,5 +172,4 @@ public class ReportsApiResource {
 
         return this.toApiJsonSerializer.serialize(result);
     }
-
 }

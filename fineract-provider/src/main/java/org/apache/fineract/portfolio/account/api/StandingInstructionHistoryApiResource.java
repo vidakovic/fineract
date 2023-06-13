@@ -41,7 +41,6 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.account.data.StandingInstructionDTO;
 import org.apache.fineract.portfolio.account.data.StandingInstructionHistoryData;
 import org.apache.fineract.portfolio.account.service.StandingInstructionHistoryReadPlatformService;
@@ -53,7 +52,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class StandingInstructionHistoryApiResource {
 
-    private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<StandingInstructionHistoryData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final StandingInstructionHistoryReadPlatformService standingInstructionHistoryReadPlatformService;
@@ -83,8 +81,7 @@ public class StandingInstructionHistoryApiResource {
             @QueryParam("fromDate") @Parameter(description = "fromDate") final DateParam fromDateParam,
             @QueryParam("toDate") @Parameter(description = "toDate") final DateParam toDateParam) {
 
-        this.context.authenticatedUser().validateHasReadPermission(StandingInstructionApiConstants.STANDING_INSTRUCTION_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission STANDINGINSTRUCTION
         final SearchParameters searchParameters = SearchParameters.forAccountTransfer(sqlSearch, externalId, offset, limit, orderBy,
                 sortOrder);
         LocalDate startDateRange = null;

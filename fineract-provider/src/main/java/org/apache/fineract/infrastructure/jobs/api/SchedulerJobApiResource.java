@@ -59,8 +59,6 @@ import org.apache.fineract.infrastructure.jobs.data.JobDetailData;
 import org.apache.fineract.infrastructure.jobs.data.JobDetailHistoryData;
 import org.apache.fineract.infrastructure.jobs.service.JobRegisterService;
 import org.apache.fineract.infrastructure.jobs.service.SchedulerJobRunnerReadService;
-import org.apache.fineract.infrastructure.security.exception.NoAuthorizationException;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/jobs")
@@ -77,7 +75,6 @@ public class SchedulerJobApiResource {
     private final ToApiJsonSerializer<JobDetailData> toApiJsonSerializer;
     private final ToApiJsonSerializer<JobDetailHistoryData> jobHistoryToApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-    private final PlatformSecurityContext context;
     private final FineractProperties fineractProperties;
 
     @GET
@@ -86,7 +83,7 @@ public class SchedulerJobApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SchedulerJobApiResourceSwagger.GetJobsResponse.class)))) })
     public String retrieveAll(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(SchedulerJobApiConstants.SCHEDULER_RESOURCE_NAME);
+        // TODO: @vidakovic check permission SCHEDULER
         final List<JobDetailData> jobDetailDatas = this.schedulerJobRunnerReadService.findAllJobDeatils();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, jobDetailDatas, SchedulerJobApiConstants.JOB_DETAIL_RESPONSE_DATA_PARAMETERS);
@@ -99,7 +96,7 @@ public class SchedulerJobApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SchedulerJobApiResourceSwagger.GetJobsResponse.class))) })
     public String retrieveOne(@PathParam(SchedulerJobApiConstants.JOB_ID) @Parameter(description = "jobId") final Long jobId,
             @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(SchedulerJobApiConstants.SCHEDULER_RESOURCE_NAME);
+        // TODO: @vidakovic check permission SCHEDULER
         final JobDetailData jobDetailData = this.schedulerJobRunnerReadService.retrieveOne(jobId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, jobDetailData, SchedulerJobApiConstants.JOB_DETAIL_RESPONSE_DATA_PARAMETERS);
@@ -116,7 +113,7 @@ public class SchedulerJobApiResource {
             @QueryParam("limit") @Parameter(description = "limit") final Integer limit,
             @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy,
             @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder) {
-        this.context.authenticatedUser().validateHasReadPermission(SchedulerJobApiConstants.SCHEDULER_RESOURCE_NAME);
+        // TODO: @vidakovic check permission SCHEDULER
         final SearchParameters searchParameters = SearchParameters.forPagination(offset, limit, orderBy, sortOrder);
         final Page<JobDetailHistoryData> jobhistoryDetailData = this.schedulerJobRunnerReadService.retrieveJobHistory(jobId,
                 searchParameters);
@@ -133,16 +130,9 @@ public class SchedulerJobApiResource {
     public Response executeJob(@PathParam(SchedulerJobApiConstants.JOB_ID) @Parameter(description = "jobId") final Long jobId,
             @QueryParam(SchedulerJobApiConstants.COMMAND) @Parameter(description = "command") final String commandParam,
             @Parameter(hidden = true) final String jsonRequestBody) {
-        // check the logged in user have permissions to execute scheduler jobs
+        // TODO: @vidakovic check permission any ALL_FUNCTIONS, EXECUTEJOB_SCHEDULER
         Response response;
         if (fineractProperties.getMode().isBatchManagerEnabled()) {
-            final boolean hasNotPermission = this.context.authenticatedUser().hasNotPermissionForAnyOf("ALL_FUNCTIONS",
-                    "EXECUTEJOB_SCHEDULER");
-            if (hasNotPermission) {
-                final String authorizationMessage = "User has no authority to execute scheduler jobs";
-                throw new NoAuthorizationException(authorizationMessage);
-            }
-            response = Response.status(400).build();
             if (is(commandParam, SchedulerJobApiConstants.COMMAND_EXECUTE_JOB)) {
                 jobRegisterService.executeJobWithParameters(jobId, jsonRequestBody);
                 response = Response.status(202).build();
@@ -150,6 +140,8 @@ public class SchedulerJobApiResource {
                 throw new UnrecognizedQueryParamException(SchedulerJobApiConstants.COMMAND, commandParam);
             }
         } else {
+            // TODO: @vidakovic check that this branch is already covered by above todo; technically a bit different,
+            // but result similar
             ApiGlobalErrorResponse errorResponse = ApiGlobalErrorResponse.invalidInstanceTypeMethod("Batch");
             response = Response.status(Status.METHOD_NOT_ALLOWED).entity(errorResponse).build();
         }

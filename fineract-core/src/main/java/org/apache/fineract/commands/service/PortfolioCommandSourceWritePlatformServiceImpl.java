@@ -29,7 +29,6 @@ import org.apache.fineract.commands.exception.CommandNotFoundException;
 import org.apache.fineract.infrastructure.core.api.JsonCommand;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
-import org.apache.fineract.infrastructure.jobs.service.SchedulerJobRunnerReadService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Service;
@@ -44,7 +43,7 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements Portfolio
     private final CommandSourceRepository commandSourceRepository;
     private final FromJsonHelper fromApiJsonHelper;
     private final CommandProcessingService processAndLogCommandService;
-    private final SchedulerJobRunnerReadService schedulerJobRunnerReadService;
+    // private final SchedulerJobRunnerReadService schedulerJobRunnerReadService;
 
     @Override
     public CommandProcessingResult logCommandSource(final CommandWrapper wrapper) {
@@ -124,7 +123,7 @@ public class PortfolioCommandSourceWritePlatformServiceImpl implements Portfolio
     }
 
     private void validateIsUpdateAllowed() {
-        this.schedulerJobRunnerReadService.isUpdatesAllowed();
+        // this.schedulerJobRunnerReadService.isUpdatesAllowed();
     }
 
     @Override

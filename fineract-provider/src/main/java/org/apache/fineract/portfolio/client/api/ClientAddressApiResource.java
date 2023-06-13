@@ -50,7 +50,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.address.data.AddressData;
 import org.apache.fineract.portfolio.address.service.AddressReadPlatformServiceImpl;
 import org.springframework.stereotype.Component;
@@ -66,8 +65,6 @@ public class ClientAddressApiResource {
                     "stateProvinceId", "countryId", "postalCode", "latitude", "longitude", "createdBy", "createdOn", "updatedBy",
                     "updatedOn", "clientAddressId", "client_id", "address_id", "address_type_id", "isActive", "fieldConfigurationId",
                     "entity", "table", "field", "is_enabled", "is_mandatory", "validation_regex"));
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "Address";
-    private final PlatformSecurityContext context;
     private final AddressReadPlatformServiceImpl readPlatformService;
     private final DefaultToApiJsonSerializer<AddressData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -78,8 +75,7 @@ public class ClientAddressApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String getAddressesTemplate(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission ADDRESS
         final AddressData template = this.readPlatformService.retrieveTemplate();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -120,7 +116,7 @@ public class ClientAddressApiResource {
             @PathParam("clientid") @Parameter(description = "clientId") final long clientid, @Context final UriInfo uriInfo) {
         Collection<AddressData> address;
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission ADDRESS
 
         // TODO: This is quite a confusing implementation with all these checks
         // These have to be considered as filtering criterias instead

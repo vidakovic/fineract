@@ -51,7 +51,6 @@ import org.apache.fineract.infrastructure.documentmanagement.exception.ContentMa
 import org.apache.fineract.infrastructure.documentmanagement.exception.InvalidEntityTypeForImageManagementException;
 import org.apache.fineract.infrastructure.documentmanagement.service.ImageReadPlatformService;
 import org.apache.fineract.infrastructure.documentmanagement.service.ImageWritePlatformService;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.client.data.ClientData;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -64,7 +63,6 @@ import org.springframework.stereotype.Component;
 @Path("/v1/{entity}/{entityId}/images")
 public class ImagesApiResource {
 
-    private final PlatformSecurityContext context;
     private final ImageReadPlatformService imageReadPlatformService;
     private final ImageWritePlatformService imageWritePlatformService;
     private final DefaultToApiJsonSerializer<ClientData> toApiJsonSerializer;
@@ -124,12 +122,9 @@ public class ImagesApiResource {
     public Response retrieveImage(@PathParam("entity") final String entityName, @PathParam("entityId") final Long entityId,
             @QueryParam("maxWidth") final Integer maxWidth, @QueryParam("maxHeight") final Integer maxHeight,
             @QueryParam("output") final String output, @HeaderParam("Accept") String acceptHeader) {
+        // TODO: @vidakovic check permission CLIENTIMAGE, STAFFIMAGE
+        // NOTE: create 2 resource classes with explicit paths
         validateEntityTypeforImage(entityName);
-        if (EntityTypeForImages.CLIENTS.toString().equalsIgnoreCase(entityName)) {
-            this.context.authenticatedUser().validateHasReadPermission("CLIENTIMAGE");
-        } else if (EntityTypeForImages.STAFF.toString().equalsIgnoreCase(entityName)) {
-            this.context.authenticatedUser().validateHasReadPermission("STAFFIMAGE");
-        }
 
         final FileData imageData = this.imageReadPlatformService.retrieveImage(entityName, entityId);
         final FileData resizedImage = imageResizer.resize(imageData, maxWidth, maxHeight);

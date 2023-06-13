@@ -55,7 +55,6 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.CommandParameterUtil;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.charge.domain.ChargeTimeType;
 import org.apache.fineract.portfolio.charge.exception.LoanChargeNotFoundException;
@@ -82,8 +81,6 @@ public class LoanChargesApiResource {
             Arrays.asList("id", "chargeId", "name", "penalty", "chargeTimeType", "dueAsOfDate", "chargeCalculationType", "percentage",
                     "amountPercentageAppliedTo", "currency", "amountWaived", "amountWrittenOff", "amountOutstanding", "amountOrPercentage",
                     "amount", "amountPaid", "chargeOptions", "installmentChargeData", "externalId"));
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "LOAN";
-    private final PlatformSecurityContext context;
     private final ChargeReadPlatformService chargeReadPlatformService;
     private final LoanChargeReadPlatformService loanChargeReadPlatformService;
     private final DefaultToApiJsonSerializer<LoanChargeData> toApiJsonSerializer;
@@ -101,7 +98,7 @@ public class LoanChargesApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = LoanChargesApiResourceSwagger.GetLoansLoanIdChargesChargeIdResponse.class)))) })
     public String retrieveAllLoanCharges(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId,
             @Context final UriInfo uriInfo) {
-
+        // TODO: @vidakovic check permission LOAN
         return retrieveAllLoanCharges(loanId, null, uriInfo);
     }
 
@@ -116,7 +113,7 @@ public class LoanChargesApiResource {
     public String retrieveAllLoanCharges(
             @PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId,
             @Context final UriInfo uriInfo) {
-
+        // TODO: @vidakovic check permission LOAN
         return retrieveAllLoanCharges(null, loanExternalId, uriInfo);
     }
 
@@ -130,7 +127,7 @@ public class LoanChargesApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = LoanChargesApiResourceSwagger.GetLoansLoanIdChargesTemplateResponse.class))) })
     public String retrieveTemplate(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId,
             @Context final UriInfo uriInfo) {
-
+        // TODO: @vidakovic check permission LOAN
         return retrieveTemplate(loanId, null, uriInfo);
     }
 
@@ -144,7 +141,7 @@ public class LoanChargesApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = LoanChargesApiResourceSwagger.GetLoansLoanIdChargesTemplateResponse.class))) })
     public String retrieveTemplate(@PathParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId,
             @Context final UriInfo uriInfo) {
-
+        // TODO: @vidakovic check permission LOAN
         return retrieveTemplate(null, loanExternalId, uriInfo);
     }
 
@@ -431,8 +428,7 @@ public class LoanChargesApiResource {
 
     private String retrieveLoanCharge(final Long loanId, final String loanExternalIdStr, final Long loanChargeId,
             final String loanChargeExternalIdStr, final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission LOAN
         ExternalId loanExternalId = ExternalIdFactory.produce(loanExternalIdStr);
         ExternalId loanChargeExternalId = ExternalIdFactory.produce(loanChargeExternalIdStr);
 
@@ -519,8 +515,6 @@ public class LoanChargesApiResource {
     }
 
     private String retrieveAllLoanCharges(final Long loanId, final String loanExternalIdStr, final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
         ExternalId loanExternalId = ExternalIdFactory.produce(loanExternalIdStr);
         Long resolvedLoanId = getResolvedLoanId(loanId, loanExternalId);
 
@@ -531,8 +525,6 @@ public class LoanChargesApiResource {
     }
 
     private String retrieveTemplate(final Long loanId, final String loanExternalIdStr, final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
         ExternalId loanExternalId = ExternalIdFactory.produce(loanExternalIdStr);
         Long resolvedLoanId = getResolvedLoanId(loanId, loanExternalId);
 

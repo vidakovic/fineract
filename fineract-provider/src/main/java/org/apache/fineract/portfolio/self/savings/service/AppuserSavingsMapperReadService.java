@@ -22,4 +22,6 @@ public interface AppuserSavingsMapperReadService {
 
     Boolean isSavingsMappedToUser(Long savingsId, Long appUserId);
 
+    void validateAppuserSavingsMapping(Long savingsId);
+
 }

@@ -50,7 +50,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -69,9 +68,6 @@ public class ChargesApiResource {
             "loanChargeTimeTypeOptions", "savingsChargeCalculationTypeOptions", "savingsChargeTimeTypeOptions", "incomeAccount",
             "clientChargeCalculationTypeOptions", "clientChargeTimeTypeOptions"));
 
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "CHARGE";
-
-    private final PlatformSecurityContext context;
     private final ChargeReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<ChargeData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -86,8 +82,7 @@ public class ChargesApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ChargesApiResourceSwagger.GetChargesResponse.class)))) })
     public String retrieveAllCharges(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission CHARGE
         final Collection<ChargeData> charges = this.readPlatformService.retrieveAllCharges();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -105,8 +100,7 @@ public class ChargesApiResource {
     public String retrieveCharge(@PathParam("chargeId") @Parameter(description = "chargeId") final Long chargeId,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission CHARGE
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         ChargeData charge = this.readPlatformService.retrieveCharge(chargeId);
@@ -128,8 +122,7 @@ public class ChargesApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ChargesApiResourceSwagger.GetChargesTemplateResponse.class))) })
     public String retrieveNewChargeDetails(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission CHARGE
         final ChargeData charge = this.readPlatformService.retrieveNewChargeDetails();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

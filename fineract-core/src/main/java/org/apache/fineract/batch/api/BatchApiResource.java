@@ -48,7 +48,6 @@ import org.apache.fineract.batch.service.BatchApiService;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
 import org.apache.fineract.infrastructure.security.exception.InvalidInstanceTypeMethodException;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -76,7 +75,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class BatchApiResource {
 
-    private final PlatformSecurityContext context;
     private final ToApiJsonSerializer<BatchResponse> toApiJsonSerializer;
     private final BatchApiService service;
     private final BatchRequestJsonHelper batchRequestJsonHelper;
@@ -102,10 +100,6 @@ public class BatchApiResource {
     public String handleBatchRequests(
             @DefaultValue("false") @QueryParam("enclosingTransaction") @Parameter(description = "enclosingTransaction", required = false) final boolean enclosingTransaction,
             @Parameter(hidden = true) final String jsonRequestString, @Context UriInfo uriInfo) {
-
-        // Handles user authentication
-        this.context.authenticatedUser();
-
         // Converts request array into BatchRequest List
         final List<BatchRequest> requestList = this.batchRequestJsonHelper.extractList(jsonRequestString);
 
@@ -123,7 +117,6 @@ public class BatchApiResource {
         }
 
         return this.toApiJsonSerializer.serialize(result);
-
     }
 
     /**

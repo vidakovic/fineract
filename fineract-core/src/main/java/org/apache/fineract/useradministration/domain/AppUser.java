@@ -434,6 +434,7 @@ public class AppUser extends AbstractPersistableCustom implements PlatformUser {
         return this.enabled;
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     public boolean isBypassUser() {
         return hasAnyPermission("BYPASS_LOAN_WRITE_PROTECTION");
     }
@@ -470,26 +471,32 @@ public class AppUser extends AbstractPersistableCustom implements PlatformUser {
         return this.lastTimePasswordUpdated;
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     public boolean canNotApproveLoanInPast() {
         return hasNotPermissionForAnyOf("ALL_FUNCTIONS", "APPROVEINPAST_LOAN");
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     public boolean canNotRejectLoanInPast() {
         return hasNotPermissionForAnyOf("ALL_FUNCTIONS", "REJECTINPAST_LOAN");
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     public boolean canNotWithdrawByClientLoanInPast() {
         return hasNotPermissionForAnyOf("ALL_FUNCTIONS", "WITHDRAWINPAST_LOAN");
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     public boolean canNotDisburseLoanInPast() {
         return hasNotPermissionForAnyOf("ALL_FUNCTIONS", "DISBURSEINPAST_LOAN");
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     public boolean canNotMakeRepaymentOnLoanInPast() {
         return hasNotPermissionForAnyOf("ALL_FUNCTIONS", "REPAYMENTINPAST_LOAN");
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     public boolean hasNotPermissionForReport(final String reportName) {
 
         if (hasNotPermissionForAnyOf("ALL_FUNCTIONS", "ALL_FUNCTIONS_READ", "REPORTING_SUPER_USER", "READ_" + reportName)) {
@@ -499,6 +506,7 @@ public class AppUser extends AbstractPersistableCustom implements PlatformUser {
         return false;
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     public boolean hasNotPermissionForDatatable(final String datatable, final String accessType) {
 
         final String matchPermission = accessType + "_" + datatable;
@@ -519,6 +527,7 @@ public class AppUser extends AbstractPersistableCustom implements PlatformUser {
         return false;
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     public boolean hasNotPermissionForAnyOf(final String... permissionCodes) {
         boolean hasNotPermission = true;
         for (final String permissionCode : permissionCodes) {
@@ -538,6 +547,7 @@ public class AppUser extends AbstractPersistableCustom implements PlatformUser {
      *            the permission code to check for.
      * @return whether the user has the specified permission
      */
+    @Deprecated // TODO: @vidakovic move this outside entity class
     public boolean hasSpecificPermissionTo(final String permissionCode) {
         boolean hasPermission = false;
         for (final Role role : this.roles) {
@@ -549,22 +559,22 @@ public class AppUser extends AbstractPersistableCustom implements PlatformUser {
         return hasPermission;
     }
 
-    public void validateHasReadPermission(final String resourceType) {
-        validateHasPermission("READ", resourceType);
-    }
-
+    @Deprecated // TODO: @vidakovic move this outside entity class
     public void validateHasCreatePermission(final String resourceType) {
         validateHasPermission("CREATE", resourceType);
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     public void validateHasUpdatePermission(final String resourceType) {
         validateHasPermission("UPDATE", resourceType);
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     public void validateHasDeletePermission(final String resourceType) {
         validateHasPermission("DELETE", resourceType);
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     private void validateHasPermission(final String prefix, final String resourceType) {
         final String authorizationMessage = "User has no authority to " + prefix + " " + resourceType.toLowerCase() + "s";
         final String matchPermission = prefix + "_" + resourceType.toUpperCase();
@@ -576,10 +586,12 @@ public class AppUser extends AbstractPersistableCustom implements PlatformUser {
         throw new NoAuthorizationException(authorizationMessage);
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     private boolean hasNotPermissionTo(final String permissionCode) {
         return !hasPermissionTo(permissionCode);
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     private boolean hasPermissionTo(final String permissionCode) {
         boolean hasPermission = hasAllFunctionsPermission();
         if (!hasPermission) {
@@ -593,6 +605,7 @@ public class AppUser extends AbstractPersistableCustom implements PlatformUser {
         return hasPermission;
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     private boolean hasAllFunctionsPermission() {
         boolean match = false;
         for (final Role role : this.roles) {
@@ -604,18 +617,17 @@ public class AppUser extends AbstractPersistableCustom implements PlatformUser {
         return match;
     }
 
-    public boolean hasIdOf(final Long userId) {
-        return getId().equals(userId);
-    }
-
+    @Deprecated // TODO: @vidakovic move this outside entity class
     private boolean hasNotAnyPermission(final List<String> permissions) {
         return !hasAnyPermission(permissions);
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     public boolean hasAnyPermission(String... permissions) {
         return hasAnyPermission(Arrays.asList(permissions));
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     public boolean hasAnyPermission(final List<String> permissions) {
         boolean hasAtLeastOneOf = false;
 
@@ -629,6 +641,7 @@ public class AppUser extends AbstractPersistableCustom implements PlatformUser {
         return hasAtLeastOneOf;
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     public void validateHasPermissionTo(final String function, final List<String> allowedPermissions) {
         if (hasNotAnyPermission(allowedPermissions)) {
             final String authorizationMessage = "User has no authority to: " + function;
@@ -636,6 +649,7 @@ public class AppUser extends AbstractPersistableCustom implements PlatformUser {
         }
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     public void validateHasPermissionTo(final String function) {
         if (hasNotPermissionTo(function)) {
             final String authorizationMessage = "User has no authority to: " + function;
@@ -643,12 +657,7 @@ public class AppUser extends AbstractPersistableCustom implements PlatformUser {
         }
     }
 
-    public void validateHasReadPermission(final String function, final Long userId) {
-        if (!("USER".equalsIgnoreCase(function) && userId.equals(getId()))) {
-            validateHasReadPermission(function);
-        }
-    }
-
+    @Deprecated // TODO: @vidakovic move this outside entity class
     public void validateHasCheckerPermissionTo(final String function) {
         final String checkerPermissionName = function.toUpperCase() + "_CHECKER";
         if (hasNotPermissionTo("CHECKER_SUPER_USER") && hasNotPermissionTo(checkerPermissionName)) {
@@ -657,6 +666,7 @@ public class AppUser extends AbstractPersistableCustom implements PlatformUser {
         }
     }
 
+    @Deprecated // TODO: @vidakovic move this outside entity class
     public void validateHasDatatableReadPermission(final String datatable) {
         if (hasNotPermissionForDatatable(datatable, "READ")) {
             throw new NoAuthorizationException("Not authorised to read datatable: " + datatable);
@@ -699,10 +709,6 @@ public class AppUser extends AbstractPersistableCustom implements PlatformUser {
         }
 
         return passwordEncodedValue;
-    }
-
-    public boolean isNotEnabled() {
-        return !isEnabled();
     }
 
     public boolean isSelfServiceUser() {

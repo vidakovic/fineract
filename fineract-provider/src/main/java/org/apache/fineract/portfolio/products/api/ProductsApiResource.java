@@ -46,7 +46,6 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.Page;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.products.constants.ProductsApiConstants;
 import org.apache.fineract.portfolio.products.data.ProductData;
 import org.apache.fineract.portfolio.products.exception.ResourceNotFoundException;
@@ -64,7 +63,6 @@ public class ProductsApiResource {
     private final ApplicationContext applicationContext;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final DefaultToApiJsonSerializer<ProductData> toApiJsonSerializer;
-    private final PlatformSecurityContext platformSecurityContext;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
 
     @GET
@@ -139,7 +137,6 @@ public class ProductsApiResource {
     public String createProduct(@PathParam("type") @Parameter(description = "type") final String productType,
             @Parameter(hidden = true) final String apiRequestBodyAsJson) {
         CommandWrapper commandWrapper = null;
-        this.platformSecurityContext.authenticatedUser();
         commandWrapper = new CommandWrapperBuilder().createProduct(productType).withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult commandProcessingResult = this.commandsSourceWritePlatformService.logCommandSource(commandWrapper);
         return this.toApiJsonSerializer.serialize(commandProcessingResult);
@@ -170,7 +167,6 @@ public class ProductsApiResource {
     public String updateProduct(@PathParam("type") @Parameter(description = "type") final String productType,
             @PathParam("productId") @Parameter(description = "productId") final Long productId,
             @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        this.platformSecurityContext.authenticatedUser();
         final CommandWrapper commandRequest = new CommandWrapperBuilder().updateProduct(productType, productId)
                 .withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);

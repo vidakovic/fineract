@@ -34,7 +34,6 @@ import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.group.data.GroupLevelData;
 import org.apache.fineract.portfolio.group.service.GroupLevelReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -48,7 +47,6 @@ public class GroupsLevelApiResource {
     private static final Set<String> GROUPLEVEL_DATA_PARAMETERS = new HashSet<>(Arrays.asList("levelId", "levelName", "parentLevelId",
             "parentLevelName", "childLevelId", "childLevelName", "superParent", "recursable", "canHaveClients"));
 
-    private final PlatformSecurityContext context;
     private final GroupLevelReadPlatformService groupLevelReadPlatformService;
     private final ToApiJsonSerializer<GroupLevelData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -58,8 +56,7 @@ public class GroupsLevelApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveAllGroups(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission("GROUP");
-
+        // TODO: @vidakovic check permission GROUP
         final Collection<GroupLevelData> groupLevel = this.groupLevelReadPlatformService.retrieveAllLevels();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 

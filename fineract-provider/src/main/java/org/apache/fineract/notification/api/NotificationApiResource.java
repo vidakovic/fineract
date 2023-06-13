@@ -40,7 +40,6 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.notification.data.NotificationData;
 import org.apache.fineract.notification.service.NotificationReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -51,7 +50,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class NotificationApiResource {
 
-    private final PlatformSecurityContext context;
     private final NotificationReadPlatformService notificationReadPlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final ToApiJsonSerializer<NotificationData> toApiJsonSerializer;
@@ -69,7 +67,6 @@ public class NotificationApiResource {
             @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder,
             @QueryParam("isRead") @Parameter(description = "isRead") final boolean isRead) {
 
-        this.context.authenticatedUser();
         final Page<NotificationData> notificationData;
         final SearchParameters searchParameters = SearchParameters.forPagination(offset, limit, orderBy, sortOrder);
         if (!isRead) {
@@ -85,7 +82,6 @@ public class NotificationApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public void update() {
-        this.context.authenticatedUser();
         this.notificationReadPlatformService.updateNotificationReadStatus();
     }
 }

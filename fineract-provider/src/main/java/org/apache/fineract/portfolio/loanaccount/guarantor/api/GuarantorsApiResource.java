@@ -56,7 +56,6 @@ import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.data.UploadRequest;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.account.AccountDetailConstants;
 import org.apache.fineract.portfolio.account.PortfolioAccountType;
 import org.apache.fineract.portfolio.account.api.AccountTransfersApiConstants;
@@ -95,7 +94,6 @@ public class GuarantorsApiResource {
     private final DefaultToApiJsonSerializer<GuarantorData> apiJsonSerializerService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-    private final PlatformSecurityContext context;
     private final PortfolioAccountReadPlatformService portfolioAccountReadPlatformService;
     private final LoanReadPlatformService loanReadPlatformService;
     private final BulkImportWorkbookService bulkImportWorkbookService;
@@ -106,8 +104,7 @@ public class GuarantorsApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String newGuarantorTemplate(@Context final UriInfo uriInfo, @PathParam("loanId") final Long loanId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
-
+        // TODO: @vidakovic check permission GUARANTOR
         final List<EnumOptionData> guarantorTypeOptions = GuarantorEnumerations.guarantorType(GuarantorType.values());
         final Collection<CodeValueData> allowedClientRelationshipTypes = this.codeValueReadPlatformService
                 .retrieveCodeValuesByCode(GuarantorConstants.GUARANTOR_RELATIONSHIP_CODE_NAME);
@@ -123,8 +120,7 @@ public class GuarantorsApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveGuarantorDetails(@Context final UriInfo uriInfo, @PathParam("loanId") final Long loanId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
-
+        // TODO: @vidakovic check permission GUARANTOR
         final List<GuarantorData> guarantorDatas = this.guarantorReadPlatformService.retrieveGuarantorsForValidLoan(loanId);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -138,8 +134,7 @@ public class GuarantorsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveGuarantorDetails(@Context final UriInfo uriInfo, @PathParam("loanId") final Long loanId,
             @PathParam("guarantorId") final Long guarantorId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
-
+        // TODO: @vidakovic check permission GUARANTOR
         GuarantorData guarantorData = this.guarantorReadPlatformService.retrieveGuarantor(loanId, guarantorId);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -200,9 +195,7 @@ public class GuarantorsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String accountsTemplate(@QueryParam("clientId") final Long clientId, @PathParam("loanId") final Long loanId,
             @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
-
+        // TODO: @vidakovic check permission GUARANTOR
         PortfolioAccountDTO portfolioAccountDTO = new PortfolioAccountDTO(PortfolioAccountType.SAVINGS.getValue(), clientId, null);
         Collection<PortfolioAccountData> accountLinkingOptions = null;
         if (this.loanReadPlatformService.isGuaranteeRequired(loanId)) {
@@ -218,6 +211,7 @@ public class GuarantorsApiResource {
     @Produces("application/vnd.ms-excel")
     public Response getGuarantorTemplate(@QueryParam("officeId") final Long officeId, @QueryParam("dateFormat") final String dateFormat,
             @PathParam("loanId") final Long loanId) {
+        // TODO: @vidakovic check permission all OFFICE, STAFF
         return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.GUARANTORS.toString(), officeId, null, dateFormat);
     }
 

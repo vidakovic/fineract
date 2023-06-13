@@ -52,7 +52,6 @@ import org.apache.fineract.infrastructure.core.service.SearchParameters;
 import org.apache.fineract.infrastructure.reportmailingjob.ReportMailingJobConstants;
 import org.apache.fineract.infrastructure.reportmailingjob.data.ReportMailingJobData;
 import org.apache.fineract.infrastructure.reportmailingjob.service.ReportMailingJobReadPlatformService;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/" + ReportMailingJobConstants.REPORT_MAILING_JOB_RESOURCE_NAME)
@@ -61,7 +60,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ReportMailingJobApiResource {
 
-    private final PlatformSecurityContext platformSecurityContext;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final DefaultToApiJsonSerializer<ReportMailingJobData> reportMailingToApiJsonSerializer;
@@ -133,9 +131,7 @@ public class ReportMailingJobApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ReportMailingJobApiResourceSwagger.GetReportMailingJobsResponse.class))) })
     public String retrieveReportMailingJob(@PathParam("entityId") @Parameter(description = "entityId") final Long entityId,
             @Context final UriInfo uriInfo) {
-        this.platformSecurityContext.authenticatedUser()
-                .validateHasReadPermission(ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME);
-
+        // TODO: @vidakovic check permission REPORTMAILINGJOB
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         ReportMailingJobData reportMailingJobData = this.reportMailingJobReadPlatformService.retrieveReportMailingJob(entityId);
 
@@ -158,9 +154,7 @@ public class ReportMailingJobApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ReportMailingJobApiResourceSwagger.GetReportMailingJobsTemplate.class))) })
     public String retrieveReportMailingJobTemplate(@Context final UriInfo uriInfo) {
-        this.platformSecurityContext.authenticatedUser()
-                .validateHasReadPermission(ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME);
-
+        // TODO: @vidakovic check permission REPORTMAILINGJOB
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         final ReportMailingJobData ReportMailingJobDataOptions = this.reportMailingJobReadPlatformService
                 .retrieveReportMailingJobEnumOptions();
@@ -180,9 +174,7 @@ public class ReportMailingJobApiResource {
             @QueryParam("limit") @Parameter(description = "limit") final Integer limit,
             @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy,
             @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder) {
-        this.platformSecurityContext.authenticatedUser()
-                .validateHasReadPermission(ReportMailingJobConstants.REPORT_MAILING_JOB_ENTITY_NAME);
-
+        // TODO: @vidakovic check permission REPORTMAILINGJOB
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         final SearchParameters searchParameters = SearchParameters.fromReportMailingJob(offset, limit, orderBy, sortOrder);
         final Page<ReportMailingJobData> reportMailingJobData = this.reportMailingJobReadPlatformService

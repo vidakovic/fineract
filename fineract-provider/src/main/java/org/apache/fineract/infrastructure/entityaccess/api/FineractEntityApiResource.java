@@ -42,7 +42,6 @@ import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSer
 import org.apache.fineract.infrastructure.entityaccess.data.FineractEntityRelationData;
 import org.apache.fineract.infrastructure.entityaccess.data.FineractEntityToEntityMappingData;
 import org.apache.fineract.infrastructure.entityaccess.service.FineractEntityAccessReadService;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/entitytoentitymapping")
@@ -53,7 +52,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FineractEntityApiResource {
 
-    private final PlatformSecurityContext context;
     private final FineractEntityAccessReadService readPlatformService;
     private final DefaultToApiJsonSerializer<FineractEntityRelationData> toApiJsonSerializer;
     private final DefaultToApiJsonSerializer<FineractEntityToEntityMappingData> toApiJsonSerializerOfficeToLoanProducts;
@@ -64,9 +62,7 @@ public class FineractEntityApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveAll(@Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(FineractEntityApiResourceConstants.FINERACT_ENTITY_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission FINERACTENTITY
         final Collection<FineractEntityRelationData> entityMappings = this.readPlatformService.retrieveAllSupportedMappingTypes();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, entityMappings, FineractEntityApiResourceConstants.RESPONSE_DATA_PARAMETERS);
@@ -77,9 +73,7 @@ public class FineractEntityApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveOne(@PathParam("mapId") final Long mapId, @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(FineractEntityApiResourceConstants.FINERACT_ENTITY_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission FINERACTENTITY
         final Collection<FineractEntityToEntityMappingData> entityToEntityMappings = this.readPlatformService.retrieveOneMapping(mapId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializerOfficeToLoanProducts.serialize(settings, entityToEntityMappings,
@@ -92,9 +86,7 @@ public class FineractEntityApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String getEntityToEntityMappings(@PathParam("mapId") final Long mapId, @PathParam("fromId") final Long fromId,
             @PathParam("toId") final Long toId, @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(FineractEntityApiResourceConstants.FINERACT_ENTITY_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission FINERACTENTITY
         final Collection<FineractEntityToEntityMappingData> entityToEntityMappings = this.readPlatformService
                 .retrieveEntityToEntityMappings(mapId, fromId, toId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

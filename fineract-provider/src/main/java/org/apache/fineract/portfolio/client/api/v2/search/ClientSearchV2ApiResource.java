@@ -25,11 +25,13 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.service.PagedRequest;
 import org.apache.fineract.portfolio.client.service.search.domain.ClientSearchData;
 import org.apache.fineract.portfolio.client.service.search.domain.ClientTextSearch;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -47,7 +49,7 @@ public class ClientSearchV2ApiResource implements ClientSearchV2Api {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     @Operation(summary = "Search Clients by text")
-    public Page<ClientSearchData> searchByText(@Parameter PagedRequest<ClientTextSearch> request) {
-        return delegate.searchByText(request);
+    public Page<ClientSearchData> searchByText(@Context final AppUser user, @Parameter PagedRequest<ClientTextSearch> request) {
+        return delegate.searchByText(user, request);
     }
 }

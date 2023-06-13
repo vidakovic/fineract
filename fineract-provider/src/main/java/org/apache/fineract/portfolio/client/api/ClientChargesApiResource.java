@@ -54,7 +54,6 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformService;
 import org.apache.fineract.portfolio.client.data.ClientChargeData;
@@ -72,7 +71,6 @@ import org.springframework.util.CollectionUtils;
 @RequiredArgsConstructor
 public class ClientChargesApiResource {
 
-    private final PlatformSecurityContext context;
     private final ChargeReadPlatformService chargeReadPlatformService;
     private final ClientChargeReadPlatformService clientChargeReadPlatformService;
     private final ClientTransactionReadPlatformService clientTransactionReadPlatformService;
@@ -92,7 +90,7 @@ public class ClientChargesApiResource {
             @QueryParam("pendingPayment") @Parameter(description = "pendingPayment") final Boolean pendingPayment,
             @Context final UriInfo uriInfo, @QueryParam("limit") @Parameter(description = "limit") final Integer limit,
             @QueryParam("offset") @Parameter(description = "offset") final Integer offset) {
-        this.context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
+        // TODO: @vidakovic check permission CLIENTCHARGE
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         if (!(is(chargeStatus, ClientApiConstants.CLIENT_CHARGE_QUERY_PARAM_STATUS_VALUE_ALL)
                 || is(chargeStatus, ClientApiConstants.CLIENT_CHARGE_QUERY_PARAM_STATUS_VALUE_ACTIVE)
@@ -120,8 +118,7 @@ public class ClientChargesApiResource {
     public String retrieveTemplate(@Context final UriInfo uriInfo,
             @PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
 
-        this.context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission CLIENTCHARGE
         final Collection<ChargeData> chargeOptions = this.chargeReadPlatformService.retrieveAllChargesApplicableToClients();
         final ClientChargeData clientChargeData = ClientChargeData.template(chargeOptions);
 
@@ -141,7 +138,7 @@ public class ClientChargesApiResource {
     public String retrieveClientCharge(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId,
             @PathParam("chargeId") @Parameter(description = "chargeId") final Long chargeId, @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
+        // TODO: @vidakovic check permission CLIENTCHARGE
         ClientChargeData clientCharge = this.clientChargeReadPlatformService.retrieveClientCharge(clientId, chargeId);
         // extract associations
         final Set<String> associationParameters = ApiParameterHelper.extractAssociationsForResponseIfProvided(uriInfo.getQueryParameters());

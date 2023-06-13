@@ -29,9 +29,7 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.UriInfo;
 import java.util.Collection;
 import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +38,6 @@ import org.apache.fineract.infrastructure.gcm.domain.DeviceRegistration;
 import org.apache.fineract.infrastructure.gcm.domain.DeviceRegistrationData;
 import org.apache.fineract.infrastructure.gcm.service.DeviceRegistrationReadPlatformService;
 import org.apache.fineract.infrastructure.gcm.service.DeviceRegistrationWritePlatformService;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/self/device/registration")
@@ -49,7 +46,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DeviceRegistrationApiResource {
 
-    private final PlatformSecurityContext context;
     private final DeviceRegistrationWritePlatformService deviceRegistrationWritePlatformService;
     private final DefaultToApiJsonSerializer<DeviceRegistrationData> toApiJsonSerializer;
     private final DeviceRegistrationReadPlatformService deviceRegistrationReadPlatformService;
@@ -58,7 +54,6 @@ public class DeviceRegistrationApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String registerDevice(final String apiRequestBodyAsJson) {
-        this.context.authenticatedUser();
         Gson gson = new Gson();
         JsonObject json = new Gson().fromJson(apiRequestBodyAsJson, JsonObject.class);
         Long clientId = json.get(DeviceRegistrationApiConstants.clientIdParamName).getAsLong();
@@ -71,10 +66,7 @@ public class DeviceRegistrationApiResource {
     @GET
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String retrieveAllDeviceRegistrations(@Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser();
-
+    public String retrieveAllDeviceRegistrations() {
         Collection<DeviceRegistrationData> deviceRegistrationDataList = this.deviceRegistrationReadPlatformService
                 .retrieveAllDeviceRegiistrations();
 
@@ -85,10 +77,7 @@ public class DeviceRegistrationApiResource {
     @Path("client/{clientId}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String retrieveDeviceRegistrationByClientId(@PathParam("clientId") final Long clientId, @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser();
-
+    public String retrieveDeviceRegistrationByClientId(@PathParam("clientId") final Long clientId) {
         DeviceRegistrationData deviceRegistrationData = this.deviceRegistrationReadPlatformService
                 .retrieveDeviceRegiistrationByClientId(clientId);
 
@@ -99,10 +88,7 @@ public class DeviceRegistrationApiResource {
     @Path("{id}")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String retrieveDeviceRegiistration(@PathParam("id") final Long id, @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser();
-
+    public String retrieveDeviceRegiistration(@PathParam("id") final Long id) {
         DeviceRegistrationData deviceRegistrationData = this.deviceRegistrationReadPlatformService.retrieveDeviceRegiistration(id);
 
         return this.toApiJsonSerializer.serialize(deviceRegistrationData);
@@ -113,9 +99,6 @@ public class DeviceRegistrationApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String updateDeviceRegistration(@PathParam("id") final Long id, final String apiRequestBodyAsJson) {
-
-        this.context.authenticatedUser();
-
         Gson gson = new Gson();
         JsonObject json = new Gson().fromJson(apiRequestBodyAsJson, JsonObject.class);
         Long clientId = json.get(DeviceRegistrationApiConstants.clientIdParamName).getAsLong();
@@ -131,8 +114,6 @@ public class DeviceRegistrationApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String delete(@PathParam("id") final Long id) {
-
-        this.context.authenticatedUser();
         this.deviceRegistrationWritePlatformService.deleteDeviceRegistration(id);
         return responseMap(id);
 

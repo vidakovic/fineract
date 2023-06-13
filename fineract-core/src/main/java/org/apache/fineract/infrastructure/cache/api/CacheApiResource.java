@@ -49,7 +49,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -64,9 +63,6 @@ import org.springframework.stereotype.Component;
 public class CacheApiResource {
 
     private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(List.of("id"));
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "CACHE";
-
-    private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<CacheData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
@@ -79,9 +75,7 @@ public class CacheApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = CacheApiResourceSwagger.GetCachesResponse.class)))) })
     public String retrieveAll(@Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission CACHE
         final Collection<CacheData> codes = this.cacheService.retrieveAll();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

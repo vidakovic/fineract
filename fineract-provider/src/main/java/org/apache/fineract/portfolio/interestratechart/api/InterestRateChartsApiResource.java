@@ -60,7 +60,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.interestratechart.InterestRateChartApiConstants;
 import org.apache.fineract.portfolio.interestratechart.data.InterestRateChartData;
 import org.apache.fineract.portfolio.interestratechart.service.InterestRateChartReadPlatformService;
@@ -73,7 +72,6 @@ import org.springframework.stereotype.Component;
 public class InterestRateChartsApiResource {
 
     private final InterestRateChartReadPlatformService chartReadPlatformService;
-    private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<InterestRateChartData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -90,8 +88,7 @@ public class InterestRateChartsApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = InterestRateChartsApiResourceSwagger.GetInterestRateChartsTemplateResponse.class))) })
     public String template(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(InterestRateChartApiConstants.INTERESTRATE_CHART_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission INTERESTCHART
         InterestRateChartData chartData = this.chartReadPlatformService.template();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -108,8 +105,7 @@ public class InterestRateChartsApiResource {
     public String retrieveAll(@Context final UriInfo uriInfo,
             @QueryParam("productId") @Parameter(description = "productId") final Long productId) {
 
-        this.context.authenticatedUser().validateHasReadPermission(InterestRateChartApiConstants.INTERESTRATE_CHART_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission INTERESTCHART
         Collection<InterestRateChartData> chartDatas = this.chartReadPlatformService.retrieveAllWithSlabs(productId);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -127,8 +123,7 @@ public class InterestRateChartsApiResource {
     public String retrieveOne(@PathParam("chartId") @Parameter(description = "chartId") final Long chartId,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(InterestRateChartApiConstants.INTERESTRATE_CHART_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission INTERESTCHART
         InterestRateChartData chartData = null;
         final Set<String> associationParameters = ApiParameterHelper.extractAssociationsForResponseIfProvided(uriInfo.getQueryParameters());
         if (!associationParameters.isEmpty() && associationParameters.contains(InterestRateChartApiConstants.chartSlabs)) {

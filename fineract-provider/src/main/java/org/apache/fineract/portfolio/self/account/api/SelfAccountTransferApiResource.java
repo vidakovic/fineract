@@ -45,7 +45,6 @@ import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDoma
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.account.api.AccountTransfersApiResource;
 import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatformService;
 import org.apache.fineract.portfolio.self.account.data.SelfAccountTemplateData;
@@ -64,7 +63,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SelfAccountTransferApiResource {
 
-    private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<SelfAccountTransferData> toApiJsonSerializer;
     private final AccountTransfersApiResource accountTransfersApiResource;
     private final SelfAccountTransferReadService selfAccountTransferReadService;
@@ -83,9 +81,8 @@ public class SelfAccountTransferApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SelfAccountTransferApiResourceSwagger.GetAccountTransferTemplateResponse.class)))) })
     public String template(@DefaultValue("") @QueryParam("type") @Parameter(name = "type") final String type,
-            @Context final UriInfo uriInfo) {
+            @Context final UriInfo uriInfo, @Context AppUser user) {
 
-        AppUser user = this.context.authenticatedUser();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         Collection<SelfAccountTemplateData> selfTemplateData = this.selfAccountTransferReadService.retrieveSelfAccountTemplateData(user);
 
@@ -105,22 +102,21 @@ public class SelfAccountTransferApiResource {
             + "\n" + "\n" + "Example Requests:\n" + "\n" + " self/accounttransfers/\n")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SelfAccountTransferApiResourceSwagger.PostNewTransferResponse.class)))) })
-    public String create(@DefaultValue("") @QueryParam("type") @Parameter(name = "type") final String type,
+    public String create(@DefaultValue("") @QueryParam("type") @Parameter(name = "type") final String type, @Context AppUser user,
             final String apiRequestBodyAsJson) {
         Map<String, Object> params = this.dataValidator.validateCreate(type, apiRequestBodyAsJson);
         if (type.equals("tpt")) {
-            checkForLimits(params);
+            checkForLimits(params, user);
         }
         return this.accountTransfersApiResource.create(apiRequestBodyAsJson);
     }
 
-    private void checkForLimits(Map<String, Object> params) {
+    private void checkForLimits(Map<String, Object> params, AppUser user) {
         SelfAccountTemplateData fromAccount = (SelfAccountTemplateData) params.get("fromAccount");
         SelfAccountTemplateData toAccount = (SelfAccountTemplateData) params.get("toAccount");
         LocalDate transactionDate = (LocalDate) params.get("transactionDate");
         BigDecimal transactionAmount = (BigDecimal) params.get("transactionAmount");
 
-        AppUser user = this.context.authenticatedUser();
         Long transferLimit = this.tptBeneficiaryReadPlatformService.getTransferLimit(user.getId(), toAccount.getAccountId(),
                 toAccount.getAccountType());
         if (transferLimit != null && transferLimit > 0) {

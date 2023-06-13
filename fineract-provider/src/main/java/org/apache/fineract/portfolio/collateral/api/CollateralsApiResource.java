@@ -53,7 +53,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.collateral.data.CollateralData;
 import org.apache.fineract.portfolio.collateral.service.CollateralReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -73,7 +72,6 @@ public class CollateralsApiResource {
     private final DefaultToApiJsonSerializer<CollateralData> apiJsonSerializerService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-    private final PlatformSecurityContext context;
     private final CodeValueReadPlatformService codeValueReadPlatformService;
 
     @GET
@@ -87,7 +85,7 @@ public class CollateralsApiResource {
     public String newCollateralTemplate(@Context final UriInfo uriInfo,
             @PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
+        // TODO: @vidakovic check permission COLLATERAL
 
         final Collection<CodeValueData> codeValues = this.codeValueReadPlatformService.retrieveCodeValuesByCode("LoanCollateral");
         final CollateralData collateralData = CollateralData.template(codeValues);
@@ -105,7 +103,7 @@ public class CollateralsApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = CollateralsApiResourceSwagger.GetLoansLoanIdCollateralsResponse.class)))) })
     public String retrieveCollateralDetails(@Context final UriInfo uriInfo,
             @PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
+        // TODO: @vidakovic check permission COLLATERAL
 
         final List<CollateralData> collateralDatas = this.collateralReadPlatformService.retrieveCollateralsForValidLoan(loanId);
 
@@ -125,7 +123,7 @@ public class CollateralsApiResource {
     public String retrieveCollateralDetails(@Context final UriInfo uriInfo,
             @PathParam("loanId") @Parameter(description = "loanId") final Long loanId,
             @PathParam("collateralId") @Parameter(description = "collateralId") final Long CollateralId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
+        // TODO: @vidakovic check permission COLLATERAL
 
         CollateralData collateralData = this.collateralReadPlatformService.retrieveCollateral(loanId, CollateralId);
 

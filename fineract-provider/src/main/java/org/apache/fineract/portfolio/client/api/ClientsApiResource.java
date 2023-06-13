@@ -61,7 +61,6 @@ import org.apache.fineract.infrastructure.core.service.CommandParameterUtil;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.accountdetails.data.AccountSummaryCollectionData;
 import org.apache.fineract.portfolio.accountdetails.service.AccountDetailsReadPlatformService;
 import org.apache.fineract.portfolio.client.data.ClientData;
@@ -82,7 +81,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ClientsApiResource {
 
-    private final PlatformSecurityContext context;
     private final ClientReadPlatformService clientReadPlatformService;
     private final ToApiJsonSerializer<ClientData> toApiJsonSerializer;
     private final ToApiJsonSerializer<AccountSummaryCollectionData> clientAccountSummaryToApiJsonSerializer;
@@ -107,10 +105,9 @@ public class ClientsApiResource {
             @QueryParam("commandParam") @Parameter(description = "commandParam") final String commandParam,
             @DefaultValue("false") @QueryParam("staffInSelectedOfficeOnly") @Parameter(description = "staffInSelectedOfficeOnly") final boolean staffInSelectedOfficeOnly) {
 
-        context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
+        // TODO: @vidakovic check permission CLIENT
 
-        ClientData clientData = null;
-        context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
+        ClientData clientData;
         if (CommandParameterUtil.is(commandParam, "close")) {
             clientData = clientReadPlatformService.retrieveAllNarrations(ClientApiConstants.CLIENT_CLOSURE_REASON);
         } else if (CommandParameterUtil.is(commandParam, "acceptTransfer")) {
@@ -282,6 +279,8 @@ public class ClientsApiResource {
     @Produces("application/vnd.ms-excel")
     public Response getClientTemplate(@QueryParam("legalFormType") final String legalFormType, @QueryParam("officeId") final Long officeId,
             @QueryParam("staffId") final Long staffId, @QueryParam("dateFormat") final String dateFormat) {
+        // TODO: @vidakovic check permission all OFFICE, STAFF
+        // NOTE: `legalFormType` can be CLIENT_PERSON or CLIENT_ENTITY, both need the same permissions
         return bulkImportWorkbookPopulatorService.getTemplate(legalFormType, officeId, staffId, dateFormat);
     }
 
@@ -444,7 +443,7 @@ public class ClientsApiResource {
             final String displayName, final String firstname, final String lastname, final String status, final String hierarchy,
             final Integer offset, final Integer limit, final String orderBy, final String sortOrder, final Boolean orphansOnly,
             final boolean isSelfUser) {
-        context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
+        // TODO: @vidakovic check permission CLIENT
         final SearchParameters searchParameters = SearchParameters.forClients(sqlSearch, officeId, externalId, displayName, firstname,
                 lastname, status, hierarchy, offset, limit, orderBy, sortOrder, orphansOnly, isSelfUser);
         final Page<ClientData> clientData = clientReadPlatformService.retrieveAll(searchParameters);
@@ -521,7 +520,7 @@ public class ClientsApiResource {
     }
 
     private String retrieveClient(Long clientId, final String externalId, final boolean staffInSelectedOfficeOnly, final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
+        // TODO: @vidakovic check permission CLIENT
 
         ExternalId clientExternalId = ExternalIdFactory.produce(externalId);
         clientId = getResolvedClientId(clientId, clientExternalId);
@@ -557,7 +556,7 @@ public class ClientsApiResource {
     }
 
     private String retrieveClientAccounts(Long clientId, final String externalId, final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
+        // TODO: @vidakovic check permission CLIENT
         ExternalId clientExternalId = ExternalIdFactory.produce(externalId);
         clientId = getResolvedClientId(clientId, clientExternalId);
 
@@ -579,7 +578,7 @@ public class ClientsApiResource {
     }
 
     private String retrieveClientObligeeDetails(Long clientId, final String externalId) {
-        context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
+        // TODO: @vidakovic check permission CLIENT
 
         ExternalId clientExternalId = ExternalIdFactory.produce(externalId);
         clientId = getResolvedClientId(clientId, clientExternalId);
@@ -589,7 +588,7 @@ public class ClientsApiResource {
     }
 
     private String retrieveClientTransferTemplate(Long clientId, final String externalId) {
-        context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_RESOURCE_NAME);
+        // TODO: @vidakovic check permission CLIENT
 
         ExternalId clientExternalId = ExternalIdFactory.produce(externalId);
         clientId = getResolvedClientId(clientId, clientExternalId);

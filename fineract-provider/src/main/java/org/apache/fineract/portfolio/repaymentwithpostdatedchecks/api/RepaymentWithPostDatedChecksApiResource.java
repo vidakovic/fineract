@@ -43,8 +43,6 @@ import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.data.PostDatedChecksData;
 import org.apache.fineract.portfolio.repaymentwithpostdatedchecks.service.RepaymentWithPostDatedChecksReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -55,8 +53,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RepaymentWithPostDatedChecksApiResource {
 
-    private final PlatformSecurityContext context;
-    private final FromJsonHelper fromJsonHelper;
     private final DefaultToApiJsonSerializer<PostDatedChecksData> apiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final RepaymentWithPostDatedChecksReadPlatformService repaymentWithPostDatedChecksReadPlatformService;
@@ -68,7 +64,6 @@ public class RepaymentWithPostDatedChecksApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostDatedChecksApiResourceSwagger.GetPostDatedChecks.class)))) })
     public String getPostDatedChecks(@PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
-        this.context.authenticatedUser();
         final List<PostDatedChecksData> postDatedChecksDataList = this.repaymentWithPostDatedChecksReadPlatformService
                 .getPostDatedChecks(loanId);
         return this.apiJsonSerializer.serialize(postDatedChecksDataList);
@@ -83,7 +78,6 @@ public class RepaymentWithPostDatedChecksApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PostDatedChecksApiResourceSwagger.GetPostDatedChecks.class)))) })
     public String getPostDatedCheck(@PathParam("installmentId") @Parameter(description = "installmentId") final Integer installmentId,
             @PathParam("loanId") @Parameter(description = "loanId") final Long loanId) {
-        this.context.authenticatedUser();
         final PostDatedChecksData postDatedChecksData = this.repaymentWithPostDatedChecksReadPlatformService
                 .getPostDatedCheckByInstallmentId(installmentId, loanId);
         return this.apiJsonSerializer.serialize(postDatedChecksData);

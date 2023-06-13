@@ -46,7 +46,6 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.account.data.AccountTransferData;
 import org.apache.fineract.portfolio.account.service.AccountTransfersReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -57,7 +56,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AccountTransfersApiResource {
 
-    private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<AccountTransferData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -84,8 +82,7 @@ public class AccountTransfersApiResource {
             @QueryParam("toAccountType") @Parameter(description = "toAccountType") final Integer toAccountType,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(AccountTransfersApiConstants.ACCOUNT_TRANSFER_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission ACCOUNTTRANSFER
         final AccountTransferData transferData = this.accountTransfersReadPlatformService.retrieveTemplate(fromOfficeId, fromClientId,
                 fromAccountId, fromAccountType, toOfficeId, toClientId, toAccountId, toAccountType);
 
@@ -124,8 +121,7 @@ public class AccountTransfersApiResource {
             @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder,
             @QueryParam("accountDetailId") @Parameter(description = "accountDetailId") final Long accountDetailId) {
 
-        this.context.authenticatedUser().validateHasReadPermission(AccountTransfersApiConstants.ACCOUNT_TRANSFER_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission ACCOUNTTRANSFER
         final SearchParameters searchParameters = SearchParameters.forAccountTransfer(sqlSearch, externalId, offset, limit, orderBy,
                 sortOrder);
 
@@ -146,8 +142,7 @@ public class AccountTransfersApiResource {
     public String retrieveOne(@PathParam("transferId") @Parameter(description = "transferId") final Long transferId,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(AccountTransfersApiConstants.ACCOUNT_TRANSFER_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission ACCOUNTTRANSFER
         final AccountTransferData transfer = this.accountTransfersReadPlatformService.retrieveOne(transferId);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -173,8 +168,7 @@ public class AccountTransfersApiResource {
             @QueryParam("toAccountType") @Parameter(description = "toAccountType") final Integer toAccountType,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(AccountTransfersApiConstants.ACCOUNT_TRANSFER_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission ACCOUNTTRANSFER
         final AccountTransferData transferData = this.accountTransfersReadPlatformService.retrieveRefundByTransferTemplate(fromOfficeId,
                 fromClientId, fromAccountId, fromAccountType, toOfficeId, toClientId, toAccountId, toAccountType);
 

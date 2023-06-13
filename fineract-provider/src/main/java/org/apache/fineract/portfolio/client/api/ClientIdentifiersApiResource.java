@@ -52,7 +52,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.client.data.ClientData;
 import org.apache.fineract.portfolio.client.data.ClientIdentifierData;
 import org.apache.fineract.portfolio.client.exception.DuplicateClientIdentifierException;
@@ -72,7 +71,6 @@ public class ClientIdentifiersApiResource {
 
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "CLIENTIDENTIFIER";
 
-    private final PlatformSecurityContext context;
     private final ClientReadPlatformService clientReadPlatformService;
     private final ClientIdentifierReadPlatformService clientIdentifierReadPlatformService;
     private final CodeValueReadPlatformService codeValueReadPlatformService;
@@ -90,8 +88,7 @@ public class ClientIdentifiersApiResource {
     public String retrieveAllClientIdentifiers(@Context final UriInfo uriInfo,
             @PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission CLIENTIDENTIFIER
         final Collection<ClientIdentifierData> clientIdentifiers = this.clientIdentifierReadPlatformService
                 .retrieveClientIdentifiers(clientId);
 
@@ -110,8 +107,7 @@ public class ClientIdentifiersApiResource {
     public String newClientIdentifierDetails(@Context final UriInfo uriInfo,
             @PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission CLIENTIDENTIFIER
         final Collection<CodeValueData> codeValues = this.codeValueReadPlatformService.retrieveCodeValuesByCode("Customer Identifier");
         final ClientIdentifierData clientIdentifierData = ClientIdentifierData.template(codeValues);
 
@@ -161,8 +157,7 @@ public class ClientIdentifiersApiResource {
             @PathParam("identifierId") @Parameter(description = "identifierId") final Long clientIdentifierId,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission CLIENTIDENTIFIER
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         ClientIdentifierData clientIdentifierData = this.clientIdentifierReadPlatformService.retrieveClientIdentifier(clientId,

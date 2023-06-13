@@ -43,6 +43,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.commands.domain.CommandWrapper;
 import org.apache.fineract.commands.service.CommandWrapperBuilder;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
@@ -54,14 +55,12 @@ import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSer
 import org.apache.fineract.infrastructure.creditbureau.data.CreditReportData;
 import org.apache.fineract.infrastructure.creditbureau.service.CreditReportReadPlatformService;
 import org.apache.fineract.infrastructure.creditbureau.service.CreditReportWritePlatformService;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestParam;
 
+@Slf4j
 @Path("/v1/creditBureauIntegration")
 @Component
 @RequiredArgsConstructor
@@ -69,14 +68,12 @@ public class CreditBureauIntegrationApiResource {
 
     private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id", "creditBureauId", "nrc", "creditReport"));
 
-    private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<CreditReportData> toCreditReportApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final CreditReportWritePlatformService creditReportWritePlatformService;
     private final CreditReportReadPlatformService creditReportReadPlatformService;
     private final DefaultToApiJsonSerializer<CreditReportData> toApiJsonSerializer;
-    private static final Logger LOG = LoggerFactory.getLogger(CreditBureauIntegrationApiResource.class);
 
     @POST
     @Path("creditReport")
@@ -135,9 +132,6 @@ public class CreditBureauIntegrationApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String getSavedCreditReport(@PathParam("creditBureauId") @Parameter(description = "creditBureauId") final Long creditBureauId,
             @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser();
-
         final Collection<CreditReportData> creditReport = this.creditReportReadPlatformService.retrieveCreditReportDetails(creditBureauId);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

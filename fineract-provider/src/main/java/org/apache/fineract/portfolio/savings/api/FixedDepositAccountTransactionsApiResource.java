@@ -43,7 +43,6 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.exception.UnrecognizedQueryParamException;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.paymenttype.data.PaymentTypeData;
 import org.apache.fineract.portfolio.paymenttype.service.PaymentTypeReadPlatformService;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
@@ -58,7 +57,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FixedDepositAccountTransactionsApiResource {
 
-    private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<SavingsAccountTransactionData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -82,8 +80,7 @@ public class FixedDepositAccountTransactionsApiResource {
             // @QueryParam("command") final String commandParam,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_ACCOUNT_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission FIXEDDEPOSITACCOUNT
         SavingsAccountTransactionData savingsAccount = this.savingsAccountReadPlatformService
                 .retrieveDepositTransactionTemplate(fixedDepositAccountId, DepositAccountType.FIXED_DEPOSIT);
         final Collection<PaymentTypeData> paymentTypeOptions = this.paymentTypeReadPlatformService.retrieveAllPaymentTypes();
@@ -102,7 +99,7 @@ public class FixedDepositAccountTransactionsApiResource {
     public String retrieveOne(@PathParam("fixedDepositAccountId") final Long fixedDepositAccountId,
             @PathParam("transactionId") final Long transactionId, @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.FIXED_DEPOSIT_ACCOUNT_RESOURCE_NAME);
+        // TODO: @vidakovic check permission FIXEDDEPOSITACCOUNT
         SavingsAccountTransactionData transactionData = this.savingsAccountReadPlatformService
                 .retrieveSavingsTransaction(fixedDepositAccountId, transactionId, DepositAccountType.FIXED_DEPOSIT);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

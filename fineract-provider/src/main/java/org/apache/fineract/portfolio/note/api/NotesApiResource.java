@@ -50,7 +50,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.note.data.NoteData;
 import org.apache.fineract.portfolio.note.domain.NoteType;
 import org.apache.fineract.portfolio.note.exception.NoteResourceNotSupportedException;
@@ -72,7 +71,6 @@ public class NotesApiResource {
     private static final Set<String> NOTE_DATA_PARAMETERS = new HashSet<>(
             Arrays.asList("id", "resourceId", "clientId", "groupId", "loanId", "loanTransactionId", "depositAccountId", "savingAccountId",
                     "noteType", "note", "createdById", "createdByUsername", "createdOn", "updatedById", "updatedByUsername", "updatedOn"));
-    private final PlatformSecurityContext context;
     private final NoteReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<NoteData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -95,7 +93,8 @@ public class NotesApiResource {
             throw new NoteResourceNotSupportedException(resourceType);
         }
 
-        this.context.authenticatedUser().validateHasReadPermission(getResourceDetails(noteType, resourceId).entityName());
+        // TODO: @vidakovic check permission CLIENTNOTE, LOANNOTE, LOANTRANSACTIONNOTE, SAVINGNOTE or GROUPNOTE
+        // NOTE: replace with one resource class per entity
 
         final Integer noteTypeId = noteType.getValue();
 
@@ -125,8 +124,7 @@ public class NotesApiResource {
             throw new NoteResourceNotSupportedException(resourceType);
         }
 
-        this.context.authenticatedUser().validateHasReadPermission(getResourceDetails(noteType, resourceId).entityName());
-
+        // TODO: @vidakovic check permission CLIENTNOTE, LOANNOTE, LOANTRANSACTIONNOTE, SAVINGNOTE or GROUPNOTE with ID
         final Integer noteTypeId = noteType.getValue();
 
         final NoteData note = this.readPlatformService.retrieveNote(noteId, resourceId, noteTypeId);

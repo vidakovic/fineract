@@ -27,9 +27,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.security.api.UserDetailsApiResource;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -40,6 +42,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SelfUserDetailsApiResource {
 
+    // TODO: bad practice (resource classes are short lived and should stand alone, no injection)!
     private final UserDetailsApiResource userDetailsApiResource;
 
     @GET
@@ -48,7 +51,7 @@ public class SelfUserDetailsApiResource {
             + "For more info visit this link - https://fineract.apache.org/legacy-docs/apiLive.htm#selfoauth")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SelfUserDetailsApiResourceSwagger.GetSelfUserDetailsResponse.class))) })
-    public String fetchAuthenticatedUserData() {
-        return this.userDetailsApiResource.fetchAuthenticatedUserData();
+    public String fetchAuthenticatedUserData(@Context AppUser user) {
+        return this.userDetailsApiResource.fetchAuthenticatedUserData(user);
     }
 }

@@ -45,7 +45,6 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.dataqueries.data.GenericResultsetData;
 import org.apache.fineract.infrastructure.dataqueries.service.GenericDataService;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.survey.data.ClientScoresOverview;
 import org.apache.fineract.infrastructure.survey.data.SurveyData;
 import org.apache.fineract.infrastructure.survey.data.SurveyDataTableData;
@@ -63,7 +62,6 @@ public class SurveyApiResource {
 
     private final DefaultToApiJsonSerializer<SurveyData> toApiJsonSerializer;
     private final DefaultToApiJsonSerializer<ClientScoresOverview> toApiJsonClientScoreOverviewSerializer;
-    private final PlatformSecurityContext context;
     private final ReadSurveyService readSurveyService;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final GenericDataService genericDataService;
@@ -75,9 +73,7 @@ public class SurveyApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = SurveyApiResourceSwagger.GetSurveyResponse.class)))) })
     public String retrieveSurveys() {
-
-        this.context.authenticatedUser().validateHasReadPermission(SurveyApiConstants.SURVEY_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission SURVEY
         List<SurveyDataTableData> surveys = this.readSurveyService.retrieveAllSurveys();
         return this.toApiJsonSerializer.serialize(surveys);
     }
@@ -90,9 +86,7 @@ public class SurveyApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SurveyApiResourceSwagger.GetSurveyResponse.class))) })
     public String retrieveSurvey(@PathParam("surveyName") @Parameter(description = "surveyName") final String surveyName) {
-
-        this.context.authenticatedUser().validateHasReadPermission(SurveyApiConstants.SURVEY_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission SURVEY
         SurveyDataTableData surveys = this.readSurveyService.retrieveSurvey(surveyName);
 
         return this.toApiJsonSerializer.serialize(surveys);
@@ -127,9 +121,7 @@ public class SurveyApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String getClientSurveyOverview(@PathParam("surveyName") final String surveyName, @PathParam("clientId") final Long clientId) {
-
-        this.context.authenticatedUser().validateHasReadPermission(SurveyApiConstants.SURVEY_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission SURVEY
         List<ClientScoresOverview> scores = this.readSurveyService.retrieveClientSurveyScoreOverview(clientId);
 
         return this.toApiJsonClientScoreOverviewSerializer.serialize(scores);
@@ -141,9 +133,7 @@ public class SurveyApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String getSurveyEntry(@PathParam("surveyName") final String surveyName, @PathParam("clientId") final Long clientId,
             @PathParam("entryId") final Long entryId) {
-
-        this.context.authenticatedUser().validateHasReadPermission(SurveyApiConstants.SURVEY_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission SURVEY
         final GenericResultsetData results = this.readSurveyService.retrieveSurveyEntry(surveyName, clientId, entryId);
 
         return this.genericDataService.generateJsonFromGenericResultsetData(results);

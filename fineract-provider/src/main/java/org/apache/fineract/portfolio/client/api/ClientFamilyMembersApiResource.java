@@ -44,7 +44,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.client.data.ClientFamilyMembersData;
 import org.apache.fineract.portfolio.client.service.ClientFamilyMembersReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -58,7 +57,6 @@ public class ClientFamilyMembersApiResource {
     private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id", "clientId", "firstName", "middleName",
             "lastName", "qualification", "relationship", "maritalStatus", "gender", "dateOfBirth", "profession", "clientFamilyMemberId"));
     private static final String RESOURCE_NAME_FOR_PERMISSIONS = "FamilyMembers";
-    private final PlatformSecurityContext context;
     private final ClientFamilyMembersReadPlatformService readPlatformService;
     private final ToApiJsonSerializer<ClientFamilyMembersData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -71,8 +69,7 @@ public class ClientFamilyMembersApiResource {
     public String getFamilyMember(@Context final UriInfo uriInfo, @PathParam("familyMemberId") final Long familyMemberId,
             @PathParam("clientId") @Parameter(description = "clientId") final Long clientId) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission FAMILYMEMBERS
         final ClientFamilyMembersData familyMembers = this.readPlatformService.getClientFamilyMember(familyMemberId);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -85,8 +82,7 @@ public class ClientFamilyMembersApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String getFamilyMembers(@Context final UriInfo uriInfo, @PathParam("clientId") final long clientId) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission FAMILYMEMBERS
         final Collection<ClientFamilyMembersData> familyMembers = this.readPlatformService.getClientFamilyMembers(clientId);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -100,8 +96,7 @@ public class ClientFamilyMembersApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String getTemplate(@Context final UriInfo uriInfo, @PathParam("clientId") final long clientId) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission FAMILYMEMBERS
         final ClientFamilyMembersData options = this.readPlatformService.retrieveTemplate();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

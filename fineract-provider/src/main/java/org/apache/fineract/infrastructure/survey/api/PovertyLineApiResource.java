@@ -27,7 +27,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.survey.data.LikeliHoodPovertyLineData;
 import org.apache.fineract.infrastructure.survey.data.PpiPovertyLineData;
 import org.apache.fineract.infrastructure.survey.service.PovertyLineService;
@@ -41,7 +40,6 @@ public class PovertyLineApiResource {
 
     private final DefaultToApiJsonSerializer<PpiPovertyLineData> toApiJsonSerializer;
     private final DefaultToApiJsonSerializer<LikeliHoodPovertyLineData> likelihoodToApiJsonSerializer;
-    private final PlatformSecurityContext context;
     private final PovertyLineService readService;
 
     @GET
@@ -49,9 +47,7 @@ public class PovertyLineApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveAll(@PathParam("ppiName") final String ppiName) {
-
-        this.context.authenticatedUser().validateHasReadPermission(PovertyLineApiConstants.POVERTY_LINE_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission POVERTYLINE
         PpiPovertyLineData povertyLine = this.readService.retrieveAll(ppiName);
         return this.toApiJsonSerializer.serialize(povertyLine);
 
@@ -62,9 +58,7 @@ public class PovertyLineApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveAll(@PathParam("ppiName") final String ppiName, @PathParam("likelihoodId") final Long likelihoodId) {
-
-        this.context.authenticatedUser().validateHasReadPermission(PovertyLineApiConstants.POVERTY_LINE_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission POVERTYLINE
         LikeliHoodPovertyLineData likeliHoodPovertyLineData = this.readService.retrieveForLikelihood(ppiName, likelihoodId);
 
         return this.likelihoodToApiJsonSerializer.serialize(likeliHoodPovertyLineData);

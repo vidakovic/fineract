@@ -34,6 +34,7 @@ public interface SchedulerJobRunnerReadService {
 
     Page<JobDetailHistoryData> retrieveJobHistory(Long jobId, SearchParameters searchParameters);
 
+    @Deprecated
     boolean isUpdatesAllowed();
 
 }

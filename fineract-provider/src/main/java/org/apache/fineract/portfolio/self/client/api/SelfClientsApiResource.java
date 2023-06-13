@@ -44,15 +44,12 @@ import java.io.InputStream;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.data.UploadRequest;
 import org.apache.fineract.infrastructure.documentmanagement.api.ImagesApiResource;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.client.api.ClientApiConstants;
 import org.apache.fineract.portfolio.client.api.ClientChargesApiResource;
 import org.apache.fineract.portfolio.client.api.ClientTransactionsApiResource;
 import org.apache.fineract.portfolio.client.api.ClientsApiResource;
-import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.portfolio.self.client.data.SelfClientDataValidator;
 import org.apache.fineract.portfolio.self.client.service.AppuserClientMapperReadService;
-import org.apache.fineract.useradministration.domain.AppUser;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -64,7 +61,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SelfClientsApiResource {
 
-    private final PlatformSecurityContext context;
     private final ClientsApiResource clientApiResource;
     private final ImagesApiResource imagesApiResource;
     private final ClientChargesApiResource clientChargesApiResource;
@@ -112,7 +108,7 @@ public class SelfClientsApiResource {
 
         this.dataValidator.validateRetrieveOne(uriInfo);
 
-        validateAppuserClientsMapping(clientId);
+        this.appUserClientMapperReadService.validateAppuserClientsMapping(clientId);
 
         final boolean staffInSelectedOfficeOnly = false;
         return this.clientApiResource.retrieveOne(clientId, uriInfo, staffInSelectedOfficeOnly);
@@ -130,7 +126,7 @@ public class SelfClientsApiResource {
     public String retrieveAssociatedAccounts(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId,
             @Context final UriInfo uriInfo) {
 
-        validateAppuserClientsMapping(clientId);
+        this.appUserClientMapperReadService.validateAppuserClientsMapping(clientId);
 
         return this.clientApiResource.retrieveAssociatedAccounts(clientId, uriInfo);
     }
@@ -147,7 +143,7 @@ public class SelfClientsApiResource {
             @QueryParam("maxHeight") @Parameter(example = "maxHeight") final Integer maxHeight,
             @QueryParam("output") @Parameter(example = "output") final String output) {
 
-        validateAppuserClientsMapping(clientId);
+        this.appUserClientMapperReadService.validateAppuserClientsMapping(clientId);
 
         return this.imagesApiResource.retrieveImage("clients", clientId, maxWidth, maxHeight, output, MediaType.TEXT_PLAIN);
     }
@@ -166,7 +162,7 @@ public class SelfClientsApiResource {
             @Context final UriInfo uriInfo, @QueryParam("limit") @Parameter(description = "limit") final Integer limit,
             @QueryParam("offset") @Parameter(description = "offset") final Integer offset) {
 
-        validateAppuserClientsMapping(clientId);
+        this.appUserClientMapperReadService.validateAppuserClientsMapping(clientId);
 
         return this.clientChargesApiResource.retrieveAllClientCharges(clientId, chargeStatus, pendingPayment, uriInfo, limit, offset);
     }
@@ -184,7 +180,7 @@ public class SelfClientsApiResource {
 
         this.dataValidator.validateClientCharges(uriInfo);
 
-        validateAppuserClientsMapping(clientId);
+        this.appUserClientMapperReadService.validateAppuserClientsMapping(clientId);
 
         return this.clientChargesApiResource.retrieveClientCharge(clientId, chargeId, uriInfo);
     }
@@ -201,7 +197,7 @@ public class SelfClientsApiResource {
             @Context final UriInfo uriInfo, @QueryParam("offset") @Parameter(description = "offset") final Integer offset,
             @QueryParam("limit") @Parameter(description = "limit") final Integer limit) {
 
-        validateAppuserClientsMapping(clientId);
+        this.appUserClientMapperReadService.validateAppuserClientsMapping(clientId);
 
         return this.clientTransactionsApiResource.retrieveAllClientTransactions(clientId, uriInfo, offset, limit);
     }
@@ -218,17 +214,9 @@ public class SelfClientsApiResource {
             @PathParam("transactionId") @Parameter(description = "transactionId") final Long transactionId,
             @Context final UriInfo uriInfo) {
 
-        validateAppuserClientsMapping(clientId);
+        this.appUserClientMapperReadService.validateAppuserClientsMapping(clientId);
 
         return this.clientTransactionsApiResource.retrieveClientTransaction(clientId, transactionId, uriInfo);
-    }
-
-    private void validateAppuserClientsMapping(final Long clientId) {
-        AppUser user = this.context.authenticatedUser();
-        final boolean mappedClientId = this.appUserClientMapperReadService.isClientMappedToUser(clientId, user.getId());
-        if (!mappedClientId) {
-            throw new ClientNotFoundException(clientId);
-        }
     }
 
     @POST
@@ -241,7 +229,7 @@ public class SelfClientsApiResource {
             @FormDataParam("file") final InputStream inputStream, @FormDataParam("file") final FormDataContentDisposition fileDetails,
             @FormDataParam("file") final FormDataBodyPart bodyPart) {
 
-        validateAppuserClientsMapping(clientId);
+        this.appUserClientMapperReadService.validateAppuserClientsMapping(clientId);
         return this.imagesApiResource.addNewClientImage(ClientApiConstants.clientEntityName, clientId, fileSize, inputStream, fileDetails,
                 bodyPart);
 
@@ -253,7 +241,7 @@ public class SelfClientsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String addNewClientImage(@PathParam("entity") final String entityName, @PathParam("clientId") final Long clientId,
             final String jsonRequestBody) {
-        validateAppuserClientsMapping(clientId);
+        this.appUserClientMapperReadService.validateAppuserClientsMapping(clientId);
         return this.imagesApiResource.addNewClientImage(ClientApiConstants.clientEntityName, clientId, jsonRequestBody);
 
     }
@@ -264,7 +252,7 @@ public class SelfClientsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String deleteClientImage(@PathParam("clientId") final Long clientId) {
 
-        validateAppuserClientsMapping(clientId);
+        this.appUserClientMapperReadService.validateAppuserClientsMapping(clientId);
         return this.imagesApiResource.deleteClientImage(ClientApiConstants.clientEntityName, clientId);
 
     }
@@ -275,7 +263,7 @@ public class SelfClientsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveObligeeDetails(@PathParam("clientId") final Long clientId, @Context final UriInfo uriInfo) {
 
-        validateAppuserClientsMapping(clientId);
+        this.appUserClientMapperReadService.validateAppuserClientsMapping(clientId);
 
         return this.clientApiResource.retrieveObligeeDetails(clientId, uriInfo);
     }

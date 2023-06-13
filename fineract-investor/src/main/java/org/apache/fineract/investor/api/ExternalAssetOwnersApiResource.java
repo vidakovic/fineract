@@ -45,7 +45,6 @@ import org.apache.fineract.infrastructure.core.domain.ExternalId;
 import org.apache.fineract.infrastructure.core.exception.UnrecognizedQueryParamException;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.CommandParameterUtil;
-import org.apache.fineract.infrastructure.security.service.PlatformUserRightsContext;
 import org.apache.fineract.investor.config.InvestorModuleIsEnabledCondition;
 import org.apache.fineract.investor.data.ExternalOwnerJournalEntryData;
 import org.apache.fineract.investor.data.ExternalOwnerTransferJournalEntryData;
@@ -64,7 +63,6 @@ import org.springframework.stereotype.Component;
 @Conditional(InvestorModuleIsEnabledCondition.class)
 public class ExternalAssetOwnersApiResource {
 
-    private final PlatformUserRightsContext platformUserRightsContext;
     private final ExternalAssetOwnersReadService externalAssetOwnersReadService;
     private final DefaultToApiJsonSerializer<ExternalTransferResponseData> postApiJsonSerializerService;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
@@ -81,7 +79,6 @@ public class ExternalAssetOwnersApiResource {
     public String transferRequestWithLoanId(@PathParam("loanId") final Long loanId,
             @QueryParam("command") @Parameter(description = "command") final String commandParam,
             @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        platformUserRightsContext.isAuthenticated();
         return getResult(loanId, apiRequestBodyAsJson, commandParam);
     }
 
@@ -96,7 +93,6 @@ public class ExternalAssetOwnersApiResource {
     public String transferRequestWithLoanExternalId(@PathParam("loanExternalId") final String externalLoanId,
             @QueryParam("command") @Parameter(description = "command") final String commandParam,
             @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        platformUserRightsContext.isAuthenticated();
         Long loanId = loanReadPlatformService.getLoanIdByLoanExternalId(externalLoanId);
 
         return getResult(loanId, apiRequestBodyAsJson, commandParam);
@@ -142,7 +138,6 @@ public class ExternalAssetOwnersApiResource {
             @QueryParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId,
             @QueryParam("offset") @Parameter(description = "offset") final Integer offset,
             @QueryParam("limit") @Parameter(description = "limit") final Integer limit, @Context final UriInfo uriInfo) {
-        platformUserRightsContext.isAuthenticated();
         return externalAssetOwnersReadService.retrieveTransferData(loanId, loanExternalId, transferExternalId, offset, limit);
 
     }
@@ -157,9 +152,7 @@ public class ExternalAssetOwnersApiResource {
             @QueryParam("loanId") @Parameter(description = "loanId") final Long loanId,
             @QueryParam("loanExternalId") @Parameter(description = "loanExternalId") final String loanExternalId,
             @Context final UriInfo uriInfo) {
-        platformUserRightsContext.isAuthenticated();
         return externalAssetOwnersReadService.retrieveActiveTransferData(loanId, loanExternalId, transferExternalId);
-
     }
 
     @GET
@@ -171,9 +164,7 @@ public class ExternalAssetOwnersApiResource {
             @PathParam("transferId") @Parameter(description = "transferId") final Long transferId,
             @QueryParam("offset") @Parameter(description = "offset") final Integer offset,
             @QueryParam("limit") @Parameter(description = "limit") final Integer limit, @Context final UriInfo uriInfo) {
-        platformUserRightsContext.isAuthenticated();
         return externalAssetOwnersReadService.retrieveJournalEntriesOfTransfer(transferId, offset, limit);
-
     }
 
     @GET
@@ -185,9 +176,7 @@ public class ExternalAssetOwnersApiResource {
             @PathParam("ownerExternalId") @Parameter(description = "ownerExternalId") final String ownerExternalId,
             @QueryParam("offset") @Parameter(description = "offset") final Integer offset,
             @QueryParam("limit") @Parameter(description = "limit") final Integer limit, @Context final UriInfo uriInfo) {
-        platformUserRightsContext.isAuthenticated();
         return externalAssetOwnersReadService.retrieveJournalEntriesOfOwner(ownerExternalId, offset, limit);
-
     }
 
     private String getResultByTransferId(Long id, String command) {

@@ -44,7 +44,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.useradministration.data.PasswordValidationPolicyData;
 import org.apache.fineract.useradministration.service.PasswordValidationPolicyReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -57,7 +56,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PasswordPreferencesApiResource {
 
-    private final PlatformSecurityContext context;
     private final PasswordValidationPolicyReadPlatformService passwordValidationPolicyReadPlatformService;
     private final DefaultToApiJsonSerializer<PasswordValidationPolicyData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -69,9 +67,7 @@ public class PasswordPreferencesApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = PasswordPreferencesApiResourceSwagger.GetPasswordPreferencesTemplateResponse.class))) })
     public String retrieve(@Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(PasswordPreferencesApiConstants.ENTITY_NAME);
-
+        // TODO: @vidakovic check permission PASSWORD_PREFERENCES
         final PasswordValidationPolicyData passwordValidationPolicyData = this.passwordValidationPolicyReadPlatformService
                 .retrieveActiveValidationPolicy();
 
@@ -107,12 +103,10 @@ public class PasswordPreferencesApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = PasswordPreferencesApiResourceSwagger.GetPasswordPreferencesTemplateResponse.class)))) })
     public String template(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(PasswordPreferencesApiConstants.ENTITY_NAME);
-
+        // TODO: @vidakovic check permission PASSWORD_PREFERENCES
         final Collection<PasswordValidationPolicyData> validationPolicies = this.passwordValidationPolicyReadPlatformService.retrieveAll();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, validationPolicies, PasswordPreferencesApiConstants.RESPONSE_DATA_PARAMETERS);
     }
-
 }

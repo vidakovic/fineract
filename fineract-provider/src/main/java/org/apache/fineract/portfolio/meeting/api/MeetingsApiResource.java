@@ -18,8 +18,6 @@
  */
 package org.apache.fineract.portfolio.meeting.api;
 
-import static org.apache.fineract.portfolio.meeting.MeetingApiConstants.MEETING_RESOURCE_NAME;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -49,7 +47,6 @@ import org.apache.fineract.infrastructure.core.exception.UnrecognizedQueryParamE
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.calendar.data.CalendarData;
 import org.apache.fineract.portfolio.calendar.domain.CalendarEntityType;
 import org.apache.fineract.portfolio.calendar.exception.CalendarEntityTypeNotSupportedException;
@@ -71,7 +68,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class MeetingsApiResource {
 
-    private final PlatformSecurityContext context;
     private final MeetingReadPlatformService readPlatformService;
     private final ClientAttendanceReadPlatformService attendanceReadPlatformService;
     private final ClientReadPlatformService clientReadPlatformService;
@@ -91,7 +87,7 @@ public class MeetingsApiResource {
     public String template(@PathParam("entityType") final String entityType, @PathParam("entityId") final Long entityId,
             @QueryParam("calendarId") final Long calendarId, @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(MEETING_RESOURCE_NAME);
+        // TODO: @vidakovic check permission MEETING
         final Integer entityTypeId = CalendarEntityType.valueOf(entityType.toUpperCase()).getValue();
         Collection<ClientData> clients = null;
         CalendarData calendarData = null;
@@ -131,8 +127,7 @@ public class MeetingsApiResource {
     public String retrieveMeetings(@PathParam("entityType") final String entityType, @PathParam("entityId") final Long entityId,
             @QueryParam("limit") final Integer limit, @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(MEETING_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission MEETING
         final Collection<MeetingData> meetingsData = this.readPlatformService.retrieveMeetingsByEntity(entityId,
                 CalendarEntityType.valueOf(entityType.toUpperCase()).getValue(), limit);
 
@@ -147,7 +142,7 @@ public class MeetingsApiResource {
     public String retrieveMeeting(@PathParam("meetingId") final Long meetingId, @PathParam("entityType") final String entityType,
             @PathParam("entityId") final Long entityId, @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(MEETING_RESOURCE_NAME);
+        // TODO: @vidakovic check permission MEETING
         final Integer entityTypeId = CalendarEntityType.valueOf(entityType.toUpperCase()).getValue();
         MeetingData meetingData = this.readPlatformService.retrieveMeeting(meetingId, entityId, entityTypeId);
         final Collection<ClientAttendanceData> clientsAttendance = this.attendanceReadPlatformService

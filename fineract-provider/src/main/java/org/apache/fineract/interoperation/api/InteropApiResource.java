@@ -18,9 +18,6 @@
  */
 package org.apache.fineract.interoperation.api;
 
-import static org.apache.fineract.interoperation.util.InteropUtil.ENTITY_NAME_QUOTE;
-import static org.apache.fineract.interoperation.util.InteropUtil.ENTITY_NAME_REQUEST;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -55,7 +52,6 @@ import org.apache.fineract.infrastructure.core.data.DataValidatorBuilder;
 import org.apache.fineract.infrastructure.core.exception.PlatformApiDataValidationException;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.interoperation.data.InteropAccountData;
 import org.apache.fineract.interoperation.data.InteropIdentifierAccountResponseData;
 import org.apache.fineract.interoperation.data.InteropIdentifierRequestData;
@@ -79,7 +75,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class InteropApiResource {
 
-    private final PlatformSecurityContext context;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final DefaultToApiJsonSerializer<CommandProcessingResult> jsonSerializer;
     private final InteropService interopService;
@@ -91,7 +86,7 @@ public class InteropApiResource {
     @Path("health")
     @Operation(summary = "Query Interoperation Health Request", description = "")
     @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK") })
-    public String health(@Context UriInfo uriInfo) {
+    public String health() {
         return "OK";
     }
 
@@ -271,8 +266,7 @@ public class InteropApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = InteropTransactionRequestResponseData.class))) })
     public String getTransactionRequest(@PathParam("transactionCode") @Parameter(description = "transactionCode") String transactionCode,
             @PathParam("requestCode") @Parameter(description = "requestCode") String requestCode, @Context UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(ENTITY_NAME_REQUEST);
-
+        // TODO: @vidakovic check permission INTERREQUEST
         InteropTransactionRequestResponseData result = interopService.getTransactionRequest(transactionCode, requestCode);
         ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
@@ -306,8 +300,7 @@ public class InteropApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = InteropQuoteResponseData.class))) })
     public String getQuote(@PathParam("transactionCode") @Parameter(description = "transactionCode") String transactionCode,
             @PathParam("quoteCode") @Parameter(description = "quoteCode") String quoteCode, @Context UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(ENTITY_NAME_QUOTE);
-
+        // TODO: @vidakovic check permission INTERQUOTE
         InteropQuoteResponseData result = interopService.getQuote(transactionCode, quoteCode);
         ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
@@ -340,8 +333,7 @@ public class InteropApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = InteropTransferResponseData.class))) })
     public String getTransfer(@PathParam("transactionCode") @Parameter(description = "transactionCode") String transactionCode,
             @PathParam("transferCode") @Parameter(description = "transferCode") String transferCode, @Context UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(ENTITY_NAME_QUOTE);
-
+        // TODO: @vidakovic check permission INTERQUOTE
         InteropTransferResponseData result = interopService.getTransfer(transactionCode, transferCode);
         ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 

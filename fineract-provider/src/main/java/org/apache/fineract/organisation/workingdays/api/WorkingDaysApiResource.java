@@ -43,7 +43,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.workingdays.data.WorkingDaysData;
 import org.apache.fineract.organisation.workingdays.service.WorkingDaysReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -60,7 +59,6 @@ public class WorkingDaysApiResource {
     private final DefaultToApiJsonSerializer<WorkingDaysData> toApiJsonSerializer;
     private final WorkingDaysReadPlatformService workingDaysReadPlatformService;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-    private final PlatformSecurityContext context;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
 
     @GET
@@ -70,7 +68,7 @@ public class WorkingDaysApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = WorkingDaysApiResourceSwagger.GetWorkingDaysResponse.class)))) })
     public String retrieveAll(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(WorkingDaysApiConstants.WORKING_DAYS_RESOURCE_NAME);
+        // TODO: @vidakovic check permission WORKINGDAYS
         final WorkingDaysData workingDaysData = this.workingDaysReadPlatformService.retrieve();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -103,13 +101,11 @@ public class WorkingDaysApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = WorkingDaysApiResourceSwagger.GetWorkingDaysTemplateResponse.class))) })
     public String template(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(WorkingDaysApiConstants.WORKING_DAYS_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission WORKINGDAYS
         final WorkingDaysData repaymentRescheduleOptions = this.workingDaysReadPlatformService.repaymentRescheduleType();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, repaymentRescheduleOptions,
                 WorkingDaysApiConstants.WORKING_DAYS_TEMPLATE_PARAMETERS);
     }
-
 }

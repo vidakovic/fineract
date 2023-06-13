@@ -53,7 +53,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
 import org.springframework.stereotype.Component;
 
@@ -70,9 +69,6 @@ public class GLClosuresApiResource {
             Arrays.asList("id", "officeId", "officeName", "closingDate", "deleted", "createdDate", "lastUpdatedDate", "createdByUserId",
                     "createdByUsername", "lastUpdatedByUserId", "lastUpdatedByUsername"));
 
-    private final String resourceNameForPermission = "GLCLOSURE";
-
-    private final PlatformSecurityContext context;
     private final GLClosureReadPlatformService glClosureReadPlatformService;
     private final DefaultToApiJsonSerializer<GLClosureData> apiJsonSerializerService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -87,8 +83,7 @@ public class GLClosuresApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = GLClosuresApiResourceSwagger.GetGlClosureResponse.class)))) })
     public String retrieveAllClosures(@Context final UriInfo uriInfo,
             @QueryParam("officeId") @Parameter(name = "officeId") final Long officeId) {
-
-        this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermission);
+        // TODO: @vidakovic check permission GLCLOSURE
         final List<GLClosureData> glClosureDatas = this.glClosureReadPlatformService.retrieveAllGLClosures(officeId);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -105,9 +100,7 @@ public class GLClosuresApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = GLClosuresApiResourceSwagger.GetGlClosureResponse.class))) })
     public String retreiveClosure(@PathParam("glClosureId") @Parameter(description = "glClosureId") final Long glClosureId,
             @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermission);
-
+        // TODO: @vidakovic check permission GLCLOSURE
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         final GLClosureData glClosureData = this.glClosureReadPlatformService.retrieveGLClosureById(glClosureId);

@@ -79,11 +79,6 @@ public class SpringSecurityPlatformSecurityContext implements PlatformSecurityCo
     }
 
     @Override
-    public void isAuthenticated() {
-        authenticatedUser();
-    }
-
-    @Override
     public AppUser getAuthenticatedUserIfPresent() {
 
         AppUser currentUser = null;

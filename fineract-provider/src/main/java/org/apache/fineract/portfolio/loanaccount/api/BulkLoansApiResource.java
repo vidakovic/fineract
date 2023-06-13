@@ -42,7 +42,6 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.data.OfficeData;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
 import org.apache.fineract.organisation.staff.data.BulkTransferLoanOfficerData;
@@ -67,9 +66,6 @@ public class BulkLoansApiResource {
     private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList(OFFICE_ID, FROM_LOAN_OFFICER_ID,
             ASSIGNMENT_DATE, OFFICE_OPTIONS, LOAN_OFFICER_OPTIONS, ACCOUNT_SUMMARY_COLLECTION));
 
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "LOAN";
-
-    private final PlatformSecurityContext context;
     private final StaffReadPlatformService staffReadPlatformService;
     private final OfficeReadPlatformService officeReadPlatformService;
     private final BulkLoansReadPlatformService bulkLoansReadPlatformService;
@@ -84,8 +80,7 @@ public class BulkLoansApiResource {
     public String loanReassignmentTemplate(@QueryParam(OFFICE_ID) final Long officeId,
             @QueryParam(FROM_LOAN_OFFICER_ID) final Long loanOfficerId, @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission LOAN
         final Collection<OfficeData> offices = this.officeReadPlatformService.retrieveAllOfficesForDropdown();
 
         Collection<StaffData> loanOfficers = null;

@@ -35,6 +35,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.exception.UnrecognizedQueryParamException;
@@ -42,29 +43,17 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
 import org.apache.fineract.infrastructure.jobs.data.SchedulerDetailData;
 import org.apache.fineract.infrastructure.jobs.service.JobRegisterService;
-import org.apache.fineract.infrastructure.security.exception.NoAuthorizationException;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/scheduler")
 @Component
+@RequiredArgsConstructor
 @Tag(name = "Scheduler", description = "")
 public class SchedulerApiResource {
 
-    private final PlatformSecurityContext context;
     private final JobRegisterService jobRegisterService;
     private final ToApiJsonSerializer<SchedulerDetailData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
-
-    @Autowired
-    public SchedulerApiResource(final PlatformSecurityContext context, final JobRegisterService jobRegisterService,
-            final ToApiJsonSerializer<SchedulerDetailData> toApiJsonSerializer, final ApiRequestParameterHelper apiRequestParameterHelper) {
-        this.context = context;
-        this.jobRegisterService = jobRegisterService;
-        this.toApiJsonSerializer = toApiJsonSerializer;
-        this.apiRequestParameterHelper = apiRequestParameterHelper;
-    }
 
     @GET
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -74,7 +63,7 @@ public class SchedulerApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = SchedulerApiResourceSwagger.GetSchedulerResponse.class))) })
     public String retrieveStatus(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(SchedulerJobApiConstants.SCHEDULER_RESOURCE_NAME);
+        // TODO: @vidakovic check permission SCHEDULER
         final boolean isSchedulerRunning = this.jobRegisterService.isSchedulerRunning();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         final SchedulerDetailData schedulerDetailData = new SchedulerDetailData().setActive(isSchedulerRunning);
@@ -90,13 +79,8 @@ public class SchedulerApiResource {
             + "POST : scheduler?command=stop") })
     public Response changeSchedulerStatus(
             @QueryParam(SchedulerJobApiConstants.COMMAND) @Parameter(description = "command") final String commandParam) {
-        // check the logged in user have permissions to update scheduler status
-        final boolean hasNotPermission = this.context.authenticatedUser().hasNotPermissionForAnyOf("ALL_FUNCTIONS", "UPDATE_SCHEDULER");
-        if (hasNotPermission) {
-            final String authorizationMessage = "User has no authority to update scheduler status";
-            throw new NoAuthorizationException(authorizationMessage);
-        }
-        Response response = Response.status(400).build();
+        // TODO: @vidakovic check permission any ALL_FUNCTIONS, UPDATE_SCHEDULER
+        Response response;
         if (is(commandParam, SchedulerJobApiConstants.COMMAND_START_SCHEDULER)) {
             this.jobRegisterService.startScheduler();
             response = Response.status(202).build();

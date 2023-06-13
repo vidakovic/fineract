@@ -55,7 +55,6 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/provisioningentries")
@@ -71,7 +70,6 @@ public class ProvisioningEntriesApiResource {
     private static final Set<String> ALL_PROVISIONING_ENTRIES = new HashSet<>(
             Arrays.asList(ProvisioningEntriesApiConstants.PROVISIONINGENTRY_PARAM));
 
-    private final PlatformSecurityContext platformSecurityContext;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final DefaultToApiJsonSerializer<ProvisioningEntryData> toApiJsonSerializer;
     private final DefaultToApiJsonSerializer<Object> entriesApiJsonSerializer;
@@ -87,8 +85,7 @@ public class ProvisioningEntriesApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProvisioningEntriesApiResourceSwagger.PostProvisioningEntriesResponse.class))) })
     public String createProvisioningEntries(@Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        CommandWrapper commandWrapper = null;
-        this.platformSecurityContext.authenticatedUser();
+        CommandWrapper commandWrapper;
         commandWrapper = new CommandWrapperBuilder().createProvisioningEntries().withJson(apiRequestBodyAsJson).build();
         final CommandProcessingResult commandProcessingResult = this.commandsSourceWritePlatformService.logCommandSource(commandWrapper);
         return this.toApiJsonSerializer.serialize(commandProcessingResult);
@@ -105,8 +102,7 @@ public class ProvisioningEntriesApiResource {
     public String modifyProvisioningEntry(@PathParam("entryId") @Parameter(description = "entryId") final Long entryId,
             @QueryParam("command") @Parameter(description = "command=createjournalentry\ncommand=recreateprovisioningentry") final String commandParam,
             @Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        CommandWrapper commandWrapper = null;
-        this.platformSecurityContext.authenticatedUser();
+        CommandWrapper commandWrapper;
         if ("createjournalentry".equals(commandParam)) {
             commandWrapper = new CommandWrapperBuilder().createProvisioningJournalEntries(entryId).withJson(apiRequestBodyAsJson).build();
             final CommandProcessingResult commandProcessingResult = this.commandsSourceWritePlatformService
@@ -130,7 +126,6 @@ public class ProvisioningEntriesApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ProvisioningEntryData.class))) })
     public String retrieveProvisioningEntry(@PathParam("entryId") @Parameter(description = "entryId") final Long entryId,
             @Context final UriInfo uriInfo) {
-        platformSecurityContext.authenticatedUser();
         ProvisioningEntryData data = this.provisioningEntriesReadPlatformService.retrieveProvisioningEntryData(entryId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, data, PROVISIONING_ENTRY_PARAMETERS);
@@ -146,7 +141,6 @@ public class ProvisioningEntriesApiResource {
             @QueryParam("limit") final Integer limit, @QueryParam("officeId") final Long officeId,
             @QueryParam("productId") final Long productId, @QueryParam("categoryId") final Long categoryId,
             @Context final UriInfo uriInfo) {
-        this.platformSecurityContext.authenticatedUser();
         SearchParameters params = SearchParameters.forProvisioningEntries(entryId, officeId, productId, categoryId, offset, limit);
         Page<LoanProductProvisioningEntryData> entries = this.provisioningEntriesReadPlatformService.retrieveProvisioningEntries(params);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -161,7 +155,6 @@ public class ProvisioningEntriesApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = ProvisioningEntryData.class)))) })
     public String retrieveAllProvisioningEntries(@QueryParam("offset") @Parameter(description = "offset") final Integer offset,
             @QueryParam("limit") @Parameter(description = "limit") final Integer limit, @Context final UriInfo uriInfo) {
-        platformSecurityContext.authenticatedUser();
         Page<ProvisioningEntryData> data = this.provisioningEntriesReadPlatformService.retrieveAllProvisioningEntries(offset, limit);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.entriesApiJsonSerializer.serialize(settings, data, ALL_PROVISIONING_ENTRIES);

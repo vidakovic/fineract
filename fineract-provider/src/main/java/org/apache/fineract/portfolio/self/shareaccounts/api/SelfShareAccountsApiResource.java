@@ -44,14 +44,11 @@ import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.accounts.api.AccountsApiResource;
 import org.apache.fineract.portfolio.accounts.constants.ShareAccountApiConstants;
 import org.apache.fineract.portfolio.accounts.data.AccountData;
-import org.apache.fineract.portfolio.accounts.exceptions.ShareAccountNotFoundException;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
 import org.apache.fineract.portfolio.charge.service.ChargeReadPlatformService;
-import org.apache.fineract.portfolio.client.exception.ClientNotFoundException;
 import org.apache.fineract.portfolio.products.data.ProductData;
 import org.apache.fineract.portfolio.products.service.ShareProductReadPlatformService;
 import org.apache.fineract.portfolio.self.client.service.AppuserClientMapperReadService;
@@ -59,7 +56,6 @@ import org.apache.fineract.portfolio.self.shareaccounts.data.SelfShareAccountsDa
 import org.apache.fineract.portfolio.self.shareaccounts.service.AppUserShareAccountsMapperReadPlatformService;
 import org.apache.fineract.portfolio.shareaccounts.data.ShareAccountData;
 import org.apache.fineract.portfolio.shareaccounts.service.ShareAccountReadPlatformService;
-import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/self/shareaccounts")
@@ -68,7 +64,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class SelfShareAccountsApiResource {
 
-    private final PlatformSecurityContext context;
     private final AccountsApiResource accountsApiResource;
     private final ShareAccountReadPlatformService readPlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -93,7 +88,7 @@ public class SelfShareAccountsApiResource {
     public String template(@QueryParam("clientId") @Parameter(name = "clientId") final Long clientId,
             @QueryParam("productId") @Parameter(name = "productId") final Long productId, @Context final UriInfo uriInfo) {
 
-        validateAppuserClientsMapping(clientId);
+        appuserClientMapperReadService.validateAppuserClientsMapping(clientId);
 
         Collection<ProductData> productOptions = new ArrayList<ProductData>();
         if (productId != null) {
@@ -124,7 +119,7 @@ public class SelfShareAccountsApiResource {
     public String createAccount(final String apiRequestBodyAsJson) {
         HashMap<String, Object> attr = selfShareAccountsDataValidator.validateShareAccountApplication(apiRequestBodyAsJson);
         final Long clientId = (Long) attr.get(ShareAccountApiConstants.clientid_paramname);
-        validateAppuserClientsMapping(clientId);
+        appuserClientMapperReadService.validateAppuserClientsMapping(clientId);
         String accountType = ShareAccountApiConstants.shareEntityType;
         return accountsApiResource.createAccount(accountType, apiRequestBodyAsJson);
     }
@@ -136,26 +131,10 @@ public class SelfShareAccountsApiResource {
     @Operation(summary = "Retrieve a share application/account", description = "\n" + "\n" + "\n" + "Example Requests:\n" + "\n"
             + "self/shareaccounts/12\n")
     public String retrieveShareAccount(@PathParam("accountId") final Long accountId, @Context final UriInfo uriInfo) {
-        validateAppuserShareAccountMapping(accountId);
+        appUserShareAccountsMapperReadPlatformService.validateAppuserShareAccountsMapping(accountId);
         final boolean includeTemplate = false;
         AccountData accountData = readPlatformService.retrieveOne(accountId, includeTemplate);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return toApiJsonSerializer.serialize(settings, accountData, readPlatformService.getResponseDataParams());
-    }
-
-    private void validateAppuserShareAccountMapping(final Long accountId) {
-        AppUser user = context.authenticatedUser();
-        final boolean isMapped = appUserShareAccountsMapperReadPlatformService.isShareAccountsMappedToUser(accountId, user.getId());
-        if (!isMapped) {
-            throw new ShareAccountNotFoundException(accountId);
-        }
-    }
-
-    private void validateAppuserClientsMapping(final Long clientId) {
-        AppUser user = context.authenticatedUser();
-        final boolean mappedClientId = appuserClientMapperReadService.isClientMappedToUser(clientId, user.getId());
-        if (!mappedClientId) {
-            throw new ClientNotFoundException(clientId);
-        }
     }
 }

@@ -36,7 +36,6 @@ import jakarta.ws.rs.core.MediaType;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.spm.data.LookupTableData;
 import org.apache.fineract.spm.domain.LookupTable;
 import org.apache.fineract.spm.domain.Survey;
@@ -54,7 +53,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LookupTableApiResource {
 
-    private final PlatformSecurityContext securityContext;
     private final SpmService spmService;
     private final LookupTableService lookupTableService;
 
@@ -66,8 +64,6 @@ public class LookupTableApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = LookupTableData.class)))) })
     public List<LookupTableData> fetchLookupTables(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId) {
-        this.securityContext.authenticatedUser();
-
         final Survey survey = findSurvey(surveyId);
 
         final List<LookupTable> lookupTables = this.lookupTableService.findBySurvey(survey);
@@ -89,8 +85,6 @@ public class LookupTableApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = LookupTableData.class))) })
     public LookupTableData findLookupTable(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId,
             @PathParam("key") @Parameter(description = "Enter key") final String key) {
-        this.securityContext.authenticatedUser();
-
         findSurvey(surveyId);
 
         final List<LookupTable> lookupTables = this.lookupTableService.findByKey(key);
@@ -111,8 +105,6 @@ public class LookupTableApiResource {
     @ApiResponses({ @ApiResponse(responseCode = "200", description = "OK") })
     public void createLookupTable(@PathParam("surveyId") @Parameter(description = "Enter surveyId") final Long surveyId,
             final LookupTableData lookupTableData) {
-        this.securityContext.authenticatedUser();
-
         final Survey survey = findSurvey(surveyId);
 
         this.lookupTableService.createLookupTable(LookupTableMapper.map(lookupTableData, survey));

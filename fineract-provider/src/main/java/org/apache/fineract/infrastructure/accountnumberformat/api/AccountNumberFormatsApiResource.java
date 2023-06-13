@@ -54,7 +54,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 @Path(AccountNumberFormatConstants.resourceRelativeURL)
@@ -63,7 +62,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AccountNumberFormatsApiResource {
 
-    private final PlatformSecurityContext context;
     private final AccountNumberFormatReadPlatformService accountNumberFormatReadPlatformService;
     private final ToApiJsonSerializer<AccountNumberFormatData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -82,9 +80,7 @@ public class AccountNumberFormatsApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountNumberFormatsApiResourceSwagger.GetAccountNumberFormatsResponseTemplate.class))) })
     public String retrieveTemplate(@Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(AccountNumberFormatConstants.ENTITY_NAME);
-
+        // TODO: @vidakovic check permission ACCOUNTNUMBERFORMAT
         EntityAccountType accountType = null;
         AccountNumberFormatData accountNumberFormatData = this.accountNumberFormatReadPlatformService.retrieveTemplate(accountType);
 
@@ -100,9 +96,7 @@ public class AccountNumberFormatsApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AccountNumberFormatsApiResourceSwagger.GetAccountNumberFormatsIdResponse.class)))) })
     public String retrieveAll(@Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(AccountNumberFormatConstants.ENTITY_NAME);
-
+        // TODO: @vidakovic check permission ACCOUNTNUMBERFORMAT
         final List<AccountNumberFormatData> accountNumberFormatData = this.accountNumberFormatReadPlatformService
                 .getAllAccountNumberFormats();
 
@@ -120,9 +114,7 @@ public class AccountNumberFormatsApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountNumberFormatsApiResourceSwagger.GetAccountNumberFormatsIdResponse.class))) })
     public String retrieveOne(@Context final UriInfo uriInfo,
             @PathParam("accountNumberFormatId") @Parameter(description = "accountNumberFormatId") final Long accountNumberFormatId) {
-
-        this.context.authenticatedUser().validateHasReadPermission(AccountNumberFormatConstants.ENTITY_NAME);
-
+        // TODO: @vidakovic check permission ACCOUNTNUMBERFORMAT
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         AccountNumberFormatData accountNumberFormatData = this.accountNumberFormatReadPlatformService

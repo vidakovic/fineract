@@ -122,6 +122,7 @@ public class SchedulerJobRunnerReadServiceImpl implements SchedulerJobRunnerRead
     }
 
     @Override
+    @Deprecated
     public boolean isUpdatesAllowed() {
         final String sql = "select job.display_name from job job where job.currently_running=true and job.updates_allowed=false";
         final List<String> names = this.jdbcTemplate.queryForList(sql, String.class);

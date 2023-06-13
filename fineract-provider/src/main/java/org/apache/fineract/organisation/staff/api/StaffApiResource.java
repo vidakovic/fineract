@@ -57,7 +57,6 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.UploadRequest;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.data.OfficeData;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
 import org.apache.fineract.organisation.staff.data.StaffData;
@@ -78,9 +77,6 @@ public class StaffApiResource {
     private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id", "firstname", "lastname", "displayName",
             "officeId", "officeName", "isLoanOfficer", "externalId", "mobileNo", "allowedOffices", "isActive", "joiningDate"));
 
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "STAFF";
-
-    private final PlatformSecurityContext context;
     private final StaffReadPlatformService readPlatformService;
     private final OfficeReadPlatformService officeReadPlatformService;
     private final DefaultToApiJsonSerializer<StaffData> toApiJsonSerializer;
@@ -104,7 +100,7 @@ public class StaffApiResource {
             @DefaultValue("false") @QueryParam("staffInOfficeHierarchy") @Parameter(description = "staffInOfficeHierarchy") final boolean staffInOfficeHierarchy,
             @DefaultValue("false") @QueryParam("loanOfficersOnly") @Parameter(description = "loanOfficersOnly") final boolean loanOfficersOnly,
             @DefaultValue("active") @QueryParam("status") @Parameter(description = "status") final String status) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission STAFF
         final Collection<StaffData> staff;
         if (staffInOfficeHierarchy) {
             staff = readPlatformService.retrieveAllStaffInOfficeAndItsParentOfficeHierarchy(officeId, loanOfficersOnly);
@@ -139,7 +135,7 @@ public class StaffApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = StaffApiResourceSwagger.RetrieveOneResponse.class))) })
     public String retrieveOne(@PathParam("staffId") @Parameter(description = "staffId") final Long staffId,
             @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission STAFF
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         StaffData staff = readPlatformService.retrieveStaff(staffId);
         if (settings.isTemplate()) {
@@ -168,6 +164,7 @@ public class StaffApiResource {
     @Path("downloadtemplate")
     @Produces("application/vnd.ms-excel")
     public Response getTemplate(@QueryParam("officeId") final Long officeId, @QueryParam("dateFormat") final String dateFormat) {
+        // TODO: @vidakovic check permission all OFFICE
         return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.STAFF.toString(), officeId, null, dateFormat);
     }
 

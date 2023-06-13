@@ -58,7 +58,6 @@ import org.apache.fineract.infrastructure.core.data.UploadRequest;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.data.OfficeData;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -77,9 +76,6 @@ public class OfficesApiResource {
     private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(
             List.of("id", "name", "nameDecorated", "externalId", "openingDate", "hierarchy", "parentId", "parentName", "allowedParents"));
 
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "OFFICE";
-
-    private final PlatformSecurityContext context;
     private final OfficeReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<OfficeData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -98,7 +94,7 @@ public class OfficesApiResource {
             @DefaultValue("false") @QueryParam("includeAllOffices") @Parameter(description = "includeAllOffices") final boolean onlyManualEntries,
             @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy,
             @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission OFFICE
         final SearchParameters searchParameters = SearchParameters.forOffices(orderBy, sortOrder);
         final Collection<OfficeData> offices = readPlatformService.retrieveAllOffices(onlyManualEntries, searchParameters);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -114,7 +110,7 @@ public class OfficesApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = OfficesApiResourceSwagger.GetOfficesTemplateResponse.class))) })
     public String retrieveOfficeTemplate(@Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission OFFICE
         OfficeData office = readPlatformService.retrieveNewOfficeTemplate();
         final Collection<OfficeData> allowedParents = readPlatformService.retrieveAllOfficesForDropdown();
         office = OfficeData.appendedTemplate(office, allowedParents);
@@ -148,7 +144,7 @@ public class OfficesApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = OfficesApiResourceSwagger.GetOfficesResponse.class))) })
     public String retrieveOffice(@PathParam("officeId") @Parameter(description = "officeId") final Long officeId,
             @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission OFFICE
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         OfficeData office = readPlatformService.retrieveOffice(officeId);
         if (settings.isTemplate()) {
@@ -180,6 +176,7 @@ public class OfficesApiResource {
     @Path("downloadtemplate")
     @Produces("application/vnd.ms-excel")
     public Response getOfficeTemplate(@QueryParam("dateFormat") final String dateFormat) {
+        // TODO: @vidakovic check permission all OFFICE
         return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.OFFICES.toString(), null, null, dateFormat);
     }
 

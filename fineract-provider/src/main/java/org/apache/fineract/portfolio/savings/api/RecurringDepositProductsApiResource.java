@@ -58,7 +58,6 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.monetary.data.CurrencyData;
 import org.apache.fineract.organisation.monetary.service.CurrencyReadPlatformService;
 import org.apache.fineract.portfolio.charge.data.ChargeData;
@@ -97,7 +96,6 @@ public class RecurringDepositProductsApiResource {
     private final DepositProductReadPlatformService depositProductReadPlatformService;
     private final SavingsDropdownReadPlatformService savingsDropdownReadPlatformService;
     private final CurrencyReadPlatformService currencyReadPlatformService;
-    private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<RecurringDepositProductData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -160,7 +158,7 @@ public class RecurringDepositProductsApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RecurringDepositProductsApiResourceSwagger.GetRecurringDepositProductsResponse.class)))) })
     public String retrieveAll(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.RECURRING_DEPOSIT_PRODUCT_RESOURCE_NAME);
+        // TODO: @vidakovic check permission RECURRINGDEPOSIT
 
         @SuppressWarnings({ "unchecked", "rawtypes" })
         final Collection<RecurringDepositProductData> products = (Collection) this.depositProductReadPlatformService
@@ -183,7 +181,7 @@ public class RecurringDepositProductsApiResource {
     public String retrieveOne(@PathParam("productId") @Parameter(description = "productId") final Long productId,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.RECURRING_DEPOSIT_PRODUCT_RESOURCE_NAME);
+        // TODO: @vidakovic check permission RECURRINGDEPOSIT
 
         RecurringDepositProductData recurringDepositProductData = (RecurringDepositProductData) this.depositProductReadPlatformService
                 .retrieveOne(DepositAccountType.RECURRING_DEPOSIT, productId);
@@ -223,7 +221,7 @@ public class RecurringDepositProductsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveTemplate(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.RECURRING_DEPOSIT_PRODUCT_RESOURCE_NAME);
+        // TODO: @vidakovic check permission RECURRINGDEPOSIT
 
         final RecurringDepositProductData recurringDepositProduct = handleTemplateRelatedData(null);
 

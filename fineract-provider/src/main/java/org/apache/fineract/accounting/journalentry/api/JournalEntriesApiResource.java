@@ -64,7 +64,6 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.springframework.stereotype.Component;
@@ -83,7 +82,6 @@ public class JournalEntriesApiResource {
 
     private final String resourceNameForPermission = "JOURNALENTRY";
 
-    private final PlatformSecurityContext context;
     private final JournalEntryReadPlatformService journalEntryReadPlatformService;
     private final DefaultToApiJsonSerializer<Object> apiJsonSerializerService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -122,9 +120,7 @@ public class JournalEntriesApiResource {
             @QueryParam("savingsId") @Parameter(description = "savingsId") final Long savingsId,
             @QueryParam("runningBalance") @Parameter(description = "runningBalance") final boolean runningBalance,
             @QueryParam("transactionDetails") @Parameter(description = "transactionDetails") final boolean transactionDetails) {
-
-        this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermission);
-
+        // TODO: @vidakovic check permission JOURNALENTRY
         LocalDate fromDate = null;
         if (fromDateParam != null) {
             fromDate = fromDateParam.getDate("fromDate", dateFormat, locale);
@@ -169,8 +165,7 @@ public class JournalEntriesApiResource {
             @Context final UriInfo uriInfo,
             @QueryParam("runningBalance") @Parameter(description = "runningBalance") final boolean runningBalance,
             @QueryParam("transactionDetails") @Parameter(description = "transactionDetails") final boolean transactionDetails) {
-
-        this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermission);
+        // TODO: @vidakovic check permission JOURNALENTRY
         JournalEntryAssociationParametersData associationParametersData = new JournalEntryAssociationParametersData(transactionDetails,
                 runningBalance);
         final JournalEntryData glJournalEntryData = this.journalEntryReadPlatformService.retrieveGLJournalEntryById(journalEntryId,
@@ -240,7 +235,6 @@ public class JournalEntriesApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveJournalEntries(@QueryParam("offset") final Integer offset, @QueryParam("limit") final Integer limit,
             @QueryParam("entryId") final Long entryId, @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser();
         String transactionId = "P" + entryId;
         SearchParameters params = SearchParameters.forPagination(offset, limit);
         Page<JournalEntryData> entries = this.journalEntryReadPlatformService.retrieveAll(params, null, null, null, null, null, null,
@@ -255,8 +249,7 @@ public class JournalEntriesApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveOpeningBalance(@Context final UriInfo uriInfo, @QueryParam("officeId") final Long officeId,
             @QueryParam("currencyCode") final String currencyCode) {
-
-        this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermission);
+        // TODO: @vidakovic check permission JOURNALENTRY
         final OfficeOpeningBalancesData officeOpeningBalancesData = this.journalEntryReadPlatformService
                 .retrieveOfficeOpeningBalances(officeId, currencyCode);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -272,6 +265,7 @@ public class JournalEntriesApiResource {
     @Produces("application/vnd.ms-excel")
     public Response getJournalEntriesTemplate(@QueryParam("officeId") final Long officeId,
             @QueryParam("dateFormat") final String dateFormat) {
+        // TODO: @vidakovic check permission all OFFICE, GLACCOUNT, FUNDS, PAYMENTTYPE, CURRENCY
         return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.GL_JOURNAL_ENTRIES.toString(), officeId, null, dateFormat);
     }
 

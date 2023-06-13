@@ -48,7 +48,6 @@ import org.apache.fineract.infrastructure.core.data.PaginationParameters;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.service.Page;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.security.utils.SQLBuilder;
 import org.springframework.stereotype.Component;
 
@@ -66,9 +65,8 @@ public class AuditsApiResource {
             "subresourceId", "maker", "madeOnDate", "checker", "checkedOnDate", "processingResult", "commandAsJson", "officeName",
             "groupLevelName", "groupName", "clientName", "loanAccountNo", "savingsAccountNo", "clientId", "loanId", "url"));
 
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "AUDIT";
+    // private static final String RESOURCE_NAME_FOR_PERMISSIONS = "AUDIT";
 
-    private final PlatformSecurityContext context;
     private final AuditReadPlatformService auditReadPlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final DefaultToApiJsonSerializer<AuditData> toApiJsonSerializer;
@@ -105,7 +103,8 @@ public class AuditsApiResource {
             @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy,
             @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder) {
 
-        this.context.authenticatedUser().validateHasReadPermission(this.RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission AUDIT
+
         final PaginationParameters parameters = PaginationParameters.instance(paged, offset, limit, orderBy, sortOrder);
         final SQLBuilder extraCriteria = getExtraCriteria(actionName, entityName, resourceId, makerId, makerDateTimeFrom, makerDateTimeTo,
                 checkerId, checkerDateTimeFrom, checkerDateTimeTo, processingResult, officeId, groupId, clientId, loanId, savingsAccountId);
@@ -135,7 +134,7 @@ public class AuditsApiResource {
     public String retrieveAuditEntry(@PathParam("auditId") @Parameter(description = "auditId") final Long auditId,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(this.RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission AUDIT
 
         final AuditData auditEntry = this.auditReadPlatformService.retrieveAuditEntry(auditId);
 
@@ -152,9 +151,7 @@ public class AuditsApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = MakercheckersApiResourceSwagger.GetMakerCheckersSearchTemplateResponse.class))) })
     public String retrieveAuditSearchTemplate(@Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(this.RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission AUDIT
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         final AuditSearchData auditSearchData = this.auditReadPlatformService.retrieveSearchTemplate("audit");

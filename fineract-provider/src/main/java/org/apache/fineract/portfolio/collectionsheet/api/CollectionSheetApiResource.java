@@ -46,8 +46,6 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.portfolio.collectionsheet.CollectionSheetConstants;
 import org.apache.fineract.portfolio.collectionsheet.data.IndividualCollectionSheetData;
 import org.apache.fineract.portfolio.collectionsheet.service.CollectionSheetReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -63,7 +61,6 @@ public class CollectionSheetApiResource {
     private final FromJsonHelper fromJsonHelper;
     private final ApiRequestParameterHelper apiRequestPrameterHelper;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-    private final PlatformSecurityContext context;
 
     @POST
     @Consumes({ MediaType.APPLICATION_JSON })
@@ -77,11 +74,12 @@ public class CollectionSheetApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CollectionSheetApiResourceSwagger.PostCollectionSheetResponse.class))) })
     public String generateCollectionSheet(@QueryParam("command") @Parameter(description = "command") final String commandParam,
             @Parameter(hidden = true) final String apiRequestBodyAsJson, @Context final UriInfo uriInfo) {
+        // TODO: @vidakovic check permission COLLECTIONSHEET
+        // NOTE: this check is a little bit broader, covers else branch
         final CommandWrapperBuilder builder = new CommandWrapperBuilder().withJson(apiRequestBodyAsJson);
-        CommandProcessingResult result = null;
+        CommandProcessingResult result;
 
         if (is(commandParam, "generateCollectionSheet")) {
-            this.context.authenticatedUser().validateHasReadPermission(CollectionSheetConstants.COLLECTIONSHEET_RESOURCE_NAME);
             final JsonElement parsedQuery = this.fromJsonHelper.parse(apiRequestBodyAsJson);
             final JsonQuery query = JsonQuery.from(apiRequestBodyAsJson, parsedQuery, this.fromJsonHelper);
             final IndividualCollectionSheetData collectionSheet = this.collectionSheetReadPlatformService

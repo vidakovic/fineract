@@ -49,7 +49,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/financialactivityaccounts")
@@ -60,7 +59,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FinancialActivityAccountsApiResource {
 
-    private final PlatformSecurityContext context;
     private final FinancialActivityAccountReadPlatformService financialActivityAccountReadPlatformService;
     private final DefaultToApiJsonSerializer<FinancialActivityAccountData> apiJsonSerializerService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -72,8 +70,7 @@ public class FinancialActivityAccountsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveTemplate(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(FinancialActivityAccountsConstants.resourceNameForPermission);
-
+        // TODO: @vidakovic check permission FINANCIALACTIVITYACCOUNT
         FinancialActivityAccountData financialActivityAccountData = this.financialActivityAccountReadPlatformService
                 .getFinancialActivityAccountTemplate();
 
@@ -91,7 +88,7 @@ public class FinancialActivityAccountsApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = FinancialActivityAccountsApiResourceSwagger.GetFinancialActivityAccountsResponse.class)))) })
     public String retrieveAll(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(FinancialActivityAccountsConstants.resourceNameForPermission);
+        // TODO: @vidakovic check permission FINANCIALACTIVITYACCOUNT
         final List<FinancialActivityAccountData> financialActivityAccounts = this.financialActivityAccountReadPlatformService.retrieveAll();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -110,8 +107,7 @@ public class FinancialActivityAccountsApiResource {
     public String retreive(@PathParam("mappingId") @Parameter(description = "mappingId") final Long mappingId,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(FinancialActivityAccountsConstants.resourceNameForPermission);
-
+        // TODO: @vidakovic check permission FINANCIALACTIVITYACCOUNT
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         FinancialActivityAccountData financialActivityAccountData = this.financialActivityAccountReadPlatformService.retrieve(mappingId);
         if (settings.isTemplate()) {

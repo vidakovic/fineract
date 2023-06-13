@@ -48,7 +48,6 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.exception.UnrecognizedQueryParamException;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.data.LoanScheduleData;
 import org.apache.fineract.portfolio.loanaccount.loanschedule.domain.LoanScheduleModel;
 import org.apache.fineract.portfolio.loanaccount.rescheduleloan.RescheduleLoansApiConstants;
@@ -65,7 +64,6 @@ public class RescheduleLoansApiResource {
 
     private final DefaultToApiJsonSerializer<LoanRescheduleRequestData> loanRescheduleRequestToApiJsonSerializer;
     private final DefaultToApiJsonSerializer<LoanScheduleData> loanRescheduleToApiJsonSerializer;
-    private final PlatformSecurityContext platformSecurityContext;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final LoanRescheduleRequestReadPlatformService loanRescheduleRequestReadPlatformService;
     private final LoanReschedulePreviewPlatformService loanReschedulePreviewPlatformService;
@@ -80,7 +78,7 @@ public class RescheduleLoansApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = RescheduleLoansApiResourceSwagger.GetRescheduleReasonsTemplateResponse.class))) })
     public String retrieveTemplate(@Context final UriInfo uriInfo) {
 
-        this.platformSecurityContext.authenticatedUser().validateHasReadPermission(RescheduleLoansApiConstants.ENTITY_NAME);
+        // TODO: @vidakovic check permission RESCHEDULELOAN
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         LoanRescheduleRequestData loanRescheduleReasons = this.loanRescheduleRequestReadPlatformService
@@ -98,8 +96,7 @@ public class RescheduleLoansApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = RescheduleLoansApiResourceSwagger.GetLoanRescheduleRequestResponse.class))) })
     public String readLoanRescheduleRequest(@Context final UriInfo uriInfo, @PathParam("scheduleId") final Long scheduleId,
             @QueryParam("command") final String command) {
-        this.platformSecurityContext.authenticatedUser().validateHasReadPermission(RescheduleLoansApiConstants.ENTITY_NAME);
-
+        // TODO: @vidakovic check permission RESCHEDULELOAN
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         if (compareIgnoreCase(command, "previewLoanReschedule")) {
@@ -182,9 +179,7 @@ public class RescheduleLoansApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = RescheduleLoansApiResourceSwagger.GetLoanRescheduleRequestResponse.class)))) })
     public String retrieveAllRescheduleRequest(@Context final UriInfo uriInfo, @QueryParam("command") final String command,
             @QueryParam("loanId") Long loanId) {
-
-        this.platformSecurityContext.authenticatedUser().validateHasReadPermission(RescheduleLoansApiConstants.ENTITY_NAME);
-
+        // TODO: @vidakovic check permission RESCHEDULELOAN
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         if (StringUtils.isNotBlank(command) && !RescheduleLoansApiConstants.commandParams.contains(command.toLowerCase())) {
             throw new UnrecognizedQueryParamException("command", command, RescheduleLoansApiConstants.allCommandParamName,

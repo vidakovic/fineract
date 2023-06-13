@@ -21,9 +21,10 @@ package org.apache.fineract.portfolio.client.api.v2.search;
 import org.apache.fineract.infrastructure.core.service.PagedRequest;
 import org.apache.fineract.portfolio.client.service.search.domain.ClientSearchData;
 import org.apache.fineract.portfolio.client.service.search.domain.ClientTextSearch;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.data.domain.Page;
 
 public interface ClientSearchV2Api {
 
-    Page<ClientSearchData> searchByText(PagedRequest<ClientTextSearch> request);
+    Page<ClientSearchData> searchByText(AppUser user, PagedRequest<ClientTextSearch> request);
 }

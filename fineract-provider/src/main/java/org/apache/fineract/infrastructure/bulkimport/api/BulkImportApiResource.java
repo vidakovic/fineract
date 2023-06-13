@@ -39,7 +39,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.documentmanagement.data.DocumentData;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/imports")
@@ -48,9 +47,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class BulkImportApiResource {
 
-    private static final String RESOURCE_NAME_FOR_PERMISSION = "IMPORT";
-
-    private final PlatformSecurityContext context;
     private final BulkImportWorkbookService bulkImportWorkbookService;
     private final DefaultToApiJsonSerializer<ImportData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -59,8 +55,7 @@ public class BulkImportApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveImportDocuments(@Context final UriInfo uriInfo, @QueryParam("entityType") final String entityType) {
-
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
+        // TODO: @vidakovic check permission IMPORT
         Collection<ImportData> importData = new ArrayList<>();
         if (entityType.equals(GlobalEntityType.CLIENT.getCode())) {
             final Collection<ImportData> importForClientEntity = this.bulkImportWorkbookService.getImports(GlobalEntityType.CLIENTS_ENTITY);
@@ -85,7 +80,7 @@ public class BulkImportApiResource {
     @GET
     @Path("getOutputTemplateLocation")
     public String retriveOutputTemplateLocation(@QueryParam("importDocumentId") final String importDocumentId) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSION);
+        // TODO: @vidakovic check permission IMPORT
         final DocumentData documentData = this.bulkImportWorkbookService.getOutputTemplateLocation(importDocumentId);
         return this.toApiJsonSerializer.serialize(documentData.fileLocation());
     }

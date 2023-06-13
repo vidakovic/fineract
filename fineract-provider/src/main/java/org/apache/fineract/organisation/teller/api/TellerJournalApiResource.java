@@ -28,7 +28,6 @@ import jakarta.ws.rs.core.MediaType;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.teller.data.TellerData;
 import org.apache.fineract.organisation.teller.data.TellerJournalData;
 import org.apache.fineract.organisation.teller.service.TellerManagementReadPlatformService;
@@ -41,7 +40,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TellerJournalApiResource {
 
-    private final PlatformSecurityContext securityContext;
     private final DefaultToApiJsonSerializer<TellerData> jsonSerializer;
     private final TellerManagementReadPlatformService readPlatformService;
 

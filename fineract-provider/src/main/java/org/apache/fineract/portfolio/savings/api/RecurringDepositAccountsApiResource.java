@@ -66,7 +66,6 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
 import org.apache.fineract.infrastructure.core.service.Page;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.savings.DepositAccountType;
 import org.apache.fineract.portfolio.savings.DepositsApiConstants;
 import org.apache.fineract.portfolio.savings.SavingsApiConstants;
@@ -89,7 +88,6 @@ import org.springframework.util.CollectionUtils;
 public class RecurringDepositAccountsApiResource {
 
     private final DepositAccountReadPlatformService depositAccountReadPlatformService;
-    private final PlatformSecurityContext context;
     private final DefaultToApiJsonSerializer<DepositAccountData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -114,8 +112,7 @@ public class RecurringDepositAccountsApiResource {
             @DefaultValue("false") @QueryParam("staffInSelectedOfficeOnly") @Parameter(description = "staffInSelectedOfficeOnly") final boolean staffInSelectedOfficeOnly,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.RECURRING_DEPOSIT_ACCOUNT_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission RECURRINGDEPOSITACCOUNT
         final DepositAccountData account = this.depositAccountReadPlatformService.retrieveTemplate(DepositAccountType.RECURRING_DEPOSIT,
                 clientId, groupId, productId, staffInSelectedOfficeOnly);
 
@@ -137,7 +134,7 @@ public class RecurringDepositAccountsApiResource {
             @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy,
             @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder) {
 
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.RECURRING_DEPOSIT_ACCOUNT_RESOURCE_NAME);
+        // TODO: @vidakovic check permission RECURRINGDEPOSITACCOUNT
         final PaginationParameters paginationParameters = PaginationParameters.instance(paged, offset, limit, orderBy, sortOrder);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
@@ -188,8 +185,7 @@ public class RecurringDepositAccountsApiResource {
             @DefaultValue("all") @QueryParam("chargeStatus") @Parameter(description = "chargeStatus") final String chargeStatus,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.RECURRING_DEPOSIT_ACCOUNT_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission RECURRINGDEPOSITACCOUNT
         if (!(is(chargeStatus, "all") || is(chargeStatus, "active") || is(chargeStatus, "inactive"))) {
             throw new UnrecognizedQueryParamException("status", chargeStatus, new Object[] { "all", "active", "inactive" });
         }
@@ -391,7 +387,7 @@ public class RecurringDepositAccountsApiResource {
     public String accountClosureTemplate(@PathParam("accountId") @Parameter(description = "accountId") final Long accountId,
             @QueryParam("command") @Parameter(description = "command") final String commandParam, @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(DepositsApiConstants.RECURRING_DEPOSIT_ACCOUNT_RESOURCE_NAME);
+        // TODO: @vidakovic check permission RECURRINGDEPOSITACCOUNT
         DepositAccountData account = null;
         if (is(commandParam, "close")) {
             account = this.depositAccountReadPlatformService.retrieveOneWithClosureTemplate(DepositAccountType.RECURRING_DEPOSIT,
@@ -409,6 +405,7 @@ public class RecurringDepositAccountsApiResource {
     @Produces("application/vnd.ms-excel")
     public Response getRecurringDepositTemplate(@QueryParam("officeId") final Long officeId, @QueryParam("staffId") final Long staffId,
             @QueryParam("dateFormat") final String dateFormat) {
+        // TODO: @vidakovic check permission all OFFICE, CLIENT, STAFF, RECURRINGDEPOSITPRODUCT
         return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.RECURRING_DEPOSIT_ACCOUNTS.toString(), officeId, staffId,
                 dateFormat);
     }
@@ -431,6 +428,7 @@ public class RecurringDepositAccountsApiResource {
     @Produces("application/vnd.ms-excel")
     public Response getRecurringDepositTransactionTemplate(@QueryParam("officeId") final Long officeId,
             @QueryParam("dateFormat") final String dateFormat) {
+        // TODO: @vidakovic check permission all OFFICE, CLIENT, FUNDS, PAYMENTTYPE, CURRENCY
         return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.RECURRING_DEPOSIT_ACCOUNTS_TRANSACTIONS.toString(), officeId,
                 null, dateFormat);
     }

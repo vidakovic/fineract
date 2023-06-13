@@ -54,7 +54,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/codes/{codeId}/codevalues")
@@ -72,9 +71,6 @@ public class CodeValuesApiResource {
             Arrays.asList(CodevalueJSONinputParams.CODEVALUE_ID.getValue(), CodevalueJSONinputParams.NAME.getValue(),
                     CodevalueJSONinputParams.POSITION.getValue(), CodevalueJSONinputParams.IS_MANDATORY.getValue(),
                     CodevalueJSONinputParams.DESCRIPTION.getValue()));
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "CODEVALUE";
-
-    private final PlatformSecurityContext context;
     private final CodeValueReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<CodeValueData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -89,9 +85,7 @@ public class CodeValuesApiResource {
             @ApiResponse(responseCode = "200", description = "A List of code values for a given code", content = @Content(array = @ArraySchema(schema = @Schema(implementation = CodeValuesApiResourceSwagger.GetCodeValuesDataResponse.class)))) })
     public String retrieveAllCodeValues(@Context final UriInfo uriInfo,
             @PathParam("codeId") @Parameter(description = "codeId") final Long codeId) {
-
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission CODEVALUE
         final Collection<CodeValueData> codeValues = this.readPlatformService.retrieveAllCodeValues(codeId);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -109,9 +103,7 @@ public class CodeValuesApiResource {
     public String retrieveCodeValue(@Context final UriInfo uriInfo,
             @PathParam("codeValueId") @Parameter(description = "codeValueId") final Long codeValueId,
             @PathParam("codeId") @Parameter(description = "codeId") final Long codeId) {
-
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission CODEVALUE
         final CodeValueData codeValue = this.readPlatformService.retrieveCodeValue(codeValueId);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

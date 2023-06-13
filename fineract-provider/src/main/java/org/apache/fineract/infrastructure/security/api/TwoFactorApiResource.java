@@ -27,7 +27,6 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +41,6 @@ import org.apache.fineract.infrastructure.security.data.OTPDeliveryMethod;
 import org.apache.fineract.infrastructure.security.data.OTPMetadata;
 import org.apache.fineract.infrastructure.security.data.OTPRequest;
 import org.apache.fineract.infrastructure.security.domain.TFAccessToken;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.infrastructure.security.service.TwoFactorService;
 import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -60,15 +58,12 @@ public class TwoFactorApiResource {
     private final ToApiJsonSerializer<AccessTokenData> accessTokenSerializer;
     private final DefaultToApiJsonSerializer<Map<String, Object>> toApiJsonSerializer;
 
-    private final PlatformSecurityContext context;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final TwoFactorService twoFactorService;
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
-    public String getOTPDeliveryMethods(@Context final UriInfo uriInfo) {
-        AppUser user = context.authenticatedUser();
-
+    public String getOTPDeliveryMethods(@Context final AppUser user) {
         List<OTPDeliveryMethod> otpDeliveryMethods = twoFactorService.getDeliveryMethodsForUser(user);
         return this.otpDeliveryMethodSerializer.serialize(otpDeliveryMethods);
     }
@@ -76,9 +71,7 @@ public class TwoFactorApiResource {
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
     public String requestToken(@QueryParam("deliveryMethod") final String deliveryMethod,
-            @QueryParam("extendedToken") @DefaultValue("false") boolean extendedAccessToken, @Context final UriInfo uriInfo) {
-        final AppUser user = context.authenticatedUser();
-
+            @QueryParam("extendedToken") @DefaultValue("false") boolean extendedAccessToken, @Context final AppUser user) {
         final OTPRequest request = twoFactorService.createNewOTPToken(user, deliveryMethod, extendedAccessToken);
         return this.otpRequestSerializer.serialize(request.getMetadata());
     }
@@ -86,9 +79,7 @@ public class TwoFactorApiResource {
     @Path("validate")
     @POST
     @Produces({ MediaType.APPLICATION_JSON })
-    public String validate(@QueryParam("token") final String token) {
-        final AppUser user = context.authenticatedUser();
-
+    public String validate(@QueryParam("token") final String token, @Context final AppUser user) {
         TFAccessToken accessToken = twoFactorService.createAccessTokenFromOTP(user, token);
 
         return accessTokenSerializer.serialize(accessToken.toTokenData());

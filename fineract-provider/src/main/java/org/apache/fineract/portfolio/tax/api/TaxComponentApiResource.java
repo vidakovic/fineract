@@ -46,7 +46,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.tax.data.TaxComponentData;
 import org.apache.fineract.portfolio.tax.service.TaxReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -57,9 +56,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TaxComponentApiResource {
 
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "TAXCOMPONENT";
-
-    private final PlatformSecurityContext context;
     private final TaxReadPlatformService readPlatformService;
     private final DefaultToApiJsonSerializer<TaxComponentData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -73,8 +69,7 @@ public class TaxComponentApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = TaxComponentApiResourceSwagger.GetTaxesComponentsResponse.class)))) })
     public String retrieveAllTaxComponents(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission TAXCOMPONENT
         final Collection<TaxComponentData> taxComponents = this.readPlatformService.retrieveAllTaxComponents();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -91,8 +86,7 @@ public class TaxComponentApiResource {
     public String retrieveTaxComponent(@PathParam("taxComponentId") @Parameter(description = "taxComponentId") final Long taxComponentId,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission TAXCOMPONENT
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         TaxComponentData taxComponentData = this.readPlatformService.retrieveTaxComponentData(taxComponentId);
@@ -105,8 +99,7 @@ public class TaxComponentApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveTemplate(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission TAXCOMPONENT
         final TaxComponentData taxComponentData = this.readPlatformService.retrieveTaxComponentTemplate();
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());

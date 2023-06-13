@@ -73,7 +73,6 @@ import org.apache.fineract.infrastructure.dataqueries.data.DatatableData;
 import org.apache.fineract.infrastructure.dataqueries.data.EntityTables;
 import org.apache.fineract.infrastructure.dataqueries.data.StatusEnum;
 import org.apache.fineract.infrastructure.dataqueries.service.EntityDatatableChecksReadService;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.accountdetails.data.AccountSummaryCollectionData;
 import org.apache.fineract.portfolio.accountdetails.service.AccountDetailsReadPlatformService;
 import org.apache.fineract.portfolio.calendar.data.CalendarData;
@@ -97,7 +96,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CentersApiResource {
 
-    private final PlatformSecurityContext context;
     private final CenterReadPlatformService centerReadPlatformService;
     private final ToApiJsonSerializer<CenterData> centerApiJsonSerializer;
     private final ToApiJsonSerializer<Object> toApiJsonSerializer;
@@ -126,7 +124,7 @@ public class CentersApiResource {
             @QueryParam("officeId") @Parameter(description = "officeId") final Long officeId,
             @DefaultValue("false") @QueryParam("staffInSelectedOfficeOnly") @Parameter(description = "staffInSelectedOfficeOnly") final boolean staffInSelectedOfficeOnly) {
 
-        this.context.authenticatedUser().validateHasReadPermission(GroupingTypesApiConstants.CENTER_RESOURCE_NAME);
+        // TODO: @vidakovic check permission CENTER
 
         if (is(commandParam, "close")) {
             final CenterData centerClosureTemplate = this.centerReadPlatformService.retrieveCenterWithClosureReasons();
@@ -167,7 +165,7 @@ public class CentersApiResource {
             @QueryParam("dateFormat") @Parameter(description = "dateFormat") final String dateFormat,
             @QueryParam("locale") @Parameter(description = "locale") final String locale) {
 
-        this.context.authenticatedUser().validateHasReadPermission(GroupingTypesApiConstants.CENTER_RESOURCE_NAME);
+        // TODO: @vidakovic check permission CENTER
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         if (meetingDateParam != null && officeId != null) {
             LocalDate meetingDate = meetingDateParam.getDate("meetingDate", dateFormat, locale);
@@ -201,7 +199,7 @@ public class CentersApiResource {
             @PathParam("centerId") @Parameter(description = "centerId") final Long centerId,
             @DefaultValue("false") @QueryParam("staffInSelectedOfficeOnly") @Parameter(description = "staffInSelectedOfficeOnly") final boolean staffInSelectedOfficeOnly) {
 
-        this.context.authenticatedUser().validateHasReadPermission(GroupingTypesApiConstants.CENTER_RESOURCE_NAME);
+        // TODO: @vidakovic check permission CENTER
         final Set<String> associationParameters = ApiParameterHelper.extractAssociationsForResponseIfProvided(uriInfo.getQueryParameters());
         CalendarData collectionMeetingCalendar = null;
         Collection<GroupGeneralData> groups = null;
@@ -374,7 +372,7 @@ public class CentersApiResource {
     public String retrieveGroupAccount(@PathParam("centerId") @Parameter(description = "centerId") final Long centerId,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(GroupingTypesApiConstants.CENTER_RESOURCE_NAME);
+        // TODO: @vidakovic check permission CENTER
 
         final AccountSummaryCollectionData groupAccount = this.accountDetailsReadPlatformService.retrieveGroupAccountDetails(centerId);
 
@@ -390,6 +388,7 @@ public class CentersApiResource {
     @Produces("application/vnd.ms-excel")
     public Response getCentersTemplate(@QueryParam("officeId") final Long officeId, @QueryParam("staffId") final Long staffId,
             @QueryParam("dateFormat") final String dateFormat) {
+        // TODO: @vidakovic check permission all OFFICE, STAFF, GROUP
         return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.CENTERS.toString(), officeId, staffId, dateFormat);
     }
 

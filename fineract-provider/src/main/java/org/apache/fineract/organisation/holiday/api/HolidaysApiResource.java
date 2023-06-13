@@ -18,7 +18,6 @@
  */
 package org.apache.fineract.organisation.holiday.api;
 
-import static org.apache.fineract.organisation.holiday.api.HolidayApiConstants.HOLIDAY_RESOURCE_NAME;
 import static org.apache.fineract.organisation.holiday.api.HolidayApiConstants.HOLIDAY_RESPONSE_DATA_PARAMETERS;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,7 +54,6 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.exception.UnrecognizedQueryParamException;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.holiday.data.HolidayData;
 import org.apache.fineract.organisation.holiday.service.HolidayReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -72,7 +70,6 @@ public class HolidaysApiResource {
 
     private final DefaultToApiJsonSerializer<HolidayData> toApiJsonSerializer;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
-    private final PlatformSecurityContext context;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
 
     private final HolidayReadPlatformService holidayReadPlatformService;
@@ -137,8 +134,7 @@ public class HolidaysApiResource {
     public String retrieveOne(@PathParam("holidayId") @Parameter(description = "holidayId") final Long holidayId,
             @Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(HOLIDAY_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission HOLIDAY
         final HolidayData holidayData = this.holidayReadPlatformService.retrieveHoliday(holidayId);
 
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -194,8 +190,7 @@ public class HolidaysApiResource {
             @QueryParam("locale") @Parameter(description = "locale") final String locale,
             @QueryParam("dateFormat") @Parameter(description = "dateFormat") final String dateFormat) {
 
-        this.context.authenticatedUser().validateHasReadPermission(HOLIDAY_RESOURCE_NAME);
-
+        // TODO: @vidakovic check permission HOLIDAY
         LocalDate fromDate = null;
         if (fromDateParam != null) {
             fromDate = fromDateParam.getDate("fromDate", dateFormat, locale);
@@ -216,8 +211,8 @@ public class HolidaysApiResource {
     @Path("/template")
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String retrieveRepaymentScheduleUpdationTyeOptions(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(HOLIDAY_RESOURCE_NAME);
+    public String retrieveRepaymentScheduleUpdationTyeOptions() {
+        // TODO: @vidakovic check permission HOLIDAY
         return this.toApiJsonSerializer.serialize(this.holidayReadPlatformService.retrieveRepaymentScheduleUpdationTyeOptions());
     }
 }

@@ -49,7 +49,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.floatingrates.data.FloatingRateData;
 import org.apache.fineract.portfolio.floatingrates.service.FloatingRatesReadPlatformService;
 import org.springframework.stereotype.Component;
@@ -60,12 +59,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class FloatingRatesApiResource {
 
-    private static final String RESOURCE_NAME = "FLOATINGRATE";
     private static final Set<String> LIST_FLOATING_RATES_PARAMETERS = new HashSet<>(
             Arrays.asList("id", "name", "isBaseLendingRate", "isActive", "createdby", "createdOn", "modifiedBy", "modifiedOn"));
     private static final Set<String> INDIVIDUAL_FLOATING_RATES_PARAMETERS = new HashSet<>(Arrays.asList("id", "name", "isBaseLendingRate",
             "isActive", "createdBy", "createdOn", "modifiedBy", "modifiedOn", "ratePeriods"));
-    private final PlatformSecurityContext context;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final DefaultToApiJsonSerializer<FloatingRateData> toApiJsonSerializer;
     private final FloatingRatesReadPlatformService floatingRatesReadPlatformService;
@@ -93,7 +90,7 @@ public class FloatingRatesApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = FloatingRatesApiResourceSwagger.GetFloatingRatesResponse.class)))) })
     public String retrieveAll(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME);
+        // TODO: @vidakovic check permission FLOATINGRATE
         final List<FloatingRateData> floatingRates = this.floatingRatesReadPlatformService.retrieveAll();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, floatingRates, FloatingRatesApiResource.LIST_FLOATING_RATES_PARAMETERS);
@@ -108,7 +105,7 @@ public class FloatingRatesApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = FloatingRatesApiResourceSwagger.GetFloatingRatesFloatingRateIdResponse.class))) })
     public String retrieveOne(@PathParam("floatingRateId") @Parameter(description = "floatingRateId") final Long floatingRateId,
             @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME);
+        // TODO: @vidakovic check permission FLOATINGRATE
         final FloatingRateData floatingRates = this.floatingRatesReadPlatformService.retrieveOne(floatingRateId);
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, floatingRates, FloatingRatesApiResource.INDIVIDUAL_FLOATING_RATES_PARAMETERS);
@@ -129,5 +126,4 @@ public class FloatingRatesApiResource {
         final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
         return this.toApiJsonSerializer.serialize(result);
     }
-
 }

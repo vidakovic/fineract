@@ -73,7 +73,6 @@ import org.apache.fineract.infrastructure.dataqueries.data.DatatableData;
 import org.apache.fineract.infrastructure.dataqueries.data.EntityTables;
 import org.apache.fineract.infrastructure.dataqueries.data.StatusEnum;
 import org.apache.fineract.infrastructure.dataqueries.service.EntityDatatableChecksReadService;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.accountdetails.data.AccountSummaryCollectionData;
 import org.apache.fineract.portfolio.accountdetails.service.AccountDetailsReadPlatformService;
 import org.apache.fineract.portfolio.calendar.data.CalendarData;
@@ -108,7 +107,6 @@ import org.springframework.util.CollectionUtils;
 @RequiredArgsConstructor
 public class GroupsApiResource {
 
-    private final PlatformSecurityContext context;
     private final GroupReadPlatformService groupReadPlatformService;
     private final CenterReadPlatformService centerReadPlatformService;
     private final ClientReadPlatformService clientReadPlatformService;
@@ -148,7 +146,7 @@ public class GroupsApiResource {
             @QueryParam("command") @Parameter(description = "command") final String commandParam,
             @DefaultValue("false") @QueryParam("staffInSelectedOfficeOnly") @Parameter(description = "staffInSelectedOfficeOnly") final boolean staffInSelectedOfficeOnly) {
 
-        context.authenticatedUser().validateHasReadPermission(GroupingTypesApiConstants.GROUP_RESOURCE_NAME);
+        // TODO: @vidakovic check permission GROUP
 
         if (is(commandParam, "close")) {
             final GroupGeneralData groupClosureTemplate = groupReadPlatformService.retrieveGroupWithClosureReasons();
@@ -196,7 +194,7 @@ public class GroupsApiResource {
             @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder,
             @QueryParam("orphansOnly") @Parameter(description = "orphansOnly") final Boolean orphansOnly) {
 
-        context.authenticatedUser().validateHasReadPermission(GroupingTypesApiConstants.GROUP_RESOURCE_NAME);
+        // TODO: @vidakovic check permission GROUP
         final PaginationParameters parameters = PaginationParameters.instance(paged, offset, limit, orderBy, sortOrder);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
@@ -223,7 +221,7 @@ public class GroupsApiResource {
             @DefaultValue("false") @QueryParam("staffInSelectedOfficeOnly") @Parameter(description = "staffInSelectedOfficeOnly") final boolean staffInSelectedOfficeOnly,
             @QueryParam("roleId") @Parameter(description = "roleId") final Long roleId) {
 
-        context.authenticatedUser().validateHasReadPermission(GroupingTypesApiConstants.GROUP_RESOURCE_NAME);
+        // TODO: @vidakovic check permission GROUP
         final Set<String> associationParameters = ApiParameterHelper.extractAssociationsForResponseIfProvided(uriInfo.getQueryParameters());
 
         GroupGeneralData group = groupReadPlatformService.retrieveOne(groupId);
@@ -505,8 +503,7 @@ public class GroupsApiResource {
     public String retrieveAccounts(@PathParam("groupId") @Parameter(description = "groupId") final Long groupId,
             @Context final UriInfo uriInfo) {
 
-        context.authenticatedUser().validateHasReadPermission("GROUP");
-
+        // TODO: @vidakovic check permission GROUP
         final AccountSummaryCollectionData groupAccount = accountDetailsReadPlatformService.retrieveGroupAccountDetails(groupId);
 
         final Set<String> GROUP_ACCOUNTS_DATA_PARAMETERS = new HashSet<>(Arrays.asList("loanAccounts",
@@ -521,6 +518,7 @@ public class GroupsApiResource {
     @Produces("application/vnd.ms-excel")
     public Response getGroupsTemplate(@QueryParam("officeId") final Long officeId, @QueryParam("staffId") final Long staffId,
             @QueryParam("dateFormat") final String dateFormat) {
+        // TODO: @vidakovic check permission all OFFICE, STAFF, CENTER, CLIENT
         return bulkImportWorkbookPopulatorService.getTemplate(GlobalEntityType.GROUPS.toString(), officeId, staffId, dateFormat);
     }
 
@@ -543,7 +541,7 @@ public class GroupsApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveglimAccounts(@PathParam("groupId") final Long groupId,
             @QueryParam("parentLoanAccountNo") final String parentLoanAccountNo, @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission("GROUP");
+        // TODO: @vidakovic check permission GROUP
         List<GLIMContainer> glimContainer = Collections.emptyList();
         if (parentLoanAccountNo == null) {
             glimContainer = (List<GLIMContainer>) glimAccountInfoReadPlatformService.findGlimAccount(groupId);
@@ -568,8 +566,8 @@ public class GroupsApiResource {
             @QueryParam("parentGSIMAccountNo") final String parentGSIMAccountNo, @QueryParam("parentGSIMId") final Long parentGSIMId,
             @Context final UriInfo uriInfo) {
         List<GSIMContainer> gsimContainer;
-        context.authenticatedUser().validateHasReadPermission("GROUP");
 
+        // TODO: @vidakovic check permission GROUP
         if (parentGSIMAccountNo == null && parentGSIMId != null) {
             gsimContainer = gsimReadPlatformService.findGsimAccountContainerbyGsimAccountId(parentGSIMId);
         } else if (parentGSIMAccountNo != null && parentGSIMId == null) {

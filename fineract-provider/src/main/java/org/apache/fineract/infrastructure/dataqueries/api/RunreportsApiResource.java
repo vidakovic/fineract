@@ -45,9 +45,6 @@ import org.apache.fineract.infrastructure.dataqueries.data.ReportExportType;
 import org.apache.fineract.infrastructure.dataqueries.service.ReadReportingService;
 import org.apache.fineract.infrastructure.report.provider.ReportingProcessServiceProvider;
 import org.apache.fineract.infrastructure.report.service.ReportingProcessService;
-import org.apache.fineract.infrastructure.security.exception.NoAuthorizationException;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.useradministration.domain.AppUser;
 import org.glassfish.jersey.internal.util.collection.MultivaluedStringMap;
 import org.springframework.stereotype.Component;
 
@@ -59,7 +56,6 @@ public class RunreportsApiResource {
 
     public static final String IS_SELF_SERVICE_USER_REPORT_PARAMETER = "isSelfServiceUserReport";
 
-    private final PlatformSecurityContext context;
     private final ReadReportingService readExtraDataAndReportingService;
     private final ReportingProcessServiceProvider reportingProcessServiceProvider;
 
@@ -119,7 +115,7 @@ public class RunreportsApiResource {
 
         final boolean parameterType = ApiParameterHelper.parameterType(queryParams);
 
-        checkUserPermissionForReport(reportName, parameterType);
+        // TODO: @vidakovic check permission ALL_FUNCTIONS, ALL_FUNCTIONS_READ, REPORTING_SUPER_USER, READ_ + reportName
 
         // Pass through isSelfServiceUserReport so that ReportingProcessService implementations can use it
         queryParams.putSingle(IS_SELF_SERVICE_USER_REPORT_PARAMETER, Boolean.toString(isSelfServiceUserReport));
@@ -131,16 +127,5 @@ public class RunreportsApiResource {
                     ReportingProcessServiceProvider.SERVICE_MISSING + reportType, reportType);
         }
         return reportingProcessService.processRequest(reportName, queryParams);
-    }
-
-    private void checkUserPermissionForReport(final String reportName, final boolean parameterType) {
-        // Anyone can run a 'report' that is simply getting possible parameter
-        // (dropdown listbox) values.
-        if (!parameterType) {
-            final AppUser currentUser = this.context.authenticatedUser();
-            if (currentUser.hasNotPermissionForReport(reportName)) {
-                throw new NoAuthorizationException("Not authorised to run report: " + reportName);
-            }
-        }
     }
 }

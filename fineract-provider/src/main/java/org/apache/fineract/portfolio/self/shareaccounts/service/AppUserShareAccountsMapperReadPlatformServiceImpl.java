@@ -19,19 +19,21 @@
 
 package org.apache.fineract.portfolio.self.shareaccounts.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
+import org.apache.fineract.portfolio.accounts.exceptions.ShareAccountNotFoundException;
+import org.apache.fineract.useradministration.domain.AppUser;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class AppUserShareAccountsMapperReadPlatformServiceImpl implements AppUserShareAccountsMapperReadPlatformService {
 
     private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public AppUserShareAccountsMapperReadPlatformServiceImpl(final JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    private final PlatformSecurityContext context;
 
     @Override
     public Boolean isShareAccountsMappedToUser(Long accountId, Long appUserId) {
@@ -41,4 +43,12 @@ public class AppUserShareAccountsMapperReadPlatformServiceImpl implements AppUse
                 Boolean.class, accountId, appUserId);
     }
 
+    @Override
+    public void validateAppuserShareAccountsMapping(Long accountId) {
+        AppUser user = context.authenticatedUser();
+        final boolean isMapped = isShareAccountsMappedToUser(accountId, user.getId());
+        if (!isMapped) {
+            throw new ShareAccountNotFoundException(accountId);
+        }
+    }
 }

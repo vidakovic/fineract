@@ -16,9 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.apache.fineract.infrastructure.security.service;
 
-public interface PlatformUserRightsContext {
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.Provider;
+import org.apache.fineract.useradministration.domain.AppUser;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 
-    void isAuthenticated();
+@Provider
+@Component
+public class AppUserContextProvider implements ContextResolver<UserDetails> {
+
+    @Override
+    public AppUser getContext(Class<?> type) {
+        if (!AppUser.class.equals(type)) {
+            return null;
+        }
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (principal instanceof AppUser appUser) {
+            return appUser;
+        }
+
+        return null;
+    }
 }

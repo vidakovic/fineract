@@ -45,7 +45,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/adhocquery")
@@ -60,7 +59,6 @@ public class AdHocApiResource {
     private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList("id", "name", "query", "tableName",
             "tableField", "isActive", "createdBy", "createdOn", "createdById", "updatedById", "updatedOn", "email"));
 
-    private final PlatformSecurityContext context;
     private final AdHocReadPlatformService adHocReadPlatformService;
     private final DefaultToApiJsonSerializer<AdHocData> toApiJsonSerializer;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
@@ -70,8 +68,6 @@ public class AdHocApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveAll(@Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser();
         final Collection<AdHocData> adhocs = this.adHocReadPlatformService.retrieveAllAdHocQuery();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, adhocs, RESPONSE_DATA_PARAMETERS);
@@ -82,7 +78,6 @@ public class AdHocApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     @Path("template")
     public String template(@Context final UriInfo uriInfo) {
-        this.context.authenticatedUser();
         final AdHocData user = this.adHocReadPlatformService.retrieveNewAdHocDetails();
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return this.toApiJsonSerializer.serialize(settings, user, RESPONSE_DATA_PARAMETERS);
@@ -106,9 +101,6 @@ public class AdHocApiResource {
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveAdHocQuery(@PathParam("adHocId") @Parameter(description = "adHocId") final Long adHocId,
             @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser();
-
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         final AdHocData adhoc = this.adHocReadPlatformService.retrieveOne(adHocId);

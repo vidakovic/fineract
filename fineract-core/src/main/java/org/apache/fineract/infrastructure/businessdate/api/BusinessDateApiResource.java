@@ -47,7 +47,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
@@ -57,7 +56,6 @@ import org.springframework.stereotype.Component;
 public class BusinessDateApiResource {
 
     private final ApiRequestParameterHelper parameterHelper;
-    private final PlatformSecurityContext securityContext;
     private final DefaultToApiJsonSerializer<BusinessDateData> jsonSerializer;
     private final BusinessDateReadPlatformService readPlatformService;
     private final PortfolioCommandSourceWritePlatformService commandWritePlatformService;
@@ -69,7 +67,7 @@ public class BusinessDateApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = BusinessDateApiResourceSwagger.BusinessDateResponse.class)))) })
     public String getBusinessDates(@Context final UriInfo uriInfo) {
-        securityContext.authenticatedUser().validateHasReadPermission("BUSINESS_DATE");
+        // TODO: @vidakovic check permission BUSINESS_DATE
         final List<BusinessDateData> foundBusinessDates = this.readPlatformService.findAll();
         ApiRequestJsonSerializationSettings settings = parameterHelper.process(uriInfo.getQueryParameters());
         return this.jsonSerializer.serialize(settings, foundBusinessDates);
@@ -83,7 +81,7 @@ public class BusinessDateApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = BusinessDateApiResourceSwagger.BusinessDateResponse.class))) })
     public String getBusinessDate(@PathParam("type") @Parameter(description = "type") final String type, @Context final UriInfo uriInfo) {
-        securityContext.authenticatedUser().validateHasReadPermission("BUSINESS_DATE");
+        // TODO: @vidakovic check permission BUSINESS_DATE
         final BusinessDateData businessDate = this.readPlatformService.findByType(type);
         ApiRequestJsonSerializationSettings settings = parameterHelper.process(uriInfo.getQueryParameters());
         return this.jsonSerializer.serialize(settings, businessDate);
@@ -97,7 +95,7 @@ public class BusinessDateApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = BusinessDateApiResourceSwagger.BusinessDateResponse.class))) })
     public String updateBusinessDate(final String jsonRequestBody, @Context UriInfo uriInfo) {
-        securityContext.authenticatedUser().validateHasUpdatePermission("BUSINESS_DATE");
+        // TODO: @vidakovic check permission BUSINESS_DATE
         final CommandWrapper commandRequest = new CommandWrapperBuilder().updateBusinessDate().withJson(jsonRequestBody).build();
 
         CommandProcessingResult result = commandWritePlatformService.logCommandSource(commandRequest);

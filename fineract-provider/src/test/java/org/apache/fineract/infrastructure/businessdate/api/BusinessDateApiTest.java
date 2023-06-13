@@ -26,7 +26,6 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import jakarta.servlet.ServletException;
 import jakarta.ws.rs.core.UriInfo;
 import java.io.IOException;
-import java.util.List;
 import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
 import org.apache.fineract.infrastructure.businessdate.data.BusinessDateData;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
@@ -80,59 +79,38 @@ class BusinessDateApiTest {
         given(parameterHelper.process(Mockito.any())).willReturn(apiRequestJsonSerializationSettings);
     }
 
-    @Test
-    void getBusinessDatesAPIHasPermission() throws ServletException, IOException {
-        AppUser appUser = Mockito.mock(AppUser.class);
-        List<BusinessDateData> response = Mockito.mock(List.class);
-        given(readPlatformService.findAll()).willReturn(response);
-        // given
-        Mockito.doNothing().when(appUser).validateHasReadPermission("BUSINESS_DATE");
-        given(securityContext.authenticatedUser()).willReturn(appUser);
-        // when
-        underTest.getBusinessDates(uriInfo);
-        // then
-        verify(readPlatformService, Mockito.times(1)).findAll();
-        verify(jsonSerializer, Mockito.times(1)).serialize(apiRequestJsonSerializationSettings, response);
-    }
-
-    @Test
-    void getBusinessDatesAPIHasNoPermission() throws ServletException, IOException {
-        AppUser appUser = Mockito.mock(AppUser.class);
-        // given
-        Mockito.doThrow(NoAuthorizationException.class).when(appUser).validateHasReadPermission("BUSINESS_DATE");
-        given(securityContext.authenticatedUser()).willReturn(appUser);
-        // when
-        assertThatThrownBy(() -> underTest.getBusinessDates(uriInfo)).isInstanceOf(NoAuthorizationException.class);
-        // then
-        verifyNoInteractions(readPlatformService);
-    }
-
-    @Test
-    void getBusinessDateByTypeAPIHasPermission() throws ServletException, IOException {
-        AppUser appUser = Mockito.mock(AppUser.class);
-        BusinessDateData response = Mockito.mock(BusinessDateData.class);
-        given(readPlatformService.findByType("type")).willReturn(response);
-        // given
-        Mockito.doNothing().when(appUser).validateHasReadPermission("BUSINESS_DATE");
-        given(securityContext.authenticatedUser()).willReturn(appUser);
-        // when
-        underTest.getBusinessDate("type", uriInfo);
-        // then
-        verify(readPlatformService, Mockito.times(1)).findByType("type");
-        verify(jsonSerializer, Mockito.times(1)).serialize(apiRequestJsonSerializationSettings, response);
-    }
-
-    @Test
-    void getBusinessDateByTypeAPIHasNoPermission() throws ServletException, IOException {
-        AppUser appUser = Mockito.mock(AppUser.class);
-        // given
-        Mockito.doThrow(NoAuthorizationException.class).when(appUser).validateHasReadPermission("BUSINESS_DATE");
-        given(securityContext.authenticatedUser()).willReturn(appUser);
-        // when
-        assertThatThrownBy(() -> underTest.getBusinessDate("type", uriInfo)).isInstanceOf(NoAuthorizationException.class);
-        // then
-        verifyNoInteractions(readPlatformService);
-    }
+    // TODO: @vidakovic permissions are not enforced on the business logic level, tests makes no sense anymore
+    /*
+     * @Test void getBusinessDatesAPIHasPermission() throws ServletException, IOException { AppUser appUser =
+     * Mockito.mock(AppUser.class); List<BusinessDateData> response = Mockito.mock(List.class);
+     * given(readPlatformService.findAll()).willReturn(response); // given
+     * Mockito.doNothing().when(appUser).validateHasReadPermission("BUSINESS_DATE");
+     * given(securityContext.authenticatedUser()).willReturn(appUser); // when underTest.getBusinessDates(uriInfo); //
+     * then verify(readPlatformService, Mockito.times(1)).findAll(); verify(jsonSerializer,
+     * Mockito.times(1)).serialize(apiRequestJsonSerializationSettings, response); }
+     *
+     * @Test void getBusinessDatesAPIHasNoPermission() throws ServletException, IOException { AppUser appUser =
+     * Mockito.mock(AppUser.class); // given
+     * Mockito.doThrow(NoAuthorizationException.class).when(appUser).validateHasReadPermission("BUSINESS_DATE");
+     * given(securityContext.authenticatedUser()).willReturn(appUser); // when assertThatThrownBy(() ->
+     * underTest.getBusinessDates(uriInfo)).isInstanceOf(NoAuthorizationException.class); // then
+     * verifyNoInteractions(readPlatformService); }
+     *
+     * @Test void getBusinessDateByTypeAPIHasPermission() throws ServletException, IOException { AppUser appUser =
+     * Mockito.mock(AppUser.class); BusinessDateData response = Mockito.mock(BusinessDateData.class);
+     * given(readPlatformService.findByType("type")).willReturn(response); // given
+     * Mockito.doNothing().when(appUser).validateHasReadPermission("BUSINESS_DATE");
+     * given(securityContext.authenticatedUser()).willReturn(appUser); // when underTest.getBusinessDate("type",
+     * uriInfo); // then verify(readPlatformService, Mockito.times(1)).findByType("type"); verify(jsonSerializer,
+     * Mockito.times(1)).serialize(apiRequestJsonSerializationSettings, response); }
+     *
+     * @Test void getBusinessDateByTypeAPIHasNoPermission() throws ServletException, IOException { AppUser appUser =
+     * Mockito.mock(AppUser.class); // given
+     * Mockito.doThrow(NoAuthorizationException.class).when(appUser).validateHasReadPermission("BUSINESS_DATE");
+     * given(securityContext.authenticatedUser()).willReturn(appUser); // when assertThatThrownBy(() ->
+     * underTest.getBusinessDate("type", uriInfo)).isInstanceOf(NoAuthorizationException.class); // then
+     * verifyNoInteractions(readPlatformService); }
+     */
 
     @Test
     void postBusinessDateAPIHasPermission() throws ServletException, IOException {

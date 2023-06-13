@@ -47,7 +47,6 @@ import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSeria
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.event.external.data.ExternalEventConfigurationData;
 import org.apache.fineract.infrastructure.event.external.service.ExternalEventConfigurationReadPlatformService;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
@@ -58,9 +57,6 @@ public class ExternalEventConfigurationApiResource {
 
     private static final Set<String> RESPONSE_DATA_PARAMETERS = new HashSet<>(Arrays.asList("type", "enabled"));
 
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "EXTERNAL_EVENT_CONFIGURATION";
-
-    private final PlatformSecurityContext context;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final PortfolioCommandSourceWritePlatformService commandWritePlatformService;
     private final DefaultToApiJsonSerializer<ExternalEventConfigurationData> jsonSerializer;
@@ -73,7 +69,7 @@ public class ExternalEventConfigurationApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "List of all external event configurations", content = @Content(schema = @Schema(implementation = ExternalEventConfigurationApiResourceSwagger.GetExternalEventConfigurationsResponse.class))) })
     public String retrieveExternalEventConfiguration(@Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission EXTERNAL_EVENT_CONFIGURATION
         final ExternalEventConfigurationData configurationData = readPlatformService.findAllExternalEventConfigurations();
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return jsonSerializer.serialize(settings, configurationData, RESPONSE_DATA_PARAMETERS);
@@ -87,7 +83,7 @@ public class ExternalEventConfigurationApiResource {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = CommandProcessingResult.class))) })
     public String updateExternalEventConfigurationsDetails(@Parameter(hidden = true) final String apiRequestBodyAsJson) {
-        context.authenticatedUser().validateHasUpdatePermission(RESOURCE_NAME_FOR_PERMISSIONS);
+        // TODO: @vidakovic check permission EXTERNAL_EVENT_CONFIGURATION (update)
         final CommandWrapper commandRequest = new CommandWrapperBuilder() //
                 .updateExternalEventConfigurations() //
                 .withJson(apiRequestBodyAsJson) //

@@ -56,7 +56,6 @@ import org.apache.fineract.infrastructure.dataqueries.data.DatatableData;
 import org.apache.fineract.infrastructure.dataqueries.data.GenericResultsetData;
 import org.apache.fineract.infrastructure.dataqueries.service.GenericDataService;
 import org.apache.fineract.infrastructure.dataqueries.service.ReadWriteNonCoreDataService;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 @Path("/v1/datatables")
@@ -67,7 +66,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DatatablesApiResource {
 
-    private final PlatformSecurityContext context;
     private final GenericDataService genericDataService;
     private final ReadWriteNonCoreDataService readWriteNonCoreDataService;
     private final ToApiJsonSerializer<GenericResultsetData> toApiJsonSerializer;
@@ -217,8 +215,7 @@ public class DatatablesApiResource {
             @QueryParam("valueFilter") @Parameter(description = "valueFilter") final String valueFilter,
             @QueryParam("resultColumns") @Parameter(description = "resultColumns") final String resultColumns,
             @Context final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasDatatableReadPermission(datatable);
-
+        // TODO: @vidakovic check permission `datatable`
         final List<JsonObject> result = this.readWriteNonCoreDataService.queryDataTable(datatable, columnFilter, valueFilter,
                 resultColumns);
 
@@ -241,9 +238,7 @@ public class DatatablesApiResource {
     public String getDatatable(@PathParam("datatable") @Parameter(description = "datatable") final String datatable,
             @PathParam("apptableId") @Parameter(description = "apptableId") final Long apptableId,
             @QueryParam("order") @Parameter(description = "order") final String order, @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasDatatableReadPermission(datatable);
-
+        // TODO: @vidakovic check permission `datatable`
         final GenericResultsetData results = this.readWriteNonCoreDataService.retrieveDataTableGenericResultSet(datatable, apptableId,
                 order, null);
 
@@ -267,9 +262,7 @@ public class DatatablesApiResource {
             @PathParam("datatableId") final Long datatableId, @QueryParam("order") final String order,
             @DefaultValue("false") @QueryParam("genericResultSet") @Parameter(in = ParameterIn.QUERY, name = "genericResultSet", description = "Optional flag to format the response", required = false) final boolean genericResultSet,
             @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasDatatableReadPermission(datatable);
-
+        // TODO: @vidakovic check permission `datatable`
         final GenericResultsetData results = this.readWriteNonCoreDataService.retrieveDataTableGenericResultSet(datatable, apptableId,
                 order, datatableId);
 

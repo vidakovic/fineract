@@ -58,7 +58,6 @@ import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSer
 import org.apache.fineract.infrastructure.core.service.CommandParameterUtil;
 import org.apache.fineract.infrastructure.core.service.DateUtils;
 import org.apache.fineract.infrastructure.core.service.ExternalIdFactory;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.portfolio.loanaccount.data.LoanRepaymentScheduleInstallmentData;
 import org.apache.fineract.portfolio.loanaccount.data.LoanTransactionData;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanTransactionType;
@@ -81,9 +80,6 @@ public class LoanTransactionsApiResource {
     private final Set<String> responseDataParameters = new HashSet<>(Arrays.asList("id", "type", "date", "currency", "amount", "externalId",
             LoanApiConstants.REVERSAL_EXTERNAL_ID_PARAMNAME, LoanApiConstants.REVERSED_ON_DATE_PARAMNAME));
 
-    private final String resourceNameForPermissions = "LOAN";
-
-    private final PlatformSecurityContext context;
     private final LoanReadPlatformService loanReadPlatformService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
     private final DefaultToApiJsonSerializer<LoanTransactionData> toApiJsonSerializer;
@@ -405,7 +401,7 @@ public class LoanTransactionsApiResource {
 
     private String retrieveTransaction(final Long loanId, final String loanExternalIdStr, final Long transactionId,
             final String transactionExternalIdStr, final UriInfo uriInfo) {
-        this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
+        // TODO: @vidakovic check permission LOAN
 
         ExternalId loanExternalId = ExternalIdFactory.produce(loanExternalIdStr);
         ExternalId transactionExternalId = ExternalIdFactory.produce(transactionExternalIdStr);
@@ -477,7 +473,7 @@ public class LoanTransactionsApiResource {
 
     private String retrieveTransactionTemplate(Long loanId, String loanExternalIdStr, String commandParam, UriInfo uriInfo,
             String dateFormat, DateParam transactionDateParam, String locale) {
-        this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermissions);
+        // TODO: @vidakovic check permission LOAN
 
         ExternalId loanExternalId = ExternalIdFactory.produce(loanExternalIdStr);
 

@@ -80,6 +80,7 @@ public class ClientTransactionsApiResource {
     public String retrieveAllClientTransactions(@PathParam("clientId") @Parameter(description = "clientId") final Long clientId,
             @Context final UriInfo uriInfo, @QueryParam("offset") @Parameter(description = "offset") final Integer offset,
             @QueryParam("limit") @Parameter(description = "limit") final Integer limit) {
+        // TODO: @vidakovic check permission CLIENTCHARGE
         context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
 
         return getAllClientTransactions(clientId, uriInfo, offset, limit);
@@ -97,6 +98,7 @@ public class ClientTransactionsApiResource {
             @PathParam("transactionId") @Parameter(description = "transactionId") final Long transactionId,
             @Context final UriInfo uriInfo) {
 
+        // TODO: @vidakovic check permission CLIENTCHARGE
         context.authenticatedUser().validateHasReadPermission(ClientApiConstants.CLIENT_CHARGES_RESOURCE_NAME);
 
         return getClientTransaction(clientId, transactionId, uriInfo);

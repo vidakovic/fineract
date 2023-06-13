@@ -63,7 +63,6 @@ import org.apache.fineract.infrastructure.core.api.ApiRequestParameterHelper;
 import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.organisation.office.data.OfficeData;
 import org.apache.fineract.organisation.office.service.OfficeReadPlatformService;
 import org.apache.fineract.useradministration.domain.AppUser;
@@ -93,7 +92,6 @@ public class AccountingRuleApiResource {
     private final OfficeReadPlatformService officeReadPlatformService;
     private final DefaultToApiJsonSerializer<AccountingRuleData> apiJsonSerializerService;
     private final ApiRequestParameterHelper apiRequestParameterHelper;
-    private final PlatformSecurityContext context;
     private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
     private final CodeValueReadPlatformService codeValueReadPlatformService;
 
@@ -107,8 +105,7 @@ public class AccountingRuleApiResource {
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccountingRuleApiResourceSwagger.GetAccountRulesTemplateResponse.class))) })
     public String retrieveTemplate(@Context final UriInfo uriInfo) {
 
-        this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermission);
-
+        // TODO: @vidakovic check permission ACCOUNTINGRULE
         AccountingRuleData accountingRuleData = null;
         accountingRuleData = handleTemplate(accountingRuleData);
 
@@ -123,12 +120,9 @@ public class AccountingRuleApiResource {
             + "Example Requests:\n" + "\n" + "accountingrules")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(array = @ArraySchema(schema = @Schema(implementation = AccountingRuleApiResourceSwagger.GetAccountRulesResponse.class)))) })
-    public String retrieveAllAccountingRules(@Context final UriInfo uriInfo) {
-
-        final AppUser currentUser = this.context.authenticatedUser();
-        currentUser.validateHasReadPermission(this.resourceNameForPermission);
-
-        final String hierarchy = currentUser.getOffice().getHierarchy();
+    public String retrieveAllAccountingRules(@Context final UriInfo uriInfo, @Context AppUser user) {
+        // TODO: @vidakovic check permission ACCOUNTINGRULE
+        final String hierarchy = user.getOffice().getHierarchy();
         final String hierarchySearchString = hierarchy + "%";
 
         final Set<String> associationParameters = ApiParameterHelper.extractAssociationsForResponseIfProvided(uriInfo.getQueryParameters());
@@ -158,8 +152,7 @@ public class AccountingRuleApiResource {
     public String retreiveAccountingRule(
             @PathParam("accountingRuleId") @Parameter(description = "accountingRuleId") final Long accountingRuleId,
             @Context final UriInfo uriInfo) {
-
-        this.context.authenticatedUser().validateHasReadPermission(this.resourceNameForPermission);
+        // TODO: @vidakovic check permission ACCOUNTINGRULE
         final ApiRequestJsonSerializationSettings settings = this.apiRequestParameterHelper.process(uriInfo.getQueryParameters());
 
         AccountingRuleData accountingRuleData = this.accountingRuleReadPlatformService.retrieveAccountingRuleById(accountingRuleId);

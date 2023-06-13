@@ -49,7 +49,6 @@ import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
 import org.apache.fineract.infrastructure.core.serialization.ApiRequestJsonSerializationSettings;
 import org.apache.fineract.infrastructure.core.serialization.DefaultToApiJsonSerializer;
 import org.apache.fineract.infrastructure.core.serialization.FromJsonHelper;
-import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -62,10 +61,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class EmailCampaignApiResource {
-
-    private static final String RESOURCE_NAME_FOR_PERMISSIONS = "EMAIL_CAMPAIGN";
-
-    private final PlatformSecurityContext context;
 
     private final DefaultToApiJsonSerializer<EmailBusinessRulesData> toApiJsonSerializer;
 
@@ -84,8 +79,7 @@ public class EmailCampaignApiResource {
     @Path("{resourceId}")
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveOneCampaign(@PathParam("resourceId") final Long resourceId, @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission EMAIL_CAMPAIGN
         EmailCampaignData emailCampaignData = emailCampaignReadPlatformService.retrieveOne(resourceId);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return emailCampaignDataDefaultToApiJsonSerializer.serialize(settings, emailCampaignData);
@@ -95,9 +89,7 @@ public class EmailCampaignApiResource {
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
     public String retrieveAllCampaign(@Context final UriInfo uriInfo) {
-
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission EMAIL_CAMPAIGN
         final Collection<EmailCampaignData> emailCampaignDataCollection = emailCampaignReadPlatformService.retrieveAllCampaign();
 
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -159,8 +151,7 @@ public class EmailCampaignApiResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
     public String preview(final String apiRequestBodyAsJson, @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission EMAIL_CAMPAIGN
         PreviewCampaignMessage campaignMessage;
         final JsonElement parsedQuery = fromJsonHelper.parse(apiRequestBodyAsJson);
         final JsonQuery query = JsonQuery.from(apiRequestBodyAsJson, parsedQuery, fromJsonHelper);
@@ -173,8 +164,7 @@ public class EmailCampaignApiResource {
     @GET()
     @Path("template")
     public String template(@Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission EMAIL_CAMPAIGN
         final Collection<EmailBusinessRulesData> emailBusinessRulesDataCollection = emailCampaignReadPlatformService.retrieveAll();
 
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
@@ -184,8 +174,7 @@ public class EmailCampaignApiResource {
     @GET
     @Path("template/{resourceId}")
     public String retrieveOneTemplate(@PathParam("resourceId") final Long resourceId, @Context final UriInfo uriInfo) {
-        context.authenticatedUser().validateHasReadPermission(RESOURCE_NAME_FOR_PERMISSIONS);
-
+        // TODO: @vidakovic check permission EMAIL_CAMPAIGN
         final EmailBusinessRulesData emailBusinessRulesData = emailCampaignReadPlatformService.retrieveOneTemplate(resourceId);
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return toApiJsonSerializer.serialize(settings, emailBusinessRulesData);

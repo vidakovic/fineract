@@ -23,4 +23,5 @@ public interface AppUserShareAccountsMapperReadPlatformService {
 
     Boolean isShareAccountsMappedToUser(Long accountId, Long appUserId);
 
+    void validateAppuserShareAccountsMapping(Long accountId);
 }
