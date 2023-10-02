@@ -25,13 +25,14 @@ import static org.springframework.security.authorization.AuthorityAuthorizationM
 import static org.springframework.security.authorization.AuthorizationManagers.allOf;
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
-import java.util.Collection;
+import java.util.UUID;
+
+import lombok.RequiredArgsConstructor;
 import org.apache.fineract.infrastructure.businessdate.service.BusinessDateReadPlatformService;
 import org.apache.fineract.infrastructure.cache.service.CacheWritePlatformService;
 import org.apache.fineract.infrastructure.configuration.domain.ConfigurationDomainService;
 import org.apache.fineract.infrastructure.core.exceptionmapper.OAuth2ExceptionEntryPoint;
 import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
-import org.apache.fineract.infrastructure.security.data.FineractJwtAuthenticationToken;
 import org.apache.fineract.infrastructure.security.data.PlatformRequestLog;
 import org.apache.fineract.infrastructure.security.filter.InsecureTwoFactorAuthenticationFilter;
 import org.apache.fineract.infrastructure.security.filter.TenantAwareTenantIdentifierFilter;
@@ -39,66 +40,57 @@ import org.apache.fineract.infrastructure.security.filter.TwoFactorAuthenticatio
 import org.apache.fineract.infrastructure.security.service.BasicAuthTenantDetailsService;
 import org.apache.fineract.infrastructure.security.service.TenantAwareJpaPlatformUserDetailsService;
 import org.apache.fineract.infrastructure.security.service.TwoFactorService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.OAuth2Error;
-import org.springframework.security.oauth2.core.OAuth2ErrorCodes;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.core.*;
+import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.SecurityContextHolderFilter;
 
+@RequiredArgsConstructor
 @Configuration
 @ConditionalOnProperty("fineract.security.oauth.enabled")
 @EnableMethodSecurity
 public class OAuth2SecurityConfig {
 
-    @Autowired
-    private TenantAwareJpaPlatformUserDetailsService userDetailsService;
+    private final TenantAwareJpaPlatformUserDetailsService userDetailsService;
 
-    @Autowired
-    private ServerProperties serverProperties;
+    private final ServerProperties serverProperties;
 
-    @Autowired
-    private FineractProperties fineractProperties;
+    private final FineractProperties fineractProperties;
 
-    @Autowired
-    private BasicAuthTenantDetailsService basicAuthTenantDetailsService;
+    private final BasicAuthTenantDetailsService basicAuthTenantDetailsService;
 
-    @Autowired
-    private ToApiJsonSerializer<PlatformRequestLog> toApiJsonSerializer;
+    private final ToApiJsonSerializer<PlatformRequestLog> toApiJsonSerializer;
 
-    @Autowired
-    private ConfigurationDomainService configurationDomainService;
+    private final ConfigurationDomainService configurationDomainService;
 
-    @Autowired
-    private CacheWritePlatformService cacheWritePlatformService;
+    private final CacheWritePlatformService cacheWritePlatformService;
 
-    @Autowired
-    private BusinessDateReadPlatformService businessDateReadPlatformService;
-    @Autowired
-    private ApplicationContext applicationContext;
+    private final BusinessDateReadPlatformService businessDateReadPlatformService;
 
-    private static final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+    private final ApplicationContext applicationContext;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
+
         http //
                 .securityMatcher(antMatcher("/api/**")).authorizeHttpRequests((auth) -> {
                     auth.requestMatchers(antMatcher(HttpMethod.OPTIONS, "/api/**")).permitAll() //
@@ -113,10 +105,11 @@ public class OAuth2SecurityConfig {
                             .access(allOf(fullyAuthenticated(), hasAuthority("TWOFACTOR_AUTHENTICATED"), selfServiceUserAuthManager())); //
                 }).csrf((csrf) -> csrf.disable()) // NOSONAR only creating a service that is used by non-browser clients
                 .exceptionHandling((ehc) -> ehc.authenticationEntryPoint(new OAuth2ExceptionEntryPoint()))
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(authenticationConverter()))
-                        .authenticationEntryPoint(new OAuth2ExceptionEntryPoint())) //
                 .sessionManagement((smc) -> smc.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) //
                 .addFilterAfter(tenantAwareTenantIdentifierFilter(), SecurityContextHolderFilter.class);
+
+        http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(Customizer.withDefaults());
+        http.formLogin(Customizer.withDefaults());
 
         if (fineractProperties.getSecurity().getTwoFactor().isEnabled()) {
             http.addFilterAfter(twoFactorAuthenticationFilter(), BasicAuthenticationFilter.class);
@@ -131,35 +124,42 @@ public class OAuth2SecurityConfig {
         return http.build();
     }
 
-    public TenantAwareTenantIdentifierFilter tenantAwareTenantIdentifierFilter() {
-        return new TenantAwareTenantIdentifierFilter(basicAuthTenantDetailsService, toApiJsonSerializer, configurationDomainService,
-                cacheWritePlatformService, businessDateReadPlatformService);
-    }
-
-    public TwoFactorAuthenticationFilter twoFactorAuthenticationFilter() {
-        TwoFactorService twoFactorService = applicationContext.getBean(TwoFactorService.class);
-        return new TwoFactorAuthenticationFilter(twoFactorService);
-    }
-
-    public InsecureTwoFactorAuthenticationFilter insecureTwoFactorAuthenticationFilter() {
-        return new InsecureTwoFactorAuthenticationFilter();
-    }
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-    private Converter<Jwt, FineractJwtAuthenticationToken> authenticationConverter() {
-        return jwt -> {
-            try {
-                UserDetails user = userDetailsService.loadUserByUsername(jwt.getSubject());
-                jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
-                Collection<GrantedAuthority> authorities = jwtGrantedAuthoritiesConverter.convert(jwt);
-                return new FineractJwtAuthenticationToken(jwt, authorities, user);
-            } catch (UsernameNotFoundException ex) {
-                throw new OAuth2AuthenticationException(new OAuth2Error(OAuth2ErrorCodes.INVALID_TOKEN), ex);
-            }
-        };
+    @Bean
+    public RegisteredClientRepository registeredClientRepository() {
+        // TODO: store this information in tenant database
+        RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
+            .clientId("fineract")
+            .clientSecret("{noop}fineract")
+            .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+            .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+            .authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+            .redirectUri("http://127.0.0.1:8080/login/oauth2/code/users-client-oidc")
+            .redirectUri("http://127.0.0.1:8080/authorized")
+            .scope(OidcScopes.OPENID)
+            .scope(OidcScopes.PROFILE)
+            .scope("read")
+            //.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+            .build();
+
+        return new InMemoryRegisteredClientRepository(registeredClient);
+    }
+
+    private TenantAwareTenantIdentifierFilter tenantAwareTenantIdentifierFilter() {
+        return new TenantAwareTenantIdentifierFilter(basicAuthTenantDetailsService, toApiJsonSerializer, configurationDomainService,
+            cacheWritePlatformService, businessDateReadPlatformService);
+    }
+
+    private TwoFactorAuthenticationFilter twoFactorAuthenticationFilter() {
+        TwoFactorService twoFactorService = applicationContext.getBean(TwoFactorService.class);
+        return new TwoFactorAuthenticationFilter(twoFactorService);
+    }
+
+    private InsecureTwoFactorAuthenticationFilter insecureTwoFactorAuthenticationFilter() {
+        return new InsecureTwoFactorAuthenticationFilter();
     }
 }
