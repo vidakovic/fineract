@@ -18,30 +18,40 @@
  */
 package org.apache.fineract.portfolio.address.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import org.apache.fineract.infrastructure.core.domain.AbstractPersistableCustom;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import java.io.Serial;
+import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.FieldNameConstants;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-@Entity
-@Table(name = "m_field_configuration")
-public class FieldConfiguration extends AbstractPersistableCustom {
+@Builder
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldNameConstants
+@Table("m_field_configuration")
+public class FieldConfiguration implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 9181640245194392646L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column("id")
+    private Long id;
+    @Column("entity")
     private String entity;
-
+    @Column("table")
     private String table;
-
+    @Column("field")
     private String field;
-
-    private boolean isEnabled;
-
-    public FieldConfiguration() {
-
-    }
-
-    public FieldConfiguration(final String entity, final String table, final String field, final boolean is_enabled) {
-        this.entity = entity;
-        this.table = table;
-        this.field = field;
-        this.isEnabled = is_enabled;
-    }
+    @Column("enabled")
+    private boolean enabled;
 }

@@ -47,6 +47,8 @@ dependencies {
             'org.springframework.boot:spring-boot-starter-oauth2-resource-server',
             'org.springframework.boot:spring-boot-starter-actuator',
             'org.springframework.boot:spring-boot-starter-batch',
+            'org.springframework.boot:spring-boot-starter-data-jdbc',
+            'com.infobip:infobip-spring-data-jdbc-querydsl-boot-starter',
             'org.springframework.batch:spring-batch-integration',
             'org.springframework.boot:spring-boot-starter-integration',
             'org.springframework.integration:spring-integration-event',
@@ -105,6 +107,9 @@ dependencies {
             'org.mapstruct:mapstruct',
 
             'io.github.resilience4j:resilience4j-spring-boot3',
+
+            'com.infobip:infobip-spring-data-jdbc-querydsl',
+            'com.querydsl:querydsl-sql-spring',
             )
 
     implementation ('software.amazon.msk:aws-msk-iam-auth:2.0.3') {
@@ -185,6 +190,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor 'org.mapstruct:mapstruct-processor'
+    annotationProcessor 'com.infobip:infobip-spring-data-jdbc-annotation-processor'
 
     implementation 'ch.qos.logback.contrib:logback-json-classic'
     implementation 'ch.qos.logback.contrib:logback-jackson'

@@ -18,10 +18,11 @@
  */
 package org.apache.fineract.portfolio.address.domain;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import com.infobip.spring.data.jdbc.QuerydslJdbcFragment;
+import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.QueryByExampleExecutor;
 
 public interface FieldConfigurationRepository
-        extends JpaRepository<FieldConfiguration, Long>, JpaSpecificationExecutor<FieldConfiguration> {
-
-}
+        extends ListCrudRepository<FieldConfiguration, Long>, PagingAndSortingRepository<FieldConfiguration, Long>,
+        QueryByExampleExecutor<FieldConfiguration>, QuerydslJdbcFragment<FieldConfiguration> {}

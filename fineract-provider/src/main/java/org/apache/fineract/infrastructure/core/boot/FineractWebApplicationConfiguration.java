@@ -18,6 +18,7 @@
  */
 package org.apache.fineract.infrastructure.core.boot;
 
+import com.infobip.spring.data.jdbc.QuerydslJdbcRepositoryFactoryBean;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.fineract.infrastructure.core.condition.FineractWebApplicationCondition;
 import org.apache.fineract.infrastructure.core.config.FineractProperties;
@@ -34,6 +35,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -47,6 +49,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         DataSourceTransactionManagerAutoConfiguration.class, GsonAutoConfiguration.class, JdbcTemplateAutoConfiguration.class,
         LiquibaseAutoConfiguration.class })
 @EnableTransactionManagement
+@EnableJdbcRepositories(basePackages = "org.apache.fineract.portfolio.address", repositoryFactoryBeanClass = QuerydslJdbcRepositoryFactoryBean.class)
 @EnableWebSecurity
 @EnableConfigurationProperties({ FineractProperties.class, LiquibaseProperties.class })
 @ComponentScan(basePackages = "org.apache.fineract.**")

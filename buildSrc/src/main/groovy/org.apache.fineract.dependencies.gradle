@@ -37,6 +37,7 @@ dependencyManagement {
         mavenBom 'org.mockito:mockito-bom:5.10.0'
         mavenBom 'software.amazon.awssdk:bom:2.23.18'
         mavenBom 'io.github.resilience4j:resilience4j-bom:2.2.0'
+        mavenBom 'com.querydsl:querydsl-bom:5.1.0'
     }
 
     dependencies {
@@ -241,5 +242,14 @@ dependencyManagement {
         dependency 'org.apache.commons:commons-math3:3.6.1'
 
         dependency 'org.mockito:mockito-inline:5.2.0'
+
+        dependency "com.infobip:infobip-spring-data-jdbc-querydsl:9.0.2"
+        dependency "com.infobip:infobip-spring-data-jdbc-querydsl-boot-starter:9.0.2"
+        dependency "com.infobip:infobip-spring-data-jpa-querydsl:9.0.2"
+        dependency "com.infobip:infobip-spring-data-jpa-querydsl-boot-starter:9.0.2"
+        dependency "com.infobip:infobip-spring-data-r2dbc-querydsl:9.0.2"
+        dependency "com.infobip:infobip-spring-data-r2dbc-querydsl-boot-starter:9.0.2"
+        dependency "com.infobip:infobip-spring-data-jdbc-annotation-processor-common:9.0.2"
+        dependency "com.infobip:infobip-spring-data-jdbc-annotation-processor:9.0.2"
     }
 }
