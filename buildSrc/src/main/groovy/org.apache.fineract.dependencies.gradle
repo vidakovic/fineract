@@ -37,6 +37,8 @@ dependencyManagement {
         mavenBom 'org.mockito:mockito-bom:5.10.0'
         mavenBom 'software.amazon.awssdk:bom:2.23.18'
         mavenBom 'io.github.resilience4j:resilience4j-bom:2.2.0'
+        mavenBom 'org.apache.camel:camel-bom:4.6.0'
+        mavenBom 'org.apache.camel.springboot:camel-spring-boot-bom:4.6.0'
     }
 
     dependencies {
@@ -241,5 +243,14 @@ dependencyManagement {
         dependency 'org.apache.commons:commons-math3:3.6.1'
 
         dependency 'org.mockito:mockito-inline:5.2.0'
+
+        dependency 'net.sf.jasperreports:jasperreports:6.21.3'
+        dependency 'net.sf.jasperreports:jasperreports-functions:6.21.3'
+        dependency 'net.sf.jasperreports:jasperreports-chart-themes:6.21.3'
+        dependency 'net.sf.jasperreports:jasperreports-chart-customizers:6.21.3'
+        dependency 'net.sf.jasperreports:jasperreports-custom-visualization:6.21.3'
+        dependency 'net.sf.jasperreports:jasperreports-annotation-processors:6.21.3'
+        dependency 'net.sf.jasperreports:jasperreports-metadata:6.21.3'
+        dependency 'net.sourceforge.dynamicreports:dynamicreports-core:6.21.3'
     }
 }

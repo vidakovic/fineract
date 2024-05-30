@@ -16,15 +16,39 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+import com.bmuschko.gradle.docker.tasks.image.DockerBuildImage
+import com.bmuschko.gradle.docker.tasks.image.DockerPushImage
+
 description = 'Fineract Custom Docker Image'
 
 apply plugin: 'java'
 apply plugin: 'com.google.cloud.tools.jib'
+apply plugin: 'com.bmuschko.docker-remote-api'
 apply from: "${rootDir}/buildSrc/src/main/groovy/org.apache.fineract.dependencies.gradle"
+
+tasks.create("dockerCreateDockerfile", Dockerfile) {
+    from("azul/zulu-openjdk-alpine:21.0.3-jre")
+    label(["maintainer": "Aleksandar Vidakovic <aleks@apache.org>"])
+    instruction 'RUN apk add --no-cache msttcorefonts-installer fontconfig'
+    instruction 'RUN update-ms-fonts'
+}
+
+task dockerBuildImage(type: DockerBuildImage) {
+    images.add('monkeysintown/fineract-base:latest')
+
+    dependsOn dockerCreateDockerfile
+}
+
+task dockerPushImage(type: DockerPushImage) {
+    images.add('monkeysintown/fineract-base:latest')
+
+    dependsOn dockerBuildImage
+}
 
 jib {
     from {
-        image = 'azul/zulu-openjdk-alpine:17'
+        image = 'monkeysintown/fineract-base:latest'
         platforms {
             platform {
                 architecture = System.getProperty("os.arch").equals("aarch64")?"arm64":"amd64"
@@ -34,7 +58,7 @@ jib {
     }
 
     to {
-        image = 'fineract-custom'
+        image = 'monkeysintown/fineract-apachecon-2024'
         tags = [
             "${project.version}",
             'latest'
@@ -60,6 +84,12 @@ jib {
     dependencies {
         implementation project(':fineract-core')
         implementation project(':fineract-provider')
+        implementation project(':fineract-accounting')
+        implementation project(':fineract-branch')
+        implementation project(':fineract-document')
+        implementation project(':fineract-investor')
+        implementation project(':fineract-loan')
+        implementation project(':fineract-savings')
         // NOTE: dynamically load all custom modules
         file("${rootDir}/custom").eachDir { companyDir ->
             if('build' != companyDir.name && 'docker' != companyDir.name) {

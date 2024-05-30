@@ -53,6 +53,7 @@ import org.apache.fineract.portfolio.group.exception.GroupNotActiveException;
 import org.apache.fineract.portfolio.loanaccount.domain.Loan;
 import org.apache.fineract.portfolio.loanaccount.domain.LoanRepositoryWrapper;
 import org.apache.fineract.portfolio.loanaccount.service.LoanWritePlatformService;
+import org.apache.fineract.portfolio.note.data.NoteDetailData;
 import org.apache.fineract.portfolio.note.service.NoteWritePlatformService;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccount;
 import org.apache.fineract.portfolio.savings.domain.SavingsAccountRepositoryWrapper;
@@ -459,7 +460,13 @@ public class TransferWritePlatformServiceJpaRepositoryImpl implements TransferWr
                 client.updateProposedTransferDate(null);
         }
 
-        this.noteWritePlatformService.createAndPersistClientNote(client, jsonCommand);
+        var noteDetail = new NoteDetailData();
+        noteDetail.setType("CLIENT");
+        noteDetail.setResourceId(client.getId());
+        noteDetail.setNote(jsonCommand.stringValueOfParameterNamed("note"));
+
+        this.noteWritePlatformService.createNote(noteDetail);
+
         this.clientTransferDetailsRepositoryWrapper
                 .save(ClientTransferDetails.instance(client.getId(), client.getOffice().getId(), destinationOffice.getId(), transferDate,
                         transferEventType.getValue(), DateUtils.getBusinessLocalDate(), this.context.authenticatedUser().getId()));

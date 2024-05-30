@@ -56,10 +56,12 @@ import org.apache.fineract.infrastructure.hooks.event.HookEvent;
 import org.apache.fineract.infrastructure.hooks.event.HookEventSource;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
 import org.apache.fineract.useradministration.domain.AppUser;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 @Service
+@ConditionalOnMissingBean(CommandProcessingService.class)
 @Slf4j
 @RequiredArgsConstructor
 public class SynchronousCommandProcessingService implements CommandProcessingService {
