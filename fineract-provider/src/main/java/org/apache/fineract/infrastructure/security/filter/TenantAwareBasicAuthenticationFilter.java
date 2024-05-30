@@ -138,8 +138,11 @@ public class TenantAwareBasicAuthenticationFilter extends BasicAuthenticationFil
                     }
 
                     if (!FIRST_REQUEST_PROCESSED) {
-                        final String baseUrl = request.getRequestURL().toString().replace(request.getPathInfo(), "/");
-                        System.setProperty("baseUrl", baseUrl);
+                        // TODO(apachecon): this should be covered by configuration:
+                        // baseUrl=https://localhost:8443${FINERACT_SERVER_SERVLET_CONTEXT_PATH:/fineract-provider}
+                        //
+                        // final var baseUrl = request.getRequestURL().toString().replace(request.getPathInfo(), "/");
+                        // System.setProperty("baseUrl", baseUrl);
 
                         final boolean ehcacheEnabled = configurationDomainService.isEhcacheEnabled();
                         if (ehcacheEnabled) {

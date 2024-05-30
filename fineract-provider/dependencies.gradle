@@ -97,6 +97,8 @@ dependencies {
 
             'com.github.spotbugs:spotbugs-annotations',
             'io.swagger.core.v3:swagger-annotations-jakarta',
+            'io.swagger.core.v3:swagger-jaxrs2-jakarta',
+            'io.swagger.core.v3:swagger-core-jakarta',
 
             'com.google.cloud.sql:mysql-socket-factory-connector-j-8',
             'com.squareup.retrofit2:converter-gson',
@@ -112,8 +114,6 @@ dependencies {
     implementation ('software.amazon.msk:aws-msk-iam-auth:2.0.3') {
         exclude group: 'commons-logging'
     }
-
-    implementation 'io.swagger.core.v3:swagger-jaxrs2-jakarta:2.2.19'
 
     implementation ('org.apache.commons:commons-email') {
         exclude group: 'com.sun.mail', module: 'javax.mail'
