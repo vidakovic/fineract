@@ -16,11 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.fineract.mix.service;
+package org.apache.fineract.mix.command;
 
-import org.apache.fineract.mix.data.MixTaxonomyMappingResponse;
+import java.io.Serial;
+import java.io.Serializable;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.apache.fineract.command.core.Command;
+import org.apache.fineract.mix.data.MixTaxonomyMappingRequest;
 
-public interface MixTaxonomyMappingReadPlatformService {
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class MixTaxonomyCommand extends Command<MixTaxonomyMappingRequest> implements Serializable {
 
-    MixTaxonomyMappingResponse retrieveTaxonomyMapping();
+    @Serial
+    private static final long serialVersionUID = 1L;
+
+    private Long mappingId;
+
 }

@@ -19,9 +19,10 @@
 package org.apache.fineract.mix.service;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.fineract.infrastructure.core.api.JsonCommand;
-import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.apache.fineract.infrastructure.core.data.CommandProcessingResultBuilder;
+import org.apache.fineract.command.core.Command;
+import org.apache.fineract.mix.command.MixTaxonomyCommand;
+import org.apache.fineract.mix.data.MixTaxonomyMappingRequest;
+import org.apache.fineract.mix.data.MixTaxonomyMappingResponse;
 import org.apache.fineract.mix.domain.MixTaxonomyMapping;
 import org.apache.fineract.mix.domain.MixTaxonomyMappingRepository;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -35,21 +36,27 @@ public class MixTaxonomyMappingWritePlatformServiceImpl implements MixTaxonomyMa
 
     @Transactional
     @Override
-    public CommandProcessingResult updateMapping(final Long mappingId, final JsonCommand command) {
-        try {
-            MixTaxonomyMapping mapping = this.mappingRepository.findById(mappingId).orElse(null);
-            if (mapping == null) {
-                mapping = MixTaxonomyMapping.fromJson(command);
-            } else {
-                mapping.update(command);
+    public MixTaxonomyMappingResponse updateMapping(Command<MixTaxonomyMappingRequest> command) {
+        if (command instanceof MixTaxonomyCommand) {
+            Long mappingId = ((MixTaxonomyCommand) command).getMappingId();
+
+            try {
+                MixTaxonomyMapping mapping = this.mappingRepository.findById(mappingId).orElse(null);
+                if (mapping == null) {
+                    mapping = new MixTaxonomyMapping();
+                }
+                mapping.setIdentifier(command.getPayload().getIdentifier());
+                mapping.setConfig(command.getPayload().getConfig());
+                mapping.setCurrency(command.getPayload().getCurrency());
+
+                MixTaxonomyMapping result = this.mappingRepository.saveAndFlush(mapping);
+
+                return new MixTaxonomyMappingResponse(result.getIdentifier(), result.getConfig());
+            } catch (final JpaSystemException | DataIntegrityViolationException dve) {
+                return new MixTaxonomyMappingResponse();
             }
-
-            this.mappingRepository.saveAndFlush(mapping);
-
-            return new CommandProcessingResultBuilder().withCommandId(command.commandId()).withEntityId(mapping.getId()).build();
-
-        } catch (final JpaSystemException | DataIntegrityViolationException dve) {
-            return CommandProcessingResult.empty();
+        } else {
+            return new MixTaxonomyMappingResponse();
         }
     }
 }

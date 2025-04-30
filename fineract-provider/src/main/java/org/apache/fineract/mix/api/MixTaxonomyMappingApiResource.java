@@ -25,15 +25,17 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.util.UUID;
+import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
-import org.apache.fineract.commands.domain.CommandWrapper;
-import org.apache.fineract.commands.service.CommandWrapperBuilder;
-import org.apache.fineract.commands.service.PortfolioCommandSourceWritePlatformService;
-import org.apache.fineract.infrastructure.core.data.CommandProcessingResult;
-import org.apache.fineract.infrastructure.core.serialization.ToApiJsonSerializer;
+import org.apache.fineract.command.core.CommandPipeline;
+import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
-import org.apache.fineract.mix.data.MixTaxonomyMappingData;
-import org.apache.fineract.mix.data.MixTaxonomyRequest;
+import org.apache.fineract.mix.command.MixTaxonomyCommand;
+import org.apache.fineract.mix.data.MixTaxonomyMappingRequest;
+import org.apache.fineract.mix.data.MixTaxonomyMappingResponse;
 import org.apache.fineract.mix.service.MixTaxonomyMappingReadPlatformService;
 import org.springframework.stereotype.Component;
 
@@ -44,30 +46,36 @@ import org.springframework.stereotype.Component;
 public class MixTaxonomyMappingApiResource {
 
     private final PlatformSecurityContext context;
-    private final ToApiJsonSerializer<MixTaxonomyMappingData> toApiJsonSerializer;
     private final MixTaxonomyMappingReadPlatformService readTaxonomyMappingService;
-    private final PortfolioCommandSourceWritePlatformService commandsSourceWritePlatformService;
+    private final CommandPipeline pipeline;
 
     @GET
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public MixTaxonomyMappingData retrieveTaxonomyMapping() {
+    public MixTaxonomyMappingResponse retrieveTaxonomyMapping() {
         this.context.authenticatedUser();
         return this.readTaxonomyMappingService.retrieveTaxonomyMapping();
     }
 
+    // TODO support multiple configuration file loading ?
     @PUT
     @Consumes({ MediaType.APPLICATION_JSON })
     @Produces({ MediaType.APPLICATION_JSON })
-    public String updateTaxonomyMapping(final MixTaxonomyRequest mixTaxonomyRequest) {
-        // TODO support multiple configuration file loading
+    public MixTaxonomyMappingResponse updateTaxonomyMapping(final MixTaxonomyMappingRequest mixTaxonomyMappingRequest) {
+
         final Long mappingId = (long) 1;
-        final CommandWrapper commandRequest = new CommandWrapperBuilder().updateTaxonomyMapping(mappingId)
-                .withJson(toApiJsonSerializer.serialize(mixTaxonomyRequest)).build();
+        var command = new MixTaxonomyCommand();
 
-        final CommandProcessingResult result = this.commandsSourceWritePlatformService.logCommandSource(commandRequest);
+        String tenantIdentifier = ThreadLocalContextUtil.getTenant().getTenantIdentifier();
+        command.setId(UUID.randomUUID());
+        command.setCreatedAt(OffsetDateTime.now(ZoneId.of("UTC")));
 
-        return this.toApiJsonSerializer.serialize(result);
+        command.setMappingId(mappingId);
+        command.setTenantId(tenantIdentifier);
+        command.setPayload(mixTaxonomyMappingRequest);
+
+        Supplier<MixTaxonomyMappingResponse> result = pipeline.send(command);
+        return result.get();
     }
 
 }
