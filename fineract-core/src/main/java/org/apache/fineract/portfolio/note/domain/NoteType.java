@@ -20,8 +20,10 @@ package org.apache.fineract.portfolio.note.domain;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.fineract.infrastructure.core.data.EnumOptionData;
+import org.apache.fineract.portfolio.note.exception.NoteResourceNotSupportedException;
 
 public enum NoteType {
 
@@ -72,7 +74,11 @@ public enum NoteType {
     }
 
     public static NoteType fromApiUrl(final String url) {
-        return BY_API.get(url);
+        try {
+            return Objects.requireNonNull(BY_API.get(url));
+        } catch (NullPointerException e) {
+            throw new NoteResourceNotSupportedException(url);
+        }
     }
 
     public static EnumOptionData toEnumOptionData(final Integer id) {

@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 /**
  * Created by Chirag Gupta on 12/29/17.
  */
+@Deprecated(forRemoval = true)
 public final class NotesApiResourceSwagger {
 
     private NotesApiResourceSwagger() {}
