@@ -30,6 +30,7 @@ dependencies {
     implementation(project(path: ':fineract-command-audit'))
     implementation(project(path: ':fineract-command-jdbc'))
     implementation(project(path: ':fineract-command-idempotency'))
+    implementation(project(path: ':fineract-command-makerchecker'))
     implementation(project(path: ':fineract-validation'))
     implementation(project(path: ':fineract-accounting'))
     implementation(project(path: ':fineract-investor'))
@@ -46,6 +47,7 @@ dependencies {
     implementation(project(path: ':fineract-security'))
     implementation(project(path: ':fineract-working-capital-loan'))
     implementation(project(path: ':fineract-mix'))
+    implementation(project(path: ':fineract-makerchecker'))
 
     providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
 

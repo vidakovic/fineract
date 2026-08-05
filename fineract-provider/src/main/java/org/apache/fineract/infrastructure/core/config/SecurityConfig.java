@@ -406,6 +406,13 @@ public class SecurityConfig {
                     .hasAnyAuthority(ALL_FUNCTIONS, ALL_FUNCTIONS_WRITE, "UPDATE_TEMPLATE")
                     .requestMatchers(API_MATCHER.matcher(HttpMethod.DELETE, "/api/*/templates/*"))
                     .hasAnyAuthority(ALL_FUNCTIONS, ALL_FUNCTIONS_WRITE, "DELETE_TEMPLATE")
+                    // maker-checker
+                    .requestMatchers(API_MATCHER.matcher(HttpMethod.GET, "/api/*/makerchecker/*"))
+                    .hasAnyAuthority(ALL_FUNCTIONS, ALL_FUNCTIONS_READ, "READ_MAKERCHECKER")
+                    .requestMatchers(API_MATCHER.matcher(HttpMethod.POST, "/api/*/makerchecker/*"))
+                    .hasAnyAuthority(ALL_FUNCTIONS, ALL_FUNCTIONS_WRITE, "APPROVE_MAKERCHECKER")
+                    .requestMatchers(API_MATCHER.matcher(HttpMethod.POST, "/api/*/makerchecker/*"))
+                    .hasAnyAuthority(ALL_FUNCTIONS, ALL_FUNCTIONS_WRITE, "REJECT_MAKERCHECKER")
 
                     .requestMatchers(API_MATCHER.matcher(HttpMethod.DELETE, "/api/*/loan-collateral-management/*"))
                     .hasAnyAuthority(ALL_FUNCTIONS, ALL_FUNCTIONS_WRITE, "DELETE_LOAN_COLLATERAL_PRODUCT")

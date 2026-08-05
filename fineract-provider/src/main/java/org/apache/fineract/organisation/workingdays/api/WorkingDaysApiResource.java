@@ -27,7 +27,6 @@ import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import java.time.Instant;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.apache.fineract.command.core.CommandDispatcher;
@@ -72,8 +71,6 @@ public class WorkingDaysApiResource {
 
         final var command = new WorkingDaysUpdateCommand();
 
-        command.setCommandId(System.currentTimeMillis());
-        command.setCreatedAt(Instant.now());
         command.setPayload(request);
 
         final Supplier<WorkingDaysUpdateResponse> response = dispatcher.dispatch(command);
