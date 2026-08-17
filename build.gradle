@@ -1,4 +1,4 @@
-    /**
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -130,6 +130,10 @@ plugins {
     id 'me.champeau.jmh' version '0.7.3' apply false
     id 'org.cyclonedx.bom' version '3.2.4' apply false
     id 'com.docktape.swagger-brake' version '2.7.0' apply false
+    id 'io.github.usekylis.java-architecture-metrics' version '0.1.1' apply false
+    id 'media.barney.crap-java' version '0.6.2' apply false
+    id 'com.ebay.graph-analytics' version '1.2.0' apply false
+
 }
 
 apply from: "${rootDir}/buildSrc/src/main/groovy/org.apache.fineract.release.gradle"
@@ -393,6 +397,7 @@ configure(project.fineractJavaProjects) {
 
     apply plugin: 'java'
     apply plugin: 'idea'
+    apply plugin: 'com.ebay.graph-analytics'
 
     java {
         toolchain {
@@ -435,6 +440,8 @@ configure(project.fineractJavaProjects) {
     apply plugin: 'jacoco'
     apply plugin: 'com.github.spotbugs'
     apply plugin: 'com.github.andygoossens.modernizer'
+    apply plugin: 'io.github.usekylis.java-architecture-metrics'
+    apply plugin: 'media.barney.crap-java'
     apply from: "${rootDir}/buildSrc/src/main/groovy/org.apache.fineract.dependencies.gradle"
 
     group = 'org.apache.fineract'
@@ -577,6 +584,7 @@ configure(project.fineractJavaProjects) {
             xml.required = true
             html.outputLocation = layout.buildDirectory.dir('code-coverage')
         }
+        // dependsOn('resolve')
     }
 
     // Configuration for the errorprone plugin
